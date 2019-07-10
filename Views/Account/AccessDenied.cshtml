@@ -1,0 +1,29 @@
+﻿@{ 
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html class="no-js" lang="">
+<head>
+    @await Html.PartialAsync("HeaderPartial")
+    <title>Z Tourist - Access Denied</title>
+</head>
+<body class="tg-404errorpage">
+    <main id="tg-main" class="tg-main tg-haslayout">
+        <div class="tg-404error" style="padding: 20% 0;">
+            <div class="container">
+                <div class="row">
+                    <div class="tg-404errorcontent">
+                        <h1>Access Denied</h1>
+                        <h2>Page not Found</h2>
+                        <div class="tg-description">
+                            <p>Sorry but the page that you requested is not allowed to access...</p>
+                        </div>
+                        <a class="tg-btn" asp-controller="Home" asp-action=""><span>go back to home</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

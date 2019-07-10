@@ -1,0 +1,87 @@
+﻿@model TourViewModel
+<style>
+    .bootstrap-select > .dropdown-toggle.bs-placeholder, .bootstrap-select > .dropdown-toggle.bs-placeholder:hover, .bootstrap-select > .dropdown-toggle.bs-placeholder:focus, .bootstrap-select > .dropdown-toggle.bs-placeholder:active {
+        color: #676767;
+    }
+</style>
+<!--************************************
+                    Home Slider Start
+    *************************************-->
+@if (Model.Tours != null && Model.Tours.Count() > 0)
+{
+    <div id="tg-homebannerslider" class="tg-homebannerslider tg-haslayout">
+        <div id="tg-homeslider" class="tg-homeslider tg-homeslidervtwo owl-carousel tg-haslayout">
+            @foreach (Tour tour in Model.Tours)
+            {
+                <figure class="item" data-vide-bg="poster: @Url.Content("~/" + tour.Image)" data-vide-options="position: 0% 50%">
+                    <figcaption>
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-7">
+                                    <div class="tg-slidercontent">
+                                        <h1>
+                                            Planning a Trip to @tour.Destinations?.LastOrDefault()?.Name?
+                                        </h1>
+                                        <h2>You Choose the Adventure We make it happen</h2>
+                                        <a class="tg-btn" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id"><span>Explore Tour</span></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </figcaption>
+                </figure>
+            }
+        </div>
+        <div class="tg-findtour">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <form class="tg-formtheme tg-formtrip" asp-controller="Tour" asp-action="Search" method="get">
+                            <fieldset>
+                                <div class="form-group">
+                                    <div class="tg-select">
+                                        <select class="selectpicker" asp-for="Destination" asp-items="@Model.DestinationItems" data-live-search="true" data-width="100%">
+                                            <option value="" selected>Destination</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="input-group date" id="datetimepicker1">
+                                        <input class="form-control" title="From Date" type="text" asp-for="FromDate" style="height: 50.5px; font-size: 14px" placeholder="From Date" />
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="tg-select">
+                                        <select class="selectpicker" asp-for="Duration" asp-items="@Model.DurationItems" data-live-search="true" data-width="100%">
+                                            <option value="0" selected>Duration</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="tg-select">
+                                        <select class="selectpicker" asp-for="PriceRange" asp-items="@Model.PriceItems" data-live-search="true" data-width="100%">
+                                            <option value="0" selected>Price</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <button class="tg-btn" type="submit"><span>find tours</span></button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <img src="~/images/tours/default.jpg" alt="Main Image" asp-append-version="true" />
+}
+<!--************************************
+                Home Slider End
+*************************************-->

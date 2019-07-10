@@ -1,0 +1,285 @@
+﻿<!--************************************
+                        Footer Start
+ *************************************-->
+<footer id="tg-footer" class="tg-footer tg-haslayout">
+    <div class="tg-fourcolumns">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3">
+                    <div class="tg-footercolumn tg-widget tg-widgettext">
+                        <div class="tg-widgettitle">
+                            <h3>About Z Tourist</h3>
+                        </div>
+                        <div class="tg-widgetcontent">
+                            <div class="tg-description">
+                                <p>The best tour in the multiverses</p>
+                            </div>
+                            <span>038 928 3348</span>
+                            <a href="mailto:info@ztourist.com">info@ztourist.com</a>
+                            <ul class="tg-socialicons tg-socialiconsvtwo">
+                                <li><a href="http://www.facebook.com/Phi.Hoang99"><i class="icon-facebook-logo-outline"></i></a></li>
+                                <li><a href="http://www.instagram.com/danzejr/"><i class="icon-instagram-social-outlined-logo"></i></a></li>
+                                <li><a href="http://twitter.com/PhiHoangVo?"><i class="icon-twitter-social-outlined-logo"></i></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3">
+                    <div class="tg-footercolumn tg-widget tg-widgettext">
+                        <div class="tg-widgettitle">
+                            <h3>Customer Care</h3>
+                        </div>
+                        <div class="tg-widgetcontent">
+                            <ul>
+                                <li><a href="javascript:void(0);">Travel insurance</a></li>
+                                <li><a href="javascript:void(0);">Privacy</a></li>
+                                <li><a href="javascript:void(0);">Terms and condition</a></li>
+                                <li><a href="javascript:void(0);">Payment online policy</a></li>
+                                <li><a href="javascript:void(0);">FAQS</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3">
+                    <div class="tg-footercolumn tg-widget tg-widgetdestinations">
+                        <div class="tg-widgettitle">
+                            <h3>Address</h3>
+                        </div>
+                        <div class="tg-widgetcontent">
+                            <ul>
+                                <li><a href="javascript:void(0);">84/11 Huynh Khuong An, Go Vap, Ho Chi Minh City, Vietnam</a></li>
+                                <li><a href="javascript:void(0);">223 Ba Trieu, District 1, Hanoi, Vietnam</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3">
+                    <div class="tg-footercolumn tg-widget tg-widgetnewsletter">
+                        <div class="tg-widgettitle">
+                            <!--<h3>Z Tourist was registered to GOV</h3>-->
+                        </div>
+                        <div class="tg-widgetcontent">
+                            <a href="http://online.gov.vn/HomePage.aspx"><img src="~/images/gov_img.png" alt="image gov"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="tg-footerbar">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <p>Copyright &copy; 2019 ZTourist. All  rights reserved</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<!--************************************
+                Footer End
+*************************************-->
+    </div>
+<!--************************************
+                Wrapper End
+*************************************-->
+<!--************************************
+                    Login Signup Start
+    *************************************-->
+<div id="tg-loginsingup" class="tg-loginsingup" data-vide-bg="poster: ../images/signup-img.jpg" data-vide-options="position: 0% 50%">
+    <div class="tg-contentarea tg-themescrollbar">
+        <div class="tg-scrollbar">
+            <button type="button" class="close">x</button>
+            <div class="tg-logincontent">
+                <nav id="tg-loginnav" class="tg-loginnav">
+                    <h3>Z TOURIST</h3>
+                </nav>
+                <div class="tg-themetabs">
+                    <ul class="tg-navtbs" role="tablist">
+                        <li role="presentation" class="active"><a href="#home" data-toggle="tab">Sign in</a></li>
+                        <li role="presentation"><a href="#profile" data-toggle="tab">New to Z Tourist?</a></li>
+                    </ul>
+                    <div class="tg-tabcontent tab-content">
+                        <div role="tabpanel" class="tab-pane active fade in" id="home">
+                            <form class="tg-formtheme tg-formlogin" asp-controller="Account" asp-action="Login" method="post">
+                                <input type="hidden" name="ReturnUrl" value="@ViewContext.HttpContext.Request.PathAndQuery()" />
+                                <fieldset>
+                                    <div class="form-group">
+                                        <label for="UserName">Username <sup>*</sup></label>
+                                        <input class="form-control" placeholder="Username" type="text" data-val="true" 
+                                               data-val-required="Username field is required" 
+                                               data-val-length="Username can&#x27;t be greater than 10 characters" 
+                                               id="UserName" name="UserName" value="" />
+                                        <span class="field-validation-valid" data-valmsg-for="UserName" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="Password">Password <sup>*</sup></label>
+                                        <input class="form-control" placeholder="Password" type="password" data-val="true" 
+                                               data-val-minlength="Password must be greater than 6 characters" 
+                                               data-val-minlength-min="6" 
+                                               data-val-required="Password field is required" 
+                                               id="Password" name="Password" />
+                                        <span class="field-validation-valid" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="tg-checkbox">
+                                            <input class="form-control" type="checkbox" id="RememberMe" name="RememberMe" />
+                                            <label for="RememberMe">Remember me</label>
+                                        </div>
+                                    </div>
+                                    <button class="tg-btn tg-btn-lg" type="submit"><span>Sign In</span></button>
+                                </fieldset>
+                            </form>
+                        </div>
+                        <div role="tabpanel" class="tab-pane fade" id="profile">
+                            <form class="tg-formtheme tg-formlogin" asp-controller="Account" asp-action="SignUp" method="get">
+                                <input type="hidden" name="ReturnUrl" value="@ViewContext.HttpContext.Request.PathAndQuery()" />
+                                <fieldset>
+                                    <div class="form-group">
+                                        <label for="UserName">Username <sup>*</sup></label>
+                                        <input class="form-control" type="text" data-val="true" 
+                                               data-val-length="Username can&#x27;t be greater than 10 characters" 
+                                               data-val-length-max="10" 
+                                               data-val-remote="&#x27;Username&#x27; is taken" data-val-remote-additionalfields="*.UserName" data-val-remote-url="/Account/IsExistedUsername" 
+                                               data-val-required="Username field is required" 
+                                               id="UserName" name="UserName" value="" />
+                                        <span class="field-validation-valid" data-valmsg-for="UserName" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="Email">Email <sup>*</sup></label>
+                                        <input class="form-control" placeholder="example@mail.com" type="email" data-val="true" 
+                                               data-val-email="Please enter a valid email" 
+                                               data-val-required="Email field is required" 
+                                               data-val-remote="&#x27;Email&#x27; is taken" data-val-remote-additionalfields="*.Email" data-val-remote-url="/Account/IsExistedEmail" 
+                                               id="Email" name="Email" value="" />
+                                        <span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                                    </div>
+                                    <button class="tg-btn tg-btn-lg" type="submit"><span>Sign Up</span></button>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="tg-shareor"><span>or</span></div>
+                <div class="tg-signupwith">
+                    <h2>Sign in With...</h2>
+                    <ul class="tg-sharesocialicon">
+                        <li class="tg-facebook"><a asp-controller="Account" asp-action="FacebookLogin"><i class="icon-facebook-1"></i><span>Facebook</span></a></li>
+                        @*<li class="tg-twitter"><a asp-controller="Account" asp-action="TwitterLogin"><i class="icon-twitter-1"></i><span>Twitter</span></a></li>*@
+                        <li class="tg-googleplus"><a asp-controller="Account" asp-action="GoogleLogin"><i class="icon-google4"></i><span>Google</span></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--************************************
+                Login Signup End
+*************************************-->
+
+<script src="~/js/vendor/jquery-library.js" asp-append-version="true"></script>
+<script src="~/js/moment.js" asp-append-version="true"></script>
+<script src="~/js/moment-with-locales.js" asp-append-version="true"></script>
+<script src="~/js/vendor/bootstrap.min.js" asp-append-version="true"></script>
+<script src="~/js/bootstrap-select.min.js" asp-append-version="true"></script>
+<script src="~/js/jquery-scrolltofixed.js" asp-append-version="true"></script>
+<script src="~/js/owl.carousel.min.js" asp-append-version="true"></script>
+<script src="~/js/jquery.mmenu.all.js" asp-append-version="true"></script>
+<script src="~/js/packery.pkgd.min.js" asp-append-version="true"></script>
+<script src="~/js/jquery.vide.min.js" asp-append-version="true"></script>
+<script src="~/js/scrollbar.min.js" asp-append-version="true"></script>
+<script src="~/js/prettyPhoto.js" asp-append-version="true"></script>
+<script src="~/js/countdown.js" asp-append-version="true"></script>
+<script src="~/js/parallax.js" asp-append-version="true"></script>
+<script src="~/js/main.js" asp-append-version="true"></script>
+<script src="~/js/bootstrap-datetimepicker.min.js" asp-append-version="true"></script>
+<script src="~/lib/jquery-validate/jquery.validate.min.js" asp-append-version="true"></script>
+<script src="~/lib/jquery-validate/additional-methods.min.js" asp-append-version="true"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+<script type="text/javascript">
+    /* -------------------------------------
+     Datetimepicker
+     -------------------------------------- */
+    $(function () {
+        $('#datetimepicker1').datetimepicker({
+            showTodayButton: true,
+            format: 'Y-MM-DD HH:mm:ss'
+        });
+    });
+
+    $('#FromDate').mousedown(function () {
+        $('#datetimepicker1').data('DateTimePicker').show();
+    });
+</script>
+<script>
+    /* -------------------------------------
+     SIGN IN ONPEN CLOSE
+     -------------------------------------- */
+    jQuery('a[href="#tg-loginsingup"]').on('click', function (event) {
+        event.preventDefault();
+        jQuery('#tg-loginsingup').addClass('open');
+        jQuery('body').addClass('tg-hidescroll');
+    });
+    jQuery('#tg-loginsingup, #tg-loginsingup button.close').on('click keyup', function (event) {
+        jQuery('body').removeClass('tg-hidescroll');
+        if (event.target === this || event.target.className === 'close' || event.keyCode === 27) {
+            jQuery(this).removeClass('open');
+        }
+    });
+    /* -------------------------------------
+    PRETTY PHOTO GALLERY
+    -------------------------------------- */
+    jQuery("a[data-rel]").each(function () {
+        jQuery(this).attr("rel", jQuery(this).data("rel"));
+    });
+    jQuery("a[data-rel^='prettyPhoto']").prettyPhoto({
+        animation_speed: 'normal',
+        theme: 'dark_square',
+        slideshow: 3000,
+        autoplay_slideshow: false,
+        social_tools: false
+    });
+
+    /* ---------------------------------------
+            MOBILE MENU
+    --------------------------------------- */
+    jQuery("#menu").mmenu({
+        extensions: [
+            "border-full",
+            "pagedim-black"
+        ]
+    });
+
+    /* -------------------------------------
+     HOME BANNER SLIDER
+     -------------------------------------- */
+    var _tg_homeslider = $('#tg-homeslider');
+    _tg_homeslider.owlCarousel({
+        items: 1,
+        loop: true,
+        dots: true,
+        nav: true,
+        autoplay: true,
+        autoplayTimeout: 5000,
+        animateIn: 'fadeIn',
+        animateOut: 'fadeOut',
+        navText: [
+            '<i class="icon-chevron-left"></i>',
+            '<i class="icon-chevron-right"></i>'
+        ],
+        navClass: [
+            'tg-btnroundprev',
+            'tg-btnroundnext'
+        ]
+    });
+    jQuery('.owl-carousel').mouseover(function () {
+        _tg_homeslider.trigger('stop.owl.autoplay');
+        $('#tg-homeslider').parent().find('.tg-btnroundnext').show();
+        $('#tg-homeslider').parent().find('.tg-btnroundprev').show();
+    });
+    jQuery('.owl-carousel').mouseleave(function () {
+        _tg_homeslider.trigger('play.owl.autoplay');
+        $('#tg-homeslider').parent().find('.tg-btnroundnext').hide();
+        $('#tg-homeslider').parent().find('.tg-btnroundprev').hide();
+    });
+</script>

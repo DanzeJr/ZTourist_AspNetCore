@@ -1,0 +1,98 @@
+﻿@charset "utf-8";
+/* CSS Document */
+
+.register-form{
+    width: 65%;
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.98);
+    margin-top: 10%;
+    margin-bottom: 6%;
+}
+
+.register-form #signup .field-validation-error span {
+    position: absolute;
+}
+
+.register-form > ul > li{
+    list-style-type: none;
+}
+
+@media only screen and (max-width:767px){
+    
+    .register-form #signin .tg-dashboardcontent {
+        width: 80% !important;
+    }
+
+    .register-form {
+        width: 99%;
+        margin-top: 40%;
+    }
+}
+
+.register-form .tab a{
+    display: block;
+    text-decoration: none;
+    color: black;
+    height: 70px;
+    line-height: 70px;
+    background-color: lightgray;
+    font-size: 20px;
+    float: left;
+    width: 50%;
+    text-align: center;
+
+    transition: 0.25s ease;
+    -webkit-transition: 0.25s ease;
+    -moz-transition: 0.25s ease;
+    -o-transition: 0.25s ease;
+}
+
+.register-form .tab a:hover{
+    background-color: black !important;
+    color: white;
+}
+
+.register-form .tab-group > .active > a{
+    background-color: #ff7550 !important;
+    color: white;
+}
+
+.register-form .tab-content > div:last-child{
+    display:none;
+}
+
+.register-form .tab-content h1{
+    text-align: center;
+    color: black;	
+}
+
+.register-form .regbtn{	
+    display: block;
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 15px 0;
+    font-size: 2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    background: #ff7550;
+    color: white;
+    transition: all .5s ease;
+}
+
+.register-form .regbtn:hover{
+    background-color: black;
+}
+
+.register-form #signup .tg-dashboardcontent {
+    width: 80%;
+    float: none;
+    margin: 0 auto;
+}
+
+.register-form #signin .tg-dashboardcontent {
+    width: 50%;
+    float: none;
+    margin: 0 auto;
+}

@@ -1,0 +1,72 @@
+﻿@model LoginSignUpModel
+
+@section CSS {
+    <link href="~/css/registerform.css" rel="stylesheet" asp-append-version="true" />
+    <style>
+        #bdPicker li {
+            list-style: none;
+        }
+
+        #bdPicker table tr td,
+        #bdPicker table tr th {
+            padding: 10px 0;
+            text-align: center;
+        }
+    </style>
+}
+
+@section JS {
+    <script src="~/js/registerswitch.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        $(function () {
+            $('#BirthDate').datetimepicker({
+                format: 'YYYY-MM-DD',
+                maxDate: moment()
+            });
+        });
+        $('#BirthDate').mousedown(function () {
+            $('#datetimepicker3').data('DateTimePicker').show();
+        });
+
+        if ($('#sin').hasClass('active')) {
+            $('#signup').hide();
+            $('#signin').show();
+        }
+        $("#tg-main").attr("style", "background-image: url(../images/tours/default.jpg);");
+    </script>
+    <script>
+        // extend jquery range validator to work for required checkboxes
+        var defaultRangeValidator = $.validator.methods.range;
+        $.validator.methods.range = function (value, element, param) {
+            if (element.type === 'checkbox') {
+                // if it's a checkbox return true if it is checked
+                return element.checked;
+            } else {
+                // otherwise run the default validation function
+                return defaultRangeValidator.call(this, value, element, param);
+            }
+        }
+    </script>
+}
+
+<div class="register-form">
+    <ul class="tab-group clearfix">
+        @if (ViewContext.RouteData.Values["action"].Equals("Login"))
+        {
+            ViewData["Title"] = "Sign In";
+            <li class="tab active" id="sin"><a href="#signin">Sign In</a></li>
+            <li class="tab"><a href="#signup">Sign Up</a></li>
+        }
+        else
+        {
+            ViewData["Title"] = "Registration";
+            <li class="tab" id="sin"><a href="#signin">Sign In</a></li>
+            <li class="tab active"><a href="#signup">Sign Up</a></li>
+        }
+    </ul>
+    <div class="tab-content">
+        @await Html.PartialAsync("SignUpPartial", Model?.SignUpModel)
+        @await Html.PartialAsync("LoginPartial", Model?.LoginModel)
+    </div><!-- tab-content -->
+</div>
+

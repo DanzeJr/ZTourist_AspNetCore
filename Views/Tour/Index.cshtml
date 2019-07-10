@@ -1,0 +1,79 @@
+﻿@model TourViewModel
+
+@{
+    ViewData["Title"] = Model?.Title ?? "All Tours";
+}
+
+@section Slider {
+    @await Component.InvokeAsync("Slider")
+}
+
+@section JS {
+    <script type="text/javascript">
+        $("body").attr("class", "tg-home tg-homevthree tg-login");
+        $("#tg-main").attr("class", "tg-main tg-sectionspace tg-haslayout tg-bglight");
+    </script>
+}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div id="tg-content" class="tg-content">
+                <div class="tg-listing tg-listingvthree">
+                    <div class="tg-sectiontitle">
+                        <h2>@Model.Title</h2>
+                    </div>
+                    @if (Model?.Tours != null)
+                    {
+                        @foreach (Tour tour in Model.Tours)
+                        {
+                            <div class="tg-populartour tg-populartourvtwo">
+                                <figure>
+                                    <a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id"><img style="width: 401px; height: 285px;" src="~/@tour.Image" alt="tour image" asp-append-version="true"></a>
+                                </figure>
+                                <div class="tg-populartourcontent">
+                                    <div class="tg-populartourtitle">
+                                        <h3 style="color: #00aff0"><a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">@tour.Name</a></h3>
+                                        <br />
+                                        <h5>@string.Join(" - ", tour.Destinations.Select(d => d.Name))</h5>
+                                    </div>
+                                    <div class="tg-description">
+                                        <p>@tour.Description<br /></p>
+                                        <a style="text-decoration:none;" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">View more...</a>
+                                    </div>
+                                    <div class="tg-populartourfoot">
+                                        <div class="tg-durationrating">
+                                            <span class="tg-tourduration">@tour.DurationStr()</span>
+                                            <p>Transport: @tour.Transport</p>
+                                        </div>
+                                    </div>
+                                    <div class="tg-priceavailability">
+                                        <div class="tg-availhead">
+                                            <time>@tour.FromDate.ToString("dd/MMM/yyyy") - @tour.ToDate.ToString("dd/MMM/yyyy")</time>
+                                        </div>
+                                        <div class="tg-pricearea">
+                                            <span>From</span>
+                                            <h4>@tour.AdultFare.ToString("C0")</h4>
+                                        </div>
+                                        <a class="tg-btn" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id"><span>View Tour</span></a>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        <nav class="tg-pagination" page-info="@Model.PageInfo" 
+                             page-url-SearchTourModel_Destination="@Model.Destination" 
+                             page-url-SearchTourModel_FromDate="@(Model.FromDate ?? null)" 
+                             page-url-SearchTourModel_Duration="@Model.Duration" 
+                             page-url-SearchTourModel_PriceRange="@(Model.PriceRange ?? null)" 
+                             page-url-SearchTourModel_IsActive="@(Model.IsActive ?? null)"
+                             page-class-selected="tg-active"></nav>
+                    }
+                    else
+                    {
+                        <h3 class="text-center">No tour found!</h3>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

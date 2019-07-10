@@ -1,0 +1,212 @@
+﻿@model NavigationViewModel
+<!--************************************
+                            Loader Start
+    *************************************-->
+<div class="loader">
+    <div class="span">
+        <div class="location_indicator"></div>
+    </div>
+</div>
+<!--************************************
+                        Loader End
+*************************************-->
+<!--************************************
+                Mobile Menu Start
+*************************************-->
+<nav id="menu">
+    <ul>
+        <li><a asp-controller="Home" asp-action="">Home</a></li>
+        <li><a asp-controller="Destination" asp-action="">Destinations</a>
+        <li>
+            <a asp-controller="Tour" asp-action="" >Tours</a>
+            <div>
+                @if (Model.PopularTours != null)
+                {
+                    <div class="tg-sliderarea">
+                        <h2>Popular Tours</h2>
+                        <div class="tg-trendingtripsslider tg-trendingtrips owl-carousel">
+                            @foreach (Tour tour in Model.PopularTours)
+                            {
+                                <div class="item tg-trendingtrip">
+                                    <figure>
+                                        <a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">
+                                            <img style="height: 180px;" src="~/@tour.Image" alt="image destinations" asp-append-version="true">
+                                            <div class="tg-hover">
+                                                <span class="tg-tourduration">@tour.Duration Day(s)</span>
+                                                <span class="tg-locationname">@tour.Destinations?.LastOrDefault()</span>
+                                                <div class="tg-pricearea">
+                                                    <span>from</span>
+                                                    <h4>@tour.AdultFare.ToString("C0")</h4>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </figure>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        </li>
+        <li>
+            <a href="javascript:void(0);">Pages</a>
+            <ul>
+                @if (!User.Identity.IsAuthenticated)
+                {
+                    <li><a href="loginStaff.jsp">For Staff Only</a></li>
+                }
+                else if (User.IsInRole("Customer"))
+                {
+                    <li><a href="viewOrderHistory">Order History</a></li>
+                }
+
+            </ul>
+        </li>
+    </ul>
+</nav>
+<!--************************************
+                Mobile Menu End
+*************************************-->
+<!--************************************
+                Wrapper Start
+*************************************-->
+<div id="tg-wrapper" class="tg-wrapper tg-haslayout">
+    <!--************************************
+                    Header Start
+    *************************************-->
+    <header id="tg-header" class="tg-header tg-headervtwo tg-headerfixed tg-haslayout">
+        <div class="container-fluid">
+            <div class="row">
+                <strong class="tg-logo"><a asp-controller="Home" asp-action=""><img src="~/images/dbzlogo.png" alt="company logo here" asp-append-version="true"></a></strong>
+                <nav class="tg-infonav" style="padding: 0;">
+                    <ul>
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            <li><a style="line-height: 40px" id="tg-btnsignin" href="#tg-loginsingup">sign in</a></li>
+                        }
+                        else
+                        {
+                            <li>
+                                <button class="mytg-btndropdown" id="tg-dropdowndashboard" type="button" data-toggle="dropdown">
+                                    <img style="width: 35px; height: 35px;" src="~/@Model.Avatar" alt="image description" asp-append-version="true">
+                                    <span>@User.Identity.Name</span>
+                                    <i class="fa fa-caret-down"></i>
+                                </button>
+                                <ul class="dropdown-menu tg-dropdownusermenu" id="dropdownUser" aria-labelledby="tg-dropdowndashboard">
+                                    <li><a asp-controller="Profile" asp-action="">Dashboard</a></li>
+                                    <li><a asp-controller="Profile" asp-action="Edit">Edit Profile</a></li>
+                                    <li><a asp-controller="Account" asp-action="Logout">Logout</a></li>
+                                </ul>
+                            </li>
+                            <li>
+                                <a style="line-height: 35px" href="viewCart"><img src="~/images/icons/icon-03.png" alt="Cart image" asp-append-version="true"></a>
+                                @if (Model.Cart?.Lines != null && Model.Cart.Lines.Count() > 0)
+                                {
+                                    <div class="tg-cartitems">
+                                        <div class="tg-cartlistitems">
+                                            <h3>Shopping Cart</h3>
+                                            @foreach (CartLine line in Model.Cart.Lines)
+                                            {
+                                                <div class="tg-cartitem">
+                                                    <figure class="tg-itemimg"><img style="width: 57px; height: 57px;" src="~/@line.Tour.Image" alt="image description"></figure>
+                                                    <div class="tg-contentbox">
+                                                        <div class="tg-producthead">
+                                                            <em>x @(line.AdultTicket + line.KidTicket)</em>
+                                                            <h4><a asp-controller="Tour" asp-action="Details">@line.Tour.Name</a></h4>
+                                                        </div>
+                                                        <span>@line.Tour.KidFare$ - @line.Tour.AdultFare$</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                            <div class="tg-subtotal">
+                                                <h2>Subtotal</h2>
+                                                <span>@Model.Cart.ComputeTotalValue()$</span>
+                                            </div>
+                                        </div>
+                                        <div class="tg-btnarea">
+                                            <a class="tg-btn" asp-controller=""><span>view cart</span></a>
+                                        </div>
+                                    </div>
+                                }
+                            </li>
+                        }
+                    </ul>
+                </nav>
+                <div class="tg-navigationarea">
+                    <div class="tg-navigationholder">
+                        <nav id="tg-nav" class="tg-nav">
+                            <div class="navbar-header">
+                                <a href="#menu" class="navbar-toggle collapsed">
+                                    <span class="sr-only">Toggle navigation</span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                    <span class="icon-bar"></span>
+                                </a>
+                            </div>
+                            <div id="tg-navigation" class="collapse navbar-collapse tg-navigation">
+                                <ul>
+                                    <li class="menu-item-has-children">
+                                        <a asp-controller="Home" asp-action="">Home</a>
+                                    </li>
+                                    <li><a asp-controller="Destination" asp-action="">destinations</a></li>
+                                    <li class="menu-item-has-children menu-item-has-mega-menu">
+                                        <a asp-controller="Tour" asp-action="">tours</a>
+                                        <div class="mega-menu">
+                                            @if (Model.PopularTours != null)
+                                            {
+                                                <div class="tg-sliderarea">
+                                                    <h2>Popular Tours</h2>
+                                                    <div class="tg-trendingtripsslider tg-trendingtrips owl-carousel">
+                                                        @foreach (Tour tour in Model.PopularTours)
+                                                        {
+                                                        <div class="item tg-trendingtrip">
+                                                            <figure>
+                                                                <a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">
+                                                                    <img style="height: 180px;" src="~/@tour.Image" alt="image destinations" asp-append-version="true">
+                                                                    <div class="tg-hover">
+                                                                        <span class="tg-tourduration">@tour.Duration Day(s)</span>
+                                                                        <span class="tg-locationname">@tour.Destinations?.LastOrDefault()?.Name</span>
+                                                                        <div class="tg-pricearea">
+                                                                            <span>from</span>
+                                                                            <h4>@tour.AdultFare$</h4>
+                                                                        </div>
+                                                                    </div>
+                                                                </a>
+                                                            </figure>
+                                                        </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </li>
+                                    <li class="menu-item-has-children">
+                                        <a href="javascript:void(0);">pages</a>
+                                        <ul class="sub-menu">
+                                            @if (!User.Identity.IsAuthenticated)
+                                            {
+                                                <li><a href="loginStaff.jsp">For Staff Only</a></li>
+                                            }
+                                            else if (User.IsInRole("Customer"))
+                                            {
+                                                <li><a href="viewOrderHistory">Order History</a></li>
+                                            }
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                        <ul class="tg-socialicons">
+                            <li><a href="http://www.facebook.com/Phi.Hoang99"><i class="icon-facebook-logo-outline"></i></a></li>
+                            <li><a href="http://www.instagram.com/danzejr/"><i class="icon-instagram-social-outlined-logo"></i></a></li>
+                            <li><a href="http://twitter.com/PhiHoangVo?"><i class="icon-twitter-social-outlined-logo"></i></a></li>
+                            <li><i><img src="~/images/icons/icon-01.png" alt="image destinations"> </i><span style="color: white">0389 283 348</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!--************************************
+                    Header End
+    *************************************-->

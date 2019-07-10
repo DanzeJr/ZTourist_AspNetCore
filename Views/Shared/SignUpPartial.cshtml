@@ -1,0 +1,104 @@
+﻿@model SignUpModel
+
+<div id="signup">
+    <h1>Register</h1>
+    <form asp-controller="Account" asp-action="SignUp">
+        <div class="tg-dashboardcontent">
+            <div class="tg-content">
+                @if (!ViewContext.RouteData.Values["action"].Equals("Login"))
+                {
+                    <div asp-validation-summary="ModelOnly" class="text-danger" style="font-size: larger; font-weight: bold"></div>
+                }
+                <fieldset>
+                    <br />
+                    <div class="form-group">
+                        <label asp-for="UserName">Username<sup>*</sup></label>
+                        <input class="form-control" asp-for="UserName" />
+                        <div><span asp-validation-for="UserName" class="text-danger"></span></div><br />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Email">Email<sup>*</sup></label>
+                        <input class="form-control" asp-for="Email" />
+                        <div><span asp-validation-for="Email" class="text-danger"></span></div><br />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="FirstName">First Name<sup>*</sup></label>
+                        <input class="form-control" asp-for="FirstName" />
+                        <div><span asp-validation-for="FirstName" class="text-danger"></span></div><br />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="LastName">Last Name<sup>*</sup></label>
+                        <input class="form-control" asp-for="LastName" />
+                        <div><span asp-validation-for="LastName" class="text-danger"></span></div><br />
+                    </div>
+
+                    <div class="form-group" style="width: 100%">
+                        <label>Gender<sup>*</sup></label>
+                        @foreach (var gender in new Dictionary<string, string>() {
+                         { "MALE", "Male" },
+                         { "FEMALE", "Female" },
+                         { "OTHER", "Other"}
+                     })
+                        {
+                            if (Model?.Gender != null && Model.Gender.Equals(gender.Key))
+                            {
+                                <label class="radio-inline control-label">
+                                    <input class="form-check-input" type="radio" asp-for="Gender" value="@gender.Key" checked /> @gender.Value
+                                </label>
+                            }
+                            else
+                            {
+                                <label class="radio-inline control-label">
+                                    <input type="radio" asp-for="Gender" value="@gender.Key" /> @gender.Value
+                                </label>
+                            }
+                        }
+                        <div><span asp-validation-for="Gender" class="text-danger"></span></div><br />
+                    </div>
+
+                    <div class="form-group" style="width: 100%">
+                        <label asp-for="Address">Address<sup>*</sup></label>
+                        <input class="form-control" asp-for="Address" />
+                        <div><span asp-validation-for="Address" class="text-danger"></span></div><br />
+                    </div>
+
+                    <div class="form-group" id="bdPicker">
+                        <label asp-for="BirthDate">Birth Date<sup>*</sup></label>
+                        <input class="form-control" asp-for="BirthDate" />
+                        <div><span asp-validation-for="BirthDate" class="text-danger"></span></div><br />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Tel">Phone Number<sup>*</sup></label>
+                        <input class="form-control" asp-for="Tel" />
+                        <div><span asp-validation-for="Tel" class="text-danger"></span></div><br />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Password">Password<sup>*</sup></label>
+                        <input class="form-control" asp-for="Password" />
+                        <div><span asp-validation-for="Password" class="text-danger"></span></div><br />
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="ConfirmPassword">Confirm Password<sup>*</sup></label>
+                        <input class="form-control" asp-for="ConfirmPassword" />
+                        <div><span asp-validation-for="ConfirmPassword" class="text-danger"></span></div><br />
+                    </div>
+
+                    <div class="form-group" style="width: 100%">
+                        <label for="AcceptTerm">
+                            <input class="form-check-input" asp-for="AcceptTerm" /> I agree to the Terms & Privacy<sup>*</sup>
+                        </label>
+                        <input name="AcceptTerm" type="hidden" value="false" />
+                        <div><span asp-validation-for="AcceptTerm" class="text-danger"></span></div><br />
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <button type="submit" class="regbtn">Sign Up</button>
+    </form>
+</div>
