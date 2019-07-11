@@ -9,44 +9,22 @@ namespace ZTourist.Models
 {
     public class Tour
     {
-        [Display(Name = "Tour ID")]
-        [Required(ErrorMessage = "Tour ID is required")]
-        [MaxLength(30, ErrorMessage = "Tour ID can't be more than 30 characters")]
         public string Id { get; set; }
 
-        [Display(Name = "Tour Name")]
-        [Required(ErrorMessage = "Tour name is required")]
-        [MaxLength(100, ErrorMessage = "Tour name can't be more than 100 characters")]
         public string Name { get; set; }
 
-
-        [Display(Name = "Tour Image")]
-        [Required(ErrorMessage = "Tour Image is required")]
-        [MaxLength(200, ErrorMessage = "Image path is too long")]
         public string Image { get; set; }
 
-        [MaxLength(500, ErrorMessage = "Description can't be more than 500 characters")]
         public string Description { get; set; }
 
-        [Display(Name = "Start Date")]
-        [Required(ErrorMessage = "Start date is required")]
-        [DataType(DataType.DateTime, ErrorMessage = "Invalid date format")]
         public DateTime FromDate { get; set; }
 
-        [Display(Name = "End Date")]
-        [Required(ErrorMessage = "End date is required")]
-        [DataType(DataType.DateTime, ErrorMessage = "Invalid date format")]
         public DateTime ToDate { get; set; }
 
-        [Display(Name = "Adult fare")]
-        [Required(ErrorMessage = "Adult fare is required")]
         public decimal AdultFare { get; set; }
 
-        [Display(Name = "Kid fare")]
         public decimal KidFare { get; set; }
 
-        [Display(Name = "Maximum guest")]
-        [Required(ErrorMessage = "Maximum guest is required")]
         public int MaxGuest { get; set; }
 
         public string Transport { get; set; }

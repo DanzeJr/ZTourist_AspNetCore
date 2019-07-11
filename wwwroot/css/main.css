@@ -3721,7 +3721,7 @@ blockquote{
 	font-size: 10px;
 	line-height: 12px;
 }
-.tg-btnaddtocart{
+.tg-btnAdd{
 	color: #000;
 	width: 100%;
 	float: left;
@@ -3731,23 +3731,23 @@ blockquote{
 	text-align:center;
 	text-transform: uppercase;
 }
-.tg-btnaddtocart i,
-.tg-btnaddtocart span{
+.tg-btnAdd i,
+.tg-btnAdd span{
 	vertical-align: top;
 	display: inline-block;
 }
-.tg-btnaddtocart i{
+.tg-btnAdd i{
 	font-size: 20px;
 	line-height: 50px;
 }
-.tg-btnaddtocart span{
+.tg-btnAdd span{
 	padding: 3px 0 0;
 	line-height: 47px;
 	font-family: 'Montserrat', Arial, Helvetica, sans-serif;
 }
-.tg-btnaddtocart:hover,
-.tg-btnaddtocart:hover i,
-.tg-btnaddtocart:hover span{color: #fff;}
+.tg-btnAdd:hover,
+.tg-btnAdd:hover i,
+.tg-btnAdd:hover span{color: #fff;}
 /*======================================================================================
 								404 Error Style											
 ======================================================================================*/
@@ -3892,7 +3892,7 @@ blockquote{
 	width:auto;
 	clear:both;
 }
-.tg-formquantity .form-group .tg-btnaddtocart{
+.tg-formquantity .form-group .tg-btnAdd{
 	padding:0 45px;
 	border-radius:5px;
 }

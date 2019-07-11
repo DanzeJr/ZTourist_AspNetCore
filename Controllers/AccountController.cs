@@ -50,7 +50,7 @@ namespace ZTourist.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> SignUp(string username, string email, string returnUrl)
+        public async Task<IActionResult> SignUp(string username, string email)
         {
             bool isExistedUser = false;
             bool isExistedEmail = false;

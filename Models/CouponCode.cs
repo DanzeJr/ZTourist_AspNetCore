@@ -9,7 +9,7 @@ namespace ZTourist.Models
     {
         public string Code { get; set; }
 
-        public int OffPercent { get; set; }
+        public int OffPercent { get; set; } = 0;
 
         public DateTime StartDate { get; set; }
 

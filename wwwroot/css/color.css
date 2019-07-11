@@ -67,7 +67,7 @@ a:active,
 .tg-imgholder .tg-btn:hover,
 .tg-btnarea .tg-btn,
 .tg-pkgplanfoot .tg-btn:hover,
-.tg-btnaddtocart:hover,
+.tg-btnAdd:hover,
 .tg-formleavecomment .tg-btn{ background:#ff7550; }
 .mCSB_scrollTools .mCSB_dragger .mCSB_dragger_bar{ background:#ff7550 !important;}
 /*=============================================
@@ -103,7 +103,7 @@ input:focus,
 .tg-navigation ul li a:before,
 .tg-btnvtwo:before,
 .tg-themetabsvtwo .tg-themetabnav li a:before,
-.tg-btnaddtocart,
+.tg-btnAdd,
 .tg-btndropdown,
 .tg-topdestination figure .tg-btnviewall:before,
 .tg-availhead,

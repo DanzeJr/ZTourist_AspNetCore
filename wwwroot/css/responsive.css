@@ -102,7 +102,7 @@
 	.table-responsive tbody tr td:before{
 		left:0;
 		top:0;
-		width:50%;
+		/*width:50%;*/
 		content:attr(data-title);
 		position:absolute;
 		font-size:15px;

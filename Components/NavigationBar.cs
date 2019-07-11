@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
@@ -34,6 +35,14 @@ namespace ZTourist.Components
             string avatar = "images/avatars/ZAvatar.png";
             if (user != null)
                 avatar = user.Avatar;
+
+            if (cart != null && cart.Lines.Count() > 0)
+            {
+                foreach (CartLine cartLine in cart.Lines)
+                {
+                    cartLine.Tour = await touristDAL.FindTourByTourIdAsync(cartLine.Tour.Id);
+                }
+            }
             NavigationViewModel model = new NavigationViewModel {
                 Cart = cart,
                 PopularTours = popularTours,

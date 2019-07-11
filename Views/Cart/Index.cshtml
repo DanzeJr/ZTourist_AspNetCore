@@ -1,0 +1,152 @@
+﻿@model CartViewModel
+
+@{
+    ViewData["Title"] = "Cart";
+}
+
+@section CSS {
+    <style>
+        .btn-tourist {
+            color: white;
+            background: #888;
+        }
+
+            .btn-tourist:hover {
+                background-color: #ff7550;
+            }
+    </style>
+}
+@section JS {
+    <script type="text/javascript">
+        $("#tg-main").attr("class", "tg-main tg-sectionspace tg-haslayout tg-bglight");
+    </script>
+}
+
+@section Slider {
+    <!--************************************
+    Inner Banner Start
+    *************************************-->
+    <section class="tg-parallax tg-innerbanner" data-appear-top-offset="600" data-parallax="scroll" data-image-src="@Url.Content("~/images/ZTouristSWR.png")">
+        <div class="tg-sectionspace tg-haslayout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h1>Cart</h1>
+                        <h2>View your selected tours</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--************************************
+                    Inner Banner End
+    *************************************-->
+}
+<div class="text-center text-danger" style="font-size: larger; font-weight: bold; padding-bottom: 3%;" asp-validation-summary="All"></div>
+<div class="container">
+    <div class="row">
+        <div id="tg-twocolumns" class="tg-twocolumns">
+            @if (Model?.Cart?.Lines != null && Model.Cart.Lines.Count() > 0)
+            {
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <div class="tg-cartproductdetail">
+                        <table class="table table-responsive">
+                            <tr>
+                                <th scope="col">Tour Name</th>
+                                <th scope="col">Ticket Adult</th>
+                                <th scope="col">Ticket Kid</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Update</th>
+                                <th scope="col">Remove</th>
+                            </tr>
+                            <tbody>
+                                @if (Model?.Cart?.Lines != null && Model.Cart.Lines.Count() > 0)
+                                {
+                                    foreach (CartLine line in Model.Cart.Lines)
+                                    {
+                                        <form asp-controller="Cart" asp-action="Update" method="post">
+                                            <input type="hidden" asp-for="CartLine.Tour.Id" value="@line.Tour.Id" />
+                                            <tr>
+                                                <td data-title="tour name">
+                                                    <div class="tg-tourname">
+                                                        <figure>
+                                                            <a asp-controller="Tour" asp-action="Details" asp-route-id="@line.Tour.Id">
+                                                                <img style="width: 68px; height: 68px;" src="~/@line.Tour.Image" alt="tour image" asp-append-version="true">
+                                                            </a>
+                                                        </figure>
+                                                        <div class="tg-populartourcontent">
+                                                            <div class="tg-populartourtitle">
+                                                                <h3><a asp-controller="Tour" asp-action="Details" asp-route-id="@line.Tour.Id">@line.Tour.Name (@line.Tour.Id)</a></h3>
+                                                            </div>
+                                                            <span>@line.Tour.KidFare.ToString("C0") - @line.Tour.AdultFare.ToString("C0")</span>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td data-title="quantity">
+                                                    <input class="form-control" asp-for="CartLine.AdultTicket" value="@line.AdultTicket"
+                                                           data-val="true"
+                                                           data-val-digits="Number of tickets only contains digits" />
+                                                    @*<span asp-validation-for="CartLine.AdultTicket" style="font-size: medium; color: orangered"></span>*@
+                                                </td>
+                                                <td data-title="quantity">
+                                                    <input class="form-control" asp-for="CartLine.KidTicket" value="@line.KidTicket"
+                                                           data-val="true"
+                                                           data-val-digits="Number of tickets only contains digits" />
+                                                    @*<span asp-validation-for="CartLine.KidTicket" style="font-size: medium; color: orangered"></span>*@
+                                                </td>
+                                                <td data-title="price"><span style="margin-right: 10px;">@line.SubTotal().ToString("C0")</span></td>
+                                                <td data-title="action"><button class="btn btn-tourist" type="submit">Update</button></td>
+                                                <td data-title="action"><a asp-controller="Cart" asp-action="Remove" asp-route-id="@line.Tour.Id"><i class="icon-trash-can"></i></a></td>
+                                            </tr>
+                                        </form>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 pull-left">
+                    <div id="tg-content" class="tg-content">
+                        <div class="tg-cart">
+                            <div class="tg-couponapply">
+                                <form asp-controller="Cart" asp-action="ApplyCoupon">
+                                    <div class="form-group">
+                                        <input class="form-control" name="CouponCode" id="CouponCode" placeholder="Coupon Code"
+                                               data-val="true" data-val-required="Please enter coupon code to continue" />
+                                        <button class="tg-btn" type="submit">apply</button>
+                                    </div>
+                                    <span class="field-validation-valid" data-valmsg-for="CouponCode" data-valmsg-replace="true"></span>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4 pull-right">
+                    <aside id="tg-sidebar" class="tg-sidebar tg-haslayout">
+                        <div class="tg-widget tg-widgetpersonprice">
+                            <div class="tg-widgetcontent">
+                                <ul>
+                                    <li class="tg-personprice"><div class="tg-perperson"><span>Booking Price</span></div></li>
+                                    <li><span>Sub Total:</span><em>@Model.Cart.ComputeTotalValue().ToString("C0")</em></li>
+                                    <li><span>Coupon Code:</span><em>@(Model?.Coupon?.Code ?? "Not applied")</em></li>
+                                    <li><span>Off Percent:</span><em>@(Model?.Coupon?.OffPercent ?? 0)%</em></li>
+                                    <li class="tg-totalprice">
+                                        <div class="tg-totalpayment">
+                                            <span>Total Price:</span><em>@((Model.Cart.ComputeTotalValue() * (100 - Model.Coupon.OffPercent) / 100).ToString("C0"))</em>
+                                        </div>
+                                    </li>
+                                    <li><a class="tg-btn tg-btn-lg" asp-controller="Order" asp-action="Pay">next step</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+
+            }
+            else
+            {
+                <h4 class="text-center">There is no tour in cart</h4>
+            }
+        </div>
+    </div>
+</div>

@@ -15,19 +15,32 @@
 @section JS {
     <script>
         //calculate total price with number of tickets
-        var adultFare = parseFloat($("#AdultFare").val());
-        var kidFare = parseFloat($("#KidFare").val());
+        var adultFare;
+        var kidFare;
+        $(document).ready(function () {
+            adultFare = parseFloat($("#AdultFare").val());
+            kidFare = parseFloat($("#KidFare").val());
+            var numAdult = $("#AdultTicket").val();
+            var numKid = $("#KidTicket").val();
+            var total = ($.isNumeric(numKid) ? parseInt(numKid) : 0) * kidFare + adultFare * ($.isNumeric(numAdult) ? parseInt(numAdult) : 0);
+            $("#total h4").html("Total: " + "$" + total);
+        });
+        
         $('#AdultTicket').on("change paste keyup", function () {
             var numAdult = $("#AdultTicket").val();
             var numKid = $("#KidTicket").val();
-            var total = (!$.isEmptyObject(numKid) && $.isNumeric(numKid) ? parseInt(numKid) : 0) * kidFare + adultFare * (!$.isEmptyObject(numAdult) && $.isNumeric(numAdult) ? parseInt(numAdult) : 0);
+            var total = ($.isNumeric(numKid) ? parseInt(numKid) : 0) * kidFare + adultFare * ($.isNumeric(numAdult) ? parseInt(numAdult) : 0);
             $("#total h4").html("Total: " + "$" + total);
+            $("#AdultTicket").valid();
+            $("#KidTicket").valid();
         });
         $('#KidTicket').on("change paste keyup", function () {
             var numAdult = $("#AdultTicket").val();
             var numKid = $("#KidTicket").val();
-            var total = (!$.isEmptyObject(numKid) && $.isNumeric(numKid) ? parseInt(numKid) : 0) * kidFare + adultFare * (!$.isEmptyObject(numAdult) && $.isNumeric(numAdult) ? parseInt(numAdult) : 0);
+            var total = ($.isNumeric(numKid) ? parseInt(numKid) : 0) * kidFare + adultFare * ($.isNumeric(numAdult) ? parseInt(numAdult) : 0);
             $("#total h4").html("Total: " + "$" + total);
+            $("#AdultTicket").valid();
+            $("#KidTicket").valid();
         });
 
         //add new method to jquery validation to ensure that number of tickets is not greater than number of left slots
@@ -35,13 +48,24 @@
             var leftSlot = parseInt($("#LeftSlot").val());
             var numAdult = $("#AdultTicket").val();
             var numKid = $("#KidTicket").val();
-            var total = (!$.isEmptyObject(numKid) && $.isNumeric(numKid) ? parseInt(numKid) : 0) + (!$.isEmptyObject(numAdult) && $.isNumeric(numAdult) ? parseInt(numAdult) : 0);
-            return this.optional(element) || total <= leftSlot;
+            var total = ($.isNumeric(numKid) ? parseInt(numKid) : 0) + ($.isNumeric(numAdult) ? parseInt(numAdult) : 0);
+            return total <= leftSlot;
         });
+        $.validator.addMethod("atLeastTicket", function (value, element) {
+            var numAdult = $("#AdultTicket").val();
+            var numKid = $("#KidTicket").val();
+            var total = ($.isNumeric(numKid) ? parseInt(numKid) : 0) + ($.isNumeric(numAdult) ? parseInt(numAdult) : 0);
+            return total > 0;
+        });
+
         //add new method to unobtrusive adapter to perform
         $.validator.unobtrusive.adapters.add("notExceed", function (options) {
             options.rules["notExceed"] = true;
             options.messages['notExceed'] = options.message;
+        });
+        $.validator.unobtrusive.adapters.add("atLeastTicket", function (options) {
+            options.rules['atLeastTicket'] = true;
+            options.messages['atLeastTicket'] = options.message;
         });
 
     </script>
@@ -64,13 +88,13 @@
                     Inner Banner End
     *************************************-->
 }
-
 <div class="container">
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <div id="tg-content" class="tg-content">
                 <div class="tg-tourbookingdetail">
                     <div class="tg-bookinginfo">
+                        <div class="text-center text-danger" style="font-size: larger; font-weight: bold; padding-bottom: 3%" asp-validation-summary="ModelOnly"></div>
                         <h2>@Model.Tour.Name</h2>
                         <h4 style="text-transform: uppercase">Tour ID: @Model.Tour.Id</h4>
                         <div class="tg-pricearea">
@@ -99,32 +123,41 @@
                                     <p>There's no spot left.</p>
                                 }
                             </div>
-                            <form asp-controller="Tour" asp-action="AddToCart" class="tg-formtheme tg-formbookingdetail" method="post">
+                            <form asp-controller="Cart" asp-action="Add" class="tg-formtheme tg-formbookingdetail" method="post">
+                                <input type="hidden" asp-for="Tour.Id" value="@Model.Tour.Id" />
                                 <fieldset>
                                     <div class="form-group">
+                                        <div class="form-horizontal">
+                                            <h4>Number of adults:</h4>
+                                        </div>
                                         <div class="tg-formicon"><i class="icon-users"></i></div>
                                         <div class="input-group">
                                             <input class="form-control" type="number" asp-for="AdultTicket" placeholder="Adult tickets"
                                                    data-val="true"
-                                                   data-val-range="Number of adult tickets must be at least 1" data-val-range-min="1"
                                                    data-val-digits="Number of tickets only contains digits"
-                                                   data-val-notExceed="Not enough tickets" />
+                                                   data-val-notExceed="Not enough tickets"
+                                                   data-val-atLeastTicket="You must choose at least 1 ticket for adult or kid" />
                                             <span asp-validation-for="AdultTicket"></span>
                                         </div>
                                     </div>
                                     <div class="form-group">
+                                        <div class="form-horizontal">
+                                            <h4>Number of kids:</h4>
+                                        </div>
                                         <div class="tg-formicon"><i class="fa fa-child"></i></div>
                                         <div class="input-group">
                                             <input class="form-control" type="number" asp-for="KidTicket" placeholder="Kid tickets"
                                                    data-val="true"
                                                    data-val-digits="Number of tickets only contains digits"
-                                                   data-val-notExceed="Not enough tickets" />
+                                                   data-val-notExceed="Not enough tickets"
+                                                   data-val-atLeastTicket="You must choose at least 1 ticket for adult or kid" />
                                             <span asp-validation-for="KidTicket"></span>
                                         </div>
                                     </div>
                                     @if (Model.Tour.LeftSlot > 0)
                                     {
-                                        <div class="form-group">
+                                        <div class="form-group" style="vertical-align: bottom">
+                                            <div>&ensp;</div>
                                             <button type="submit" class="tg-btn tg-btn-lg"><span>add to cart</span></button>
                                         </div>
                                     }
@@ -142,10 +175,9 @@
                                 </div>
                             </fieldset>
                         }
-                        <div class="text-center text-danger" style="font-weight: bold; padding-top: 4%" asp-validation-summary="ModelOnly"></div>
                         <ul class="tg-tripinfo">
                             <li><span class="tg-tourduration">@Model.Tour.DurationStr()</span></li>
-                            <li><span class="tg-tourduration tg-availabilty">From @Model.Tour.FromDate.ToString("dd/MMMM/yyyy")</span></li>
+                            <li><span class="tg-tourduration tg-availabilty">From @Model.Tour.FromDate.ToString("dd - MMMM - yyyy")</span></li>
                             <li>
                                 <span class="tg-tourduration tg-location">
                                     @if (Model.Tour.Destinations != null)

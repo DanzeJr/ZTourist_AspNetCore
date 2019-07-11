@@ -1,7 +1,7 @@
-﻿@model TourViewModel
+﻿@model TourSearchViewModel
 
 @{
-    ViewData["Title"] = Model?.Title ?? "All Tours";
+    ViewData["Title"] = ViewBag.Title ?? "All Tours";
 }
 
 @section Slider {
@@ -20,7 +20,7 @@
             <div id="tg-content" class="tg-content">
                 <div class="tg-listing tg-listingvthree">
                     <div class="tg-sectiontitle">
-                        <h2>@Model.Title</h2>
+                        <h2>@ViewBag.Title</h2>
                     </div>
                     @if (Model?.Tours != null)
                     {

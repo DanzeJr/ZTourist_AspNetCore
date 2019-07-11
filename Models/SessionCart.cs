@@ -21,17 +21,36 @@ namespace ZTourist.Models
             cart.Session = session;
             return cart;
         }
-
-
-        public override void AddItem(Tour tour, int adultTicket, int kidTicket)
+        
+        public override void AddItem(CartLine line)
         {
-            base.AddItem(tour, adultTicket, kidTicket);
+            base.AddItem(line);
             Session.SetJson("Cart", this);
         }
 
-        public override void RemoveLine(Tour tour)
+        public override bool  UpdateItem(CartLine line)
         {
-            base.RemoveLine(tour);
+            bool result = base.UpdateItem(line);
+            Session.SetJson("Cart", this);
+            return result;
+        }
+
+        public override int RemoveItem(string id)
+        {
+            int result = base.RemoveItem(id);
+            Session.SetJson("Cart", this);
+            return result;
+        }
+
+        public override void ApplyCoupon(string code)
+        {
+            base.ApplyCoupon(code);
+            Session.SetJson("Cart", this);
+        }
+
+        public override void RemoveCoupon()
+        {
+            base.RemoveCoupon();
             Session.SetJson("Cart", this);
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ZTourist.Infrastructure;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
 
@@ -19,7 +20,7 @@ namespace ZTourist.Controllers
 
         public async Task<IActionResult> Index(int page = 1)
         {
-            TourViewModel model = new TourViewModel { IsActive = true };
+            TourSearchViewModel model = new TourSearchViewModel { IsActive = true };
             model.Skip = (page - 1) * model.Fetch;
             int total = await touristDAL.GetTotalToursAsync();
             PageInfo pageInfo = new PageInfo
@@ -39,45 +40,49 @@ namespace ZTourist.Controllers
                 model.Tours = tours;
             }
             model.PageInfo = pageInfo;
-            model.Title = "All Tours";
+            ViewBag.Title = "All Tours";
             return View(model);
         }
 
-        public async Task<IActionResult> Search(TourViewModel tvm, int page = 1)
+        public async Task<IActionResult> Search(TourSearchViewModel model, int page = 1)
         {
-            if (tvm == null)
-                tvm = new TourViewModel();
-            tvm.InitSearchValues();
+            if (model == null)
+                model = new TourSearchViewModel();
+            model.InitSearchValues();
             if (!(User.Identity.IsAuthenticated && User.IsInRole("Admin")))
-                tvm.IsActive = true;
-            tvm.Skip = (page - 1) * tvm.Fetch;
-            int total = await touristDAL.GetTotalSearchToursAsync(tvm);
+                model.IsActive = true;
+            model.Skip = (page - 1) * model.Fetch;
+            int total = await touristDAL.GetTotalSearchToursAsync(model);
             PageInfo pageInfo = new PageInfo
             {
                 TotalItems = total,
-                ItemPerPage = tvm.Fetch,
+                ItemPerPage = model.Fetch,
                 PageAction = nameof(Search),
                 CurrentPage = page
             };
-            IEnumerable<Tour> tours = await touristDAL.SearchToursAsync(tvm);
+            IEnumerable<Tour> tours = await touristDAL.SearchToursAsync(model);
             if (tours != null)
             {
                 foreach (Tour tour in tours)
                 {
                     tour.Destinations = await touristDAL.GetDestinationsByTourIdAsync(tour.Id);
                 }
-                tvm.Tours = tours;
+                model.Tours = tours;
             }
-            tvm.PageInfo = pageInfo;
-            tvm.Title = "Search Tours";
-            return View("Index", tvm);
+            model.PageInfo = pageInfo;
+            ViewBag.Title = "Search Tours";
+            return View("Index", model);
         }
 
+        [ImportModelState]
         public async Task<IActionResult> Details(string id)
         {
             Tour tour = await touristDAL.FindTourByTourIdAsync(id);
             if (tour != null)
+            {
                 tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(id);
+                tour.TakenSlot = await touristDAL.GetTakenSlotByTourIdAsync(id);
+            }                
             CartLine model = new CartLine { Tour = tour };
             return View(model);
         }

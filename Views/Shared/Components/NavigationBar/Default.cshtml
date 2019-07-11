@@ -18,7 +18,7 @@
         <li><a asp-controller="Home" asp-action="">Home</a></li>
         <li><a asp-controller="Destination" asp-action="">Destinations</a>
         <li>
-            <a asp-controller="Tour" asp-action="" >Tours</a>
+            <a asp-controller="Tour" asp-action="">Tours</a>
             <div>
                 @if (Model.PopularTours != null)
                 {
@@ -32,7 +32,7 @@
                                         <a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">
                                             <img style="height: 180px;" src="~/@tour.Image" alt="image destinations" asp-append-version="true">
                                             <div class="tg-hover">
-                                                <span class="tg-tourduration">@tour.Duration Day(s)</span>
+                                                <span class="tg-tourduration">@tour.DurationStr()</span>
                                                 <span class="tg-locationname">@tour.Destinations?.LastOrDefault()</span>
                                                 <div class="tg-pricearea">
                                                     <span>from</span>
@@ -98,38 +98,38 @@
                                     <li><a asp-controller="Account" asp-action="Logout">Logout</a></li>
                                 </ul>
                             </li>
-                            <li>
-                                <a style="line-height: 35px" href="viewCart"><img src="~/images/icons/icon-03.png" alt="Cart image" asp-append-version="true"></a>
-                                @if (Model.Cart?.Lines != null && Model.Cart.Lines.Count() > 0)
-                                {
-                                    <div class="tg-cartitems">
-                                        <div class="tg-cartlistitems">
-                                            <h3>Shopping Cart</h3>
-                                            @foreach (CartLine line in Model.Cart.Lines)
-                                            {
-                                                <div class="tg-cartitem">
-                                                    <figure class="tg-itemimg"><img style="width: 57px; height: 57px;" src="~/@line.Tour.Image" alt="image description"></figure>
-                                                    <div class="tg-contentbox">
-                                                        <div class="tg-producthead">
-                                                            <em>x @(line.AdultTicket + line.KidTicket)</em>
-                                                            <h4><a asp-controller="Tour" asp-action="Details">@line.Tour.Name</a></h4>
-                                                        </div>
-                                                        <span>@line.Tour.KidFare$ - @line.Tour.AdultFare$</span>
+                        }
+                        <li>
+                            <a style="line-height: 35px" asp-controller="Cart" asp-action=""><img src="~/images/icons/icon-03.png" alt="Cart image" asp-append-version="true"></a>
+                            @if (Model.Cart?.Lines != null && Model.Cart.Lines.Count() > 0)
+                            {
+                                <div class="tg-cartitems">
+                                    <div class="tg-cartlistitems">
+                                        <h3>Shopping Cart</h3>
+                                        @foreach (CartLine line in Model.Cart.Lines)
+                                        {
+                                            <div class="tg-cartitem">
+                                                <figure class="tg-itemimg"><img style="width: 57px; height: 57px;" src="~/@line.Tour.Image" alt="image description" asp-append-version="true"></figure>
+                                                <div class="tg-contentbox">
+                                                    <div class="tg-producthead">
+                                                        <em>x @(line.AdultTicket + line.KidTicket)</em>
+                                                        <h4><a asp-controller="Tour" asp-action="Details" asp-route-id="@line.Tour.Id">@line.Tour.Name</a></h4>
                                                     </div>
+                                                    <span>@line.Tour.KidFare.ToString("C0") - @line.Tour.AdultFare.ToString("C0")</span>
                                                 </div>
-                                            }
-                                            <div class="tg-subtotal">
-                                                <h2>Subtotal</h2>
-                                                <span>@Model.Cart.ComputeTotalValue()$</span>
                                             </div>
-                                        </div>
-                                        <div class="tg-btnarea">
-                                            <a class="tg-btn" asp-controller=""><span>view cart</span></a>
+                                        }
+                                        <div class="tg-subtotal">
+                                            <h2>Subtotal</h2>
+                                            <span>@Model.Cart.ComputeTotalValue().ToString("C0")</span>
                                         </div>
                                     </div>
-                                }
-                            </li>
-                        }
+                                    <div class="tg-btnarea">
+                                        <a class="tg-btn" asp-controller="Cart" asp-action=""><span>view cart</span></a>
+                                    </div>
+                                </div>
+                            }
+                        </li>
                     </ul>
                 </nav>
                 <div class="tg-navigationarea">
@@ -159,21 +159,21 @@
                                                     <div class="tg-trendingtripsslider tg-trendingtrips owl-carousel">
                                                         @foreach (Tour tour in Model.PopularTours)
                                                         {
-                                                        <div class="item tg-trendingtrip">
-                                                            <figure>
-                                                                <a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">
-                                                                    <img style="height: 180px;" src="~/@tour.Image" alt="image destinations" asp-append-version="true">
-                                                                    <div class="tg-hover">
-                                                                        <span class="tg-tourduration">@tour.Duration Day(s)</span>
-                                                                        <span class="tg-locationname">@tour.Destinations?.LastOrDefault()?.Name</span>
-                                                                        <div class="tg-pricearea">
-                                                                            <span>from</span>
-                                                                            <h4>@tour.AdultFare$</h4>
+                                                            <div class="item tg-trendingtrip">
+                                                                <figure>
+                                                                    <a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">
+                                                                        <img style="height: 180px;" src="~/@tour.Image" alt="image destinations" asp-append-version="true">
+                                                                        <div class="tg-hover">
+                                                                            <span class="tg-tourduration">@tour.DurationStr()</span>
+                                                                            <span class="tg-locationname">@tour.Destinations?.LastOrDefault()?.Name</span>
+                                                                            <div class="tg-pricearea">
+                                                                                <span>from</span>
+                                                                                <h4>@tour.AdultFare.ToString("C0")</h4>
+                                                                            </div>
                                                                         </div>
-                                                                    </div>
-                                                                </a>
-                                                            </figure>
-                                                        </div>
+                                                                    </a>
+                                                                </figure>
+                                                            </div>
                                                         }
                                                     </div>
                                                 </div>

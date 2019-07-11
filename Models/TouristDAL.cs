@@ -33,7 +33,7 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@Id", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
@@ -62,9 +62,9 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@Id", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
-                        if (sdr.Read())
+                        if (await sdr.ReadAsync())
                         {
                             result = new Tour { Id = id };
                             result.Name = sdr.GetString(sdr.GetOrdinal("Name"));
@@ -98,9 +98,9 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@Id", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
-                        if (sdr.Read())
+                        if (await sdr.ReadAsync())
                         {
                             result = new Tour();
                             result.Name = sdr.GetString(sdr.GetOrdinal("Name"));
@@ -136,9 +136,9 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@Id", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
-                        if (sdr.Read())
+                        if (await sdr.ReadAsync())
                         {
                             result = new Tour();
                             result.Name = sdr.GetString(sdr.GetOrdinal("Name"));
@@ -169,12 +169,13 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@Id", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
-                        if (sdr.Read())
-                        {
-                            result = sdr.GetInt32(sdr.GetOrdinal("MaxGuest"));
-                        }
+                        if (sdr.HasRows)
+                            if (await sdr.ReadAsync())
+                            {
+                                result = sdr.GetInt32(sdr.GetOrdinal("MaxGuest"));
+                            }
                     }
                 }
             }
@@ -198,11 +199,12 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@Id", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
-                        if (sdr.Read())
+                        if (await sdr.ReadAsync())
                         {
-                            result = sdr.GetInt32(sdr.GetOrdinal("TakenSlot"));
+                            if (!await sdr.IsDBNullAsync(sdr.GetOrdinal("TakenSlot")))
+                                result = sdr.GetInt32(sdr.GetOrdinal("TakenSlot"));
                         }
                     }
                 }
@@ -227,12 +229,12 @@ namespace ZTourist.Models
                     cmd.CommandType = CommandType.StoredProcedure;
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
                             result = new List<Tour>();
-                            while (sdr.Read())
+                            while (await sdr.ReadAsync())
                             {
                                 tour = new Tour();
                                 tour.Id = sdr.GetString(sdr.GetOrdinal("TourId"));
@@ -265,12 +267,12 @@ namespace ZTourist.Models
                     cmd.CommandType = CommandType.StoredProcedure;
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
                             result = new List<Tour>();
-                            while (sdr.Read())
+                            while (await sdr.ReadAsync())
                             {
                                 tour = new Tour();
                                 tour.Id = sdr.GetString(sdr.GetOrdinal("Id"));
@@ -304,12 +306,12 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@ID", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
                             result = new List<Destination>();
-                            while (sdr.Read())
+                            while (await sdr.ReadAsync())
                             {
                                 destination = new Destination();
                                 destination.Id = sdr.GetString(sdr.GetOrdinal("DestinationId"));
@@ -340,9 +342,9 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@ID", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
-                        if (sdr.Read())
+                        if (await sdr.ReadAsync())
                         {
                             result = new Destination();
                             result.Name = sdr.GetString(sdr.GetOrdinal("Name"));
@@ -371,12 +373,12 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@ID", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
                             result = new List<AppUser>();
-                            while (sdr.Read())
+                            while (await sdr.ReadAsync())
                             {
                                 user = new AppUser();
                                 user.UserName = sdr.GetString(sdr.GetOrdinal("UserName"));
@@ -407,9 +409,9 @@ namespace ZTourist.Models
                     cmd.CommandType = CommandType.StoredProcedure;
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
-                        if (sdr.Read())
+                        if (await sdr.ReadAsync())
                         {
                             result = sdr.GetInt32(sdr.GetOrdinal("Total"));
                         }
@@ -438,12 +440,12 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@Fetch", fetch);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
                             result = new List<Tour>();
-                            while (sdr.Read())
+                            while (await sdr.ReadAsync())
                             {
                                 tour = new Tour();
                                 tour.Id = sdr.GetString(sdr.GetOrdinal("Id"));
@@ -468,7 +470,7 @@ namespace ZTourist.Models
             return result;
         }
 
-        public async Task<int> GetTotalSearchToursAsync(TourViewModel search)
+        public async Task<int> GetTotalSearchToursAsync(TourSearchViewModel search)
         {
             int result = 0;
 
@@ -484,7 +486,7 @@ namespace ZTourist.Models
                     else
                     {
                         cmd = new SqlCommand("spGetTotalSearchToursIncludeDestinationId", cnn);
-                    }                    
+                    }
                     cmd.CommandType = CommandType.StoredProcedure;
                     if (!string.IsNullOrEmpty(search.Id))
                         cmd.Parameters.AddWithValue("@Id", search.Id);
@@ -506,7 +508,8 @@ namespace ZTourist.Models
                         {
                             cmd.Parameters.AddWithValue("@IsActive", true);
                             cmd.Parameters.AddWithValue("@IsActiveCheck", true);
-                        } else
+                        }
+                        else
                         {
                             cmd.Parameters.AddWithValue("@IsActive", false);
                             cmd.Parameters.AddWithValue("@IsActiveCheck", false);
@@ -520,9 +523,9 @@ namespace ZTourist.Models
 
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
-                        if (sdr.Read())
+                        if (await sdr.ReadAsync())
                         {
                             result = sdr.GetInt32(sdr.GetOrdinal("Total"));
                         }
@@ -536,7 +539,7 @@ namespace ZTourist.Models
             return result;
         }
 
-        public async Task<IEnumerable<Tour>> SearchToursAsync(TourViewModel search)
+        public async Task<IEnumerable<Tour>> SearchToursAsync(TourSearchViewModel search)
         {
             List<Tour> result = null;
             Tour tour;
@@ -544,7 +547,7 @@ namespace ZTourist.Models
             try
             {
                 using (SqlConnection cnn = new SqlConnection(connectionStr))
-                {                    
+                {
                     SqlCommand cmd;
                     if (string.IsNullOrEmpty(search.Destination))
                     {
@@ -592,12 +595,12 @@ namespace ZTourist.Models
 
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
                             result = new List<Tour>();
-                            while (sdr.Read())
+                            while (await sdr.ReadAsync())
                             {
                                 tour = new Tour();
                                 tour.Id = sdr.GetString(sdr.GetOrdinal("Id"));
@@ -635,7 +638,7 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@Id", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
@@ -713,12 +716,12 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@ID", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
-                            result = new List<Destination>();                            
-                            while (sdr.Read())
+                            result = new List<Destination>();
+                            while (await sdr.ReadAsync())
                             {
                                 destination = new Destination();
                                 destination.Id = sdr.GetString(sdr.GetOrdinal("DestinationId"));
@@ -797,12 +800,12 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@ID", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
                             result = new List<string>();
-                            while (sdr.Read())
+                            while (await sdr.ReadAsync())
                             {
                                 guide = sdr.GetString(sdr.GetOrdinal("UserId"));
                                 result.Add(guide);
@@ -901,7 +904,7 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@Id", id);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
@@ -931,12 +934,12 @@ namespace ZTourist.Models
                     cmd.CommandType = CommandType.StoredProcedure;
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
                             result = new Dictionary<string, string>();
-                            while (sdr.Read())
+                            while (await sdr.ReadAsync())
                             {
                                 id = sdr.GetString(sdr.GetOrdinal("Id"));
                                 name = sdr.GetString(sdr.GetOrdinal("Name"));
@@ -965,9 +968,9 @@ namespace ZTourist.Models
                     cmd.CommandType = CommandType.StoredProcedure;
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
-                        if (sdr.Read())
+                        if (await sdr.ReadAsync())
                         {
                             result = sdr.GetInt32(sdr.GetOrdinal("Total"));
                         }
@@ -994,12 +997,12 @@ namespace ZTourist.Models
                     cmd.CommandType = CommandType.StoredProcedure;
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
                         if (sdr.HasRows)
                         {
                             result = new List<Destination>();
-                            while (sdr.Read())
+                            while (await sdr.ReadAsync())
                             {
                                 destination = new Destination();
                                 destination.Id = sdr.GetString(sdr.GetOrdinal("Id"));
@@ -1191,24 +1194,27 @@ namespace ZTourist.Models
             return result;
         }
 
-        public async Task<int> GetOffPercentByCodeAsync(string code)
+        public async Task<CouponCode> FindCouponByCodeAsync(string code)
         {
-            int result = 0;
+            CouponCode result = null;
 
             try
             {
                 using (SqlConnection cnn = new SqlConnection(connectionStr))
                 {
-                    SqlCommand cmd = new SqlCommand("spGetOffPercentByCode", cnn);
+                    SqlCommand cmd = new SqlCommand("spFindCouponByCode", cnn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Code", code);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync())
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
                     {
-                        if (sdr.Read())
+                        if (await sdr.ReadAsync())
                         {
-                            result = sdr.GetInt32(sdr.GetOrdinal("OffPercent"));
+                            result = new CouponCode { Code = code.ToUpper() };
+                            result.OffPercent = sdr.GetInt32(sdr.GetOrdinal("OffPercent"));
+                            result.StartDate = sdr.GetDateTime(sdr.GetOrdinal("StartDate"));
+                            result.EndDate = sdr.GetDateTime(sdr.GetOrdinal("EndDate"));
                         }
                     }
                 }

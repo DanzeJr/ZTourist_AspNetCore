@@ -20,7 +20,7 @@ namespace ZTourist.Components
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            TourViewModel model = new TourViewModel();
+            TourSearchViewModel model = new TourSearchViewModel();
             IEnumerable<Tour> tours = await touristDAL.GetNearestToursAsync();
             if (tours != null)
             {
