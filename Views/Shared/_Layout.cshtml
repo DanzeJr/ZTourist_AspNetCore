@@ -18,7 +18,7 @@
     <!--************************************
                     Main End
     *************************************-->
-    @await Html.PartialAsync("FooterPartial")
+    @await Html.PartialAsync("FooterPartial", new LoginSignUpModel())
     @RenderSection("JS", false)
 </body>
 </html>

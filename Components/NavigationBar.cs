@@ -32,7 +32,7 @@ namespace ZTourist.Components
                 }
             }
             AppUser user = User?.Identity?.Name == null ? null : await userManager.FindByNameAsync(User.Identity.Name);
-            string avatar = "images/avatars/ZAvatar.png";
+            string avatar = "https://ztourist.blob.core.windows.net/others/avatar.png";
             if (user != null)
                 avatar = user.Avatar;
 

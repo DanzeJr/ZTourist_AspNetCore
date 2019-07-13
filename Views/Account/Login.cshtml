@@ -19,20 +19,20 @@
     <script src="~/js/registerswitch.js" asp-append-version="true"></script>
     <script type="text/javascript">
         $(function () {
-            $('#BirthDate').datetimepicker({
+            $('#SignUpModel_BirthDate').datetimepicker({
                 format: 'YYYY-MM-DD',
                 maxDate: moment()
             });
         });
-        $('#BirthDate').mousedown(function () {
-            $('#datetimepicker3').data('DateTimePicker').show();
-        });
 
-        if ($('#sin').hasClass('active')) {
-            $('#signup').hide();
-            $('#signin').show();
-        }
-        $("#tg-main").attr("style", "background-image: url(../images/tours/default.jpg);");
+        $(document).ready(function () {
+            @if (ViewBag.Title == "Login")
+            {
+                @:$("#signinOpen").click();
+            }
+        })
+
+        $("#tg-main").attr("style", "background-image: url(https://ztourist.blob.core.windows.net/others/tour.jpg);");
     </script>
     <script>
         // extend jquery range validator to work for required checkboxes
@@ -51,22 +51,11 @@
 
 <div class="register-form">
     <ul class="tab-group clearfix">
-        @if (ViewContext.RouteData.Values["action"].Equals("Login"))
-        {
-            ViewData["Title"] = "Sign In";
-            <li class="tab active" id="sin"><a href="#signin">Sign In</a></li>
-            <li class="tab"><a href="#signup">Sign Up</a></li>
-        }
-        else
-        {
-            ViewData["Title"] = "Registration";
-            <li class="tab" id="sin"><a href="#signin">Sign In</a></li>
-            <li class="tab active"><a href="#signup">Sign Up</a></li>
-        }
+        <li class="tab"><a id="signinOpen" href="#signin">Sign In</a></li>
+        <li class="tab active"><a href="#signup">Sign Up</a></li>
     </ul>
     <div class="tab-content">
-        @await Html.PartialAsync("SignUpPartial", Model?.SignUpModel)
-        @await Html.PartialAsync("LoginPartial", Model?.LoginModel)
+        @await Html.PartialAsync("SignUpPartial", Model)
+        @await Html.PartialAsync("LoginPartial", Model)
     </div><!-- tab-content -->
 </div>
-

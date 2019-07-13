@@ -30,7 +30,7 @@
                                 <div class="item tg-trendingtrip">
                                     <figure>
                                         <a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">
-                                            <img style="height: 180px;" src="~/@tour.Image" alt="image destinations" asp-append-version="true">
+                                            <img style="height: 180px;" src="@tour.Image" alt="image destinations" asp-append-version="true">
                                             <div class="tg-hover">
                                                 <span class="tg-tourduration">@tour.DurationStr()</span>
                                                 <span class="tg-locationname">@tour.Destinations?.LastOrDefault()</span>
@@ -77,7 +77,7 @@
     <header id="tg-header" class="tg-header tg-headervtwo tg-headerfixed tg-haslayout">
         <div class="container-fluid">
             <div class="row">
-                <strong class="tg-logo"><a asp-controller="Home" asp-action=""><img src="~/images/dbzlogo.png" alt="company logo here" asp-append-version="true"></a></strong>
+                <strong class="tg-logo"><a asp-controller="Home" asp-action=""><img src="https://ztourist.blob.core.windows.net/others/logo.png" alt="company logo here" asp-append-version="true"></a></strong>
                 <nav class="tg-infonav" style="padding: 0;">
                     <ul>
                         @if (!User.Identity.IsAuthenticated)
@@ -88,7 +88,7 @@
                         {
                             <li>
                                 <button class="mytg-btndropdown" id="tg-dropdowndashboard" type="button" data-toggle="dropdown">
-                                    <img style="width: 35px; height: 35px;" src="~/@Model.Avatar" alt="image description" asp-append-version="true">
+                                    <img style="width: 35px; height: 35px;" src="@Model.Avatar" alt="image description" asp-append-version="true">
                                     <span>@User.Identity.Name</span>
                                     <i class="fa fa-caret-down"></i>
                                 </button>
@@ -109,7 +109,7 @@
                                         @foreach (CartLine line in Model.Cart.Lines)
                                         {
                                             <div class="tg-cartitem">
-                                                <figure class="tg-itemimg"><img style="width: 57px; height: 57px;" src="~/@line.Tour.Image" alt="image description" asp-append-version="true"></figure>
+                                                <figure class="tg-itemimg"><img style="width: 57px; height: 57px;" src="@line.Tour.Image" alt="image description" asp-append-version="true"></figure>
                                                 <div class="tg-contentbox">
                                                     <div class="tg-producthead">
                                                         <em>x @(line.AdultTicket + line.KidTicket)</em>
@@ -162,7 +162,7 @@
                                                             <div class="item tg-trendingtrip">
                                                                 <figure>
                                                                     <a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">
-                                                                        <img style="height: 180px;" src="~/@tour.Image" alt="image destinations" asp-append-version="true">
+                                                                        <img style="height: 180px;" src="@tour.Image" alt="image destinations" asp-append-version="true">
                                                                         <div class="tg-hover">
                                                                             <span class="tg-tourduration">@tour.DurationStr()</span>
                                                                             <span class="tg-locationname">@tour.Destinations?.LastOrDefault()?.Name</span>

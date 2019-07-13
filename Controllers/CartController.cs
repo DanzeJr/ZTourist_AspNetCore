@@ -24,26 +24,41 @@ namespace ZTourist.Controllers
         public async Task<IActionResult> Index()
         {
             CouponCode cp = null;
-            if (!string.IsNullOrEmpty(cart.CouponCode)) // check if cart contains coupon code
+            if (!string.IsNullOrEmpty(cart.Coupon?.Code)) // check if cart contains coupon code
             {
-                cp = await touristDAL.FindCouponByCodeAsync(cart.CouponCode);
+                cp = await touristDAL.FindCouponByCodeAsync(cart.Coupon.Code);
                 if (cp == null) // if coupon code is not found or outdated
                 {
-                    ModelState.AddModelError("", "Coupon Code is not existed or out of date");
+                    ModelState.AddModelError("", "Coupon Code " + cart.Coupon.Code.ToUpper() + " is not existed or out of date");
                     cart.RemoveCoupon(); // remove coupon code from cart
                 }
+                else
+                {
+                    cart.Coupon = cp;
+                }
             }
-            if (cart != null && cart.Lines.Count() > 0)
+            if (cart.Lines.Count() > 0)
             {
                 foreach (CartLine cartLine in cart.Lines)
                 {
-                    cartLine.Tour = await touristDAL.FindTourByTourIdAsync(cartLine.Tour.Id);
+                    Tour tour = await touristDAL.FindTourByTourIdAsync(cartLine.Tour.Id); //find tour which is active
+                    if (tour == null || tour.FromDate < DateTime.Now)
+                    {
+                        ModelState.AddModelError("", "Tour " + cartLine.Tour.Id.ToUpper() + " is not existed or available");
+                    } else
+                    {
+                        cartLine.Tour = tour;
+                        cartLine.Tour.TakenSlot = await touristDAL.GetTakenSlotByTourIdAsync(cartLine.Tour.Id);
+                        if ((cartLine.AdultTicket + cartLine.KidTicket) > (cartLine.Tour.MaxGuest - cartLine.Tour.TakenSlot))
+                        {
+                            ModelState.AddModelError("", "Not enough tickets of tour " + cartLine.Tour.Id.ToUpper());
+                        }
+                    }
                 }
             }
             CartViewModel model = new CartViewModel
             {
-                Cart = cart,
-                Coupon = cp ?? new CouponCode()
+                Cart = cart
             };
             return View(model);
         }
@@ -64,19 +79,19 @@ namespace ZTourist.Controllers
                 }
                 else
                 {
-                    bool isExistedTour = false;
+                    bool isAvailableTour = false;
                     if (!string.IsNullOrWhiteSpace(model.Tour.Id))
-                        isExistedTour = await touristDAL.IsExistedTourIdAsync(model.Tour.Id);
-                    if (!isExistedTour)
+                        isAvailableTour = await touristDAL.IsAvailableTourAsync(model.Tour.Id);
+                    if (!isAvailableTour)
                     {
-                        cart.RemoveItem(model.Tour.Id); // remove tour from cart if tour is not existed anymore
-                        ModelState.AddModelError("", "Tour is not existed");
+                        ModelState.AddModelError("", "Tour " + model.Tour.Id.ToUpper() + " is not existed or available");
+                        return RedirectToAction(nameof(Index)); //if tour is not available then report error at cart view since tour details can be found
                     }
                     else
                     {
                         int takenSlot = await touristDAL.GetTakenSlotByTourIdAsync(model.Tour.Id);
                         int maxGuest = await touristDAL.GetMaxGuestByTourIdAsync(model.Tour.Id);
-                        CartLine line = cart.Lines.FirstOrDefault(x => x.Tour.Id == model.Tour.Id);
+                        CartLine line = cart.Lines.FirstOrDefault(x => x.Tour.Id == model.Tour.Id); // find if tour is in cart
                         int totalTicket = (line?.AdultTicket ?? 0) + (line?.KidTicket ?? 0);
                         if ((totalTicket + model.AdultTicket + model.KidTicket) > (maxGuest - takenSlot))
                         {
@@ -90,7 +105,7 @@ namespace ZTourist.Controllers
                     }
                 }
             }
-            return RedirectToAction("Details", "Tour", new { model.Tour.Id });
+            return RedirectToAction("Details", "Tour", new { model.Tour.Id }); //report error at tour details if model properties is invalid or not enough tickets
         }
 
         [HttpPost]
@@ -113,13 +128,12 @@ namespace ZTourist.Controllers
                 }
                 else
                 {
-                    bool isExistedTour = false;
+                    bool isAvailableTour = false;
                     if (!string.IsNullOrWhiteSpace(model.Tour.Id))
-                        isExistedTour = await touristDAL.IsExistedTourIdAsync(model.Tour.Id);
-                    if (!isExistedTour)
+                        isAvailableTour = await touristDAL.IsAvailableTourAsync(model.Tour.Id);
+                    if (!isAvailableTour)
                     {
-                        cart.RemoveItem(model.Tour.Id); // remove tour from cart if tour is not existed anymore
-                        ModelState.AddModelError("", "Tour is not existed");
+                        ModelState.AddModelError("", "Tour " + model.Tour.Id.ToUpper() + " is not existed or available");
                     }
                     else
                     {
@@ -169,7 +183,7 @@ namespace ZTourist.Controllers
                 CouponCode cp = await touristDAL.FindCouponByCodeAsync(couponCode);
                 if (cp == null) // if coupon code is not found or outdated
                 {
-                    ModelState.AddModelError("", "Coupon Code is not existed or out of date");
+                    ModelState.AddModelError("", "Coupon Code " + couponCode.ToUpper() + " is not existed or out of date");
                     // if there was old coupon code, leave it remain in cart
                 }
                 else

@@ -5,10 +5,7 @@ using System.Threading.Tasks;
 
 namespace ZTourist.Models.ViewModels
 {
-    public class CartViewModel
+    public class OrderViewModel
     {
-        public Cart Cart { get; set; }
-
-        public CartLine CartLine { get; set; }
     }
 }

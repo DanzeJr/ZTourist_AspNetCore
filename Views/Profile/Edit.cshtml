@@ -1,0 +1,164 @@
+﻿@model ProfileModel
+
+@{
+    ViewData["Title"] = "Edit Profile";
+    List<SelectListItem> gender = new List<SelectListItem>
+{
+        new SelectListItem { Text = "Male", Value = "Male" },
+        new SelectListItem { Text = "Female", Value = "Female" },
+        new SelectListItem { Text = "Other", Value = "Other" }
+    };
+}
+
+@section CSS {
+    <style>
+        .tg-dashboardcontent .tg-content .field-validation-error span {
+            position: absolute;
+        }
+
+        .tg-content label.error {
+            color: red !important;
+            font-size: 12px !important;
+        }
+
+        #yob li {
+            list-style: none;
+        }
+
+        #yob table tr td,
+        #yob table tr th {
+            padding: 10px 0;
+            text-align: center;
+        }
+    </style>
+}
+
+@section JS {
+    <script type="text/javascript">
+        $(function () {
+            $('#BirthDate').datetimepicker({
+                format: 'YYYY-MM-DD',
+                maxDate: moment()
+            });
+        });
+
+        $('#avatar').change(function () { //show preview avatar
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#avatarImg').attr('src', e.target.result);
+                },
+                    reader.readAsDataURL(this.files[0]);
+            }
+        });
+        $("#tg-main").attr("class", "tg-main tg-sectionspace tg-haslayout");
+/**/</script>
+}
+
+@section Slider {
+    <!--************************************
+                    Inner Banner Start
+    *************************************-->
+    <section class="tg-parallax tg-innerbanner" data-appear-top-offset="100" data-parallax="scroll" data-image-src="https://ztourist.blob.core.windows.net/others/banner.png">
+        <div class="tg-sectionspace tg-haslayout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h1>Edit Profile</h1>
+                        <h2>@User.Identity.Name</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--************************************
+                    Inner Banner End
+    *************************************-->
+}
+
+<div class="container">
+    <div class="row">
+        <div id="tg-twocolumns" class="tg-twocolumns">
+            <form class="tg-formtheme tg-formdashboard" asp-controller="Profile" asp-action="Update" method="post" enctype="multipart/form-data">
+                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                    <aside id="tg-sidebar" class="tg-sidebar">
+                        <div class="tg-widget tg-widgetdashboard">
+                            <div class="tg-widgettitle">
+                                <h3>My Account</h3>
+                            </div>
+                            <div class="tg-widgetcontent">
+                                <ul>
+                                    <li><a asp-controller="Profile" asp-action=""><i class="icon-user"></i><span>Dashboard</span></a></li>
+                                    <li class="selected"><a asp-controller="Profile" asp-action="Edit"><i class="icon-pen2"></i><span>Edit Profile</span></a></li>
+                                    <li><a asp-controller="Profile" asp-action="ChangePassword"><i class="icon-lock-open3"></i><span>Change Password</span></a></li>
+                                    <li><a asp-controller="Order" asp-action="History"><i class="icon-basket3"></i><span>Order History</span></a></li>
+                                    <li><a asp-controller="Account" asp-action="Logout"><i class="icon-lock"></i><span>Sign Out</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+                <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+                    <div id="tg-content" class="tg-content">
+                        <div class="tg-dashboard">
+                            <div class="tg-box tg-ediprofile">
+                                <div class="tg-heading">
+                                    <h3>Edit Profile</h3>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-center text-danger" style="margin: 5% 0; font-size: larger; font-weight: bold"></div>
+                                <div class="tg-dashboardcontent">
+                                    <div class="tg-imgholder">
+                                        <figure><img id="avatarImg" style="width: 87px; height: 87px;" src="@Model.Avatar" alt="avatar" asp-append-version="true"></figure>
+                                        <input type="file" id="avatar" style="display: none" asp-for="Photo" />
+                                        <input type="hidden" asp-for="Avatar" value="@Model.Avatar" />
+                                        <a class="tg-btn" href="javascript:void(0);" onclick="$('#avatar').click();">Change Profile Picture</a>
+                                    </div>
+                                    <div class="tg-content">
+                                        <fieldset>
+                                            <div class="form-group">
+                                                <label asp-for="FirstName">First Name <sup>*</sup></label>
+                                                <input class="form-control" asp-for="FirstName" />
+                                                <div><span asp-validation-for="FirstName" class="text-danger"></span></div><br />
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="LastName">Last Name <sup>*</sup></label>
+                                                <input class="form-control" asp-for="LastName" />
+                                                <div><span asp-validation-for="LastName" class="text-danger"></span></div><br />
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="Gender">Gender <sup>*</sup></label>
+                                                <select class="form-control" asp-for="Gender" asp-items="gender"></select>
+                                                <div><span asp-validation-for="Gender" class="text-danger"></span></div><br />
+                                            </div>
+                                            <div class="form-group" id="yob">
+                                                <label asp-for="BirthDate">Birth Date <sup>*</sup></label>
+                                                <input class="form-control" asp-for="BirthDate" />
+                                                <div><span asp-validation-for="BirthDate" class="text-danger"></span></div><br />
+                                            </div>
+                                            <div class="form-group" style="width: 100%">
+                                                <label asp-for="Email">Email Address <sup>*</sup></label>
+                                                <input class="form-control" asp-for="Email" />
+                                                <div><span asp-validation-for="Email" class="text-danger"></span></div><br />
+                                            </div>
+                                            <div class="form-group" style="width: 100%">
+                                                <label asp-for="Tel">Phone Number <sup>*</sup></label>
+                                                <input class="form-control" asp-for="Tel" />
+                                                <div><span asp-validation-for="Tel" class="text-danger"></span></div><br />
+                                            </div>
+                                            <div class="form-group" style="width: 100%">
+                                                <label asp-for="Address">Contact Address <sup>*</sup></label>
+                                                <input class="form-control" asp-for="Address" />
+                                                <div><span asp-validation-for="Address" class="text-danger"></span></div><br />
+                                            </div>
+                                            <button class="tg-btn" type="submit"><span>update profile</span></button>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

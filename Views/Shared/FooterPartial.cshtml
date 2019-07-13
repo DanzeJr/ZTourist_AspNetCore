@@ -1,4 +1,5 @@
-﻿<!--************************************
+﻿@model  LoginSignUpModel
+<!--************************************
                         Footer Start
  *************************************-->
 <footer id="tg-footer" class="tg-footer tg-haslayout">
@@ -59,7 +60,7 @@
                             <!--<h3>Z Tourist was registered to GOV</h3>-->
                         </div>
                         <div class="tg-widgetcontent">
-                            <a href="http://online.gov.vn/HomePage.aspx"><img src="~/images/gov_img.png" alt="image gov"></a>
+                            <a href="http://online.gov.vn/HomePage.aspx"><img src="https://ztourist.blob.core.windows.net/others/gov_img.png" alt="image gov" asp-append-version="true"></a>
                         </div>
                     </div>
                 </div>
@@ -86,7 +87,7 @@
 <!--************************************
                     Login Signup Start
     *************************************-->
-<div id="tg-loginsingup" class="tg-loginsingup" data-vide-bg="poster: ../images/signup-img.jpg" data-vide-options="position: 0% 50%">
+<div id="tg-loginsingup" class="tg-loginsingup" data-vide-bg="poster: https://ztourist.blob.core.windows.net/others/signup-img.jpg" data-vide-options="position: 0% 50%">
     <div class="tg-contentarea tg-themescrollbar">
         <div class="tg-scrollbar">
             <button type="button" class="close">x</button>
@@ -102,29 +103,24 @@
                     <div class="tg-tabcontent tab-content">
                         <div role="tabpanel" class="tab-pane active fade in" id="home">
                             <form class="tg-formtheme tg-formlogin" asp-controller="Account" asp-action="Login" method="post">
-                                <input type="hidden" name="ReturnUrl" value="@ViewContext.HttpContext.Request.PathAndQuery()" />
+                                <input type="hidden" asp-for="LoginModel.ReturnUrl" value="@(ViewBag.returnUrl ?? ViewContext.HttpContext.Request.PathAndQuery())" />
                                 <fieldset>
                                     <div class="form-group">
                                         <label for="UserName">Username <sup>*</sup></label>
-                                        <input class="form-control" placeholder="Username" type="text" data-val="true" 
-                                               data-val-required="Username field is required" 
-                                               data-val-length="Username can&#x27;t be greater than 10 characters" 
-                                               id="UserName" name="UserName" value="" />
-                                        <span class="field-validation-valid" data-valmsg-for="UserName" data-valmsg-replace="true"></span>
+                                        <input class="form-control" placeholder="Username" 
+                                               asp-for="LoginModel.UserName" />
+                                        <span asp-validation-for="LoginModel.UserName"></span>
                                     </div>
                                     <div class="form-group">
                                         <label for="Password">Password <sup>*</sup></label>
-                                        <input class="form-control" placeholder="Password" type="password" data-val="true" 
-                                               data-val-minlength="Password must be greater than 6 characters" 
-                                               data-val-minlength-min="6" 
-                                               data-val-required="Password field is required" 
-                                               id="Password" name="Password" />
-                                        <span class="field-validation-valid" data-valmsg-for="Password" data-valmsg-replace="true"></span>
+                                        <input class="form-control" placeholder="Password" type="password" 
+                                               asp-for="LoginModel.Password" />
+                                        <span asp-validation-for="LoginModel.Password"></span>
                                     </div>
                                     <div class="form-group">
                                         <div class="tg-checkbox">
-                                            <input class="form-control" type="checkbox" id="RememberMe" name="RememberMe" />
-                                            <label for="RememberMe">Remember me</label>
+                                            <input class="form-control" type="checkbox" asp-for="LoginModel.RememberMe" />
+                                            <label asp-for="LoginModel.RememberMe">Remember me</label>
                                         </div>
                                     </div>
                                     <button class="tg-btn tg-btn-lg" type="submit"><span>Sign In</span></button>
@@ -133,26 +129,17 @@
                         </div>
                         <div role="tabpanel" class="tab-pane fade" id="profile">
                             <form class="tg-formtheme tg-formlogin" asp-controller="Account" asp-action="SignUp" method="get">
-                                <input type="hidden" name="ReturnUrl" value="@ViewContext.HttpContext.Request.PathAndQuery()" />
+                                <input type="hidden" asp-for="SignUpModel.ReturnUrl" value="@(ViewBag.returnUrl ?? ViewContext.HttpContext.Request.PathAndQuery())" />
                                 <fieldset>
                                     <div class="form-group">
                                         <label for="UserName">Username <sup>*</sup></label>
-                                        <input class="form-control" type="text" data-val="true" 
-                                               data-val-length="Username can&#x27;t be greater than 10 characters" 
-                                               data-val-length-max="10" 
-                                               data-val-remote="&#x27;Username&#x27; is taken" data-val-remote-additionalfields="*.UserName" data-val-remote-url="/Account/IsExistedUsername" 
-                                               data-val-required="Username field is required" 
-                                               id="UserName" name="UserName" value="" />
-                                        <span class="field-validation-valid" data-valmsg-for="UserName" data-valmsg-replace="true"></span>
+                                        <input class="form-control" placeholder="Username" asp-for="SignUpModel.UserName" />
+                                        <span asp-validation-for="SignUpModel.UserName"></span>
                                     </div>
                                     <div class="form-group">
                                         <label for="Email">Email <sup>*</sup></label>
-                                        <input class="form-control" placeholder="example@mail.com" type="email" data-val="true" 
-                                               data-val-email="Please enter a valid email" 
-                                               data-val-required="Email field is required" 
-                                               data-val-remote="&#x27;Email&#x27; is taken" data-val-remote-additionalfields="*.Email" data-val-remote-url="/Account/IsExistedEmail" 
-                                               id="Email" name="Email" value="" />
-                                        <span class="field-validation-valid" data-valmsg-for="Email" data-valmsg-replace="true"></span>
+                                        <input class="form-control" placeholder="example@mail.com" asp-for="SignUpModel.Email" />
+                                        <span asp-validation-for="SignUpModel.Email"></span>
                                     </div>
                                     <button class="tg-btn tg-btn-lg" type="submit"><span>Sign Up</span></button>
                                 </fieldset>

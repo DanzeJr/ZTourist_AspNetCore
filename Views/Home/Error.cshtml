@@ -1,12 +1,12 @@
 ﻿@{ 
     Layout = null;
 }
-<!DOCTYPE html>
 
+<!DOCTYPE html>
 <html class="no-js" lang="">
 <head>
     @await Html.PartialAsync("HeaderPartial")
-    <title>Z Tourist - Access Denied</title>
+    <title>Z Tourist - @(ViewBag.Title ?? "Error")</title>
 </head>
 <body class="tg-404errorpage">
     <main id="tg-main" class="tg-main tg-haslayout">
@@ -14,12 +14,12 @@
             <div class="container">
                 <div class="row">
                     <div class="tg-404errorcontent">
-                        <h1>Access Denied</h1>
-                        <h2>This page isn't available</h2>
+                        <h1>@(ViewBag.StatusCode ?? "ERROR")</h1>
+                        <h2>@(ViewBag.Title ?? "Oops! Something went wrong")</h2>
                         <div class="tg-description">
-                            <p>Sorry but the link that you followed is not allowed to access...</p>
+                            <p>@(ViewBag.Message ?? "We are very sorry, please try again in a moment.")</p>
                         </div>
-                        <a class="tg-btn" asp-controller="Home" asp-action=""><span>Back to home</span></a>
+                        <a class="tg-btn" asp-controller="Home" asp-action=""><span>go back to home</span></a>
                     </div>
                 </div>
             </div>

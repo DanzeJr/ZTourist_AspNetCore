@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using ZTourist.Models;
 
 namespace ZTourist
@@ -34,6 +35,7 @@ namespace ZTourist
                 .AddEntityFrameworkStores<AppIdentityDbContext>()
                 .AddDefaultTokenProviders();
             services.AddTransient<TouristDAL>();
+            services.AddTransient<BlobService>();
             services.AddScoped<Cart>(sp => SessionCart.GetCart(sp));
             services.AddHttpContextAccessor();
             services.AddMvc();
@@ -46,7 +48,8 @@ namespace ZTourist
         {
             if (env.IsDevelopment())
             {
-                app.UseStatusCodePages();
+                app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
+                //app.UseExceptionHandler("/Error");
                 app.UseDeveloperExceptionPage();
             }
             else
@@ -60,14 +63,19 @@ namespace ZTourist
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
+                    name: "ErrorWithStatusCode",
+                    template: "Error/StatusCode{statusCode:int}",
+                    defaults: new { controller = "Home", action = "Error" }
+                    );
+                routes.MapRoute(
                     name: "Error",
                     template: "Error",
                     defaults: new { controller = "Home", action = "Error" }
                     );
                 routes.MapRoute(
-                    name: null,
-                    template: "{controller}s",
-                    defaults: new { controller = "Tour", action = "Index" }
+                    name: "Home",
+                    template: "Home",
+                    defaults: new { controller = "Home", action = "Index" }
                     );
                 routes.MapRoute(
                     name: null,

@@ -20,14 +20,16 @@ namespace ZTourist.Controllers
             this.signInManager = signInManager;
         }
 
-        public IActionResult Login()
+        public IActionResult Login(string returnUrl)
         {
+            ViewBag.returnUrl = returnUrl;
+            ViewBag.Title = "Login";
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginModel login)
+        public async Task<IActionResult> Login([Bind(Prefix = nameof(LoginSignUpModel.LoginModel))] LoginModel login)
         {
             if (ModelState.IsValid)
             {
@@ -38,7 +40,10 @@ namespace ZTourist.Controllers
                     Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(user, login.Password, false, false);
                     if (result.Succeeded)
                     {
-                        return Redirect(login.ReturnUrl ?? "/");
+                        if (!string.IsNullOrEmpty(login.ReturnUrl) && Url.IsLocalUrl(login.ReturnUrl))
+                            return Redirect(login.ReturnUrl);
+                        else
+                            return RedirectToAction("Index", "Home");
                     }
                 }
                 ModelState.AddModelError("", "Invalid User or Password");
@@ -47,41 +52,21 @@ namespace ZTourist.Controllers
             {
                 LoginModel = login
             };
+            ViewBag.returnUrl = login.ReturnUrl;
+            ViewBag.Title = "Login";
             return View(model);
         }
 
-        public async Task<IActionResult> SignUp(string username, string email)
+        public IActionResult SignUp(LoginSignUpModel model)
         {
-            bool isExistedUser = false;
-            bool isExistedEmail = false;
-            if (username != null)
-            {
-                isExistedUser = await userManager.FindByNameAsync(username) == null ? false : true;
-            }
-            if (email != null)
-            {
-                isExistedEmail = await userManager.FindByEmailAsync(email) == null ? false : true;
-            }
-
-            if (isExistedUser)
-            {
-                ModelState.AddModelError("", $"User name '{username}' is already taken");
-            }
-            if (isExistedEmail)
-            {
-                ModelState.AddModelError("", $"Email '{email}' is already taken");
-            }
-
-            LoginSignUpModel model = new LoginSignUpModel
-            {
-                SignUpModel = new SignUpModel { UserName = username, Email = email }
-            };
+            ViewBag.returnUrl = model.SignUpModel.ReturnUrl;
+            ViewBag.Title = "Registration";
             return View("Login", model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignUp(SignUpModel signUp)
+        public async Task<IActionResult> SignUp([Bind(Prefix = nameof(LoginSignUpModel.SignUpModel))] SignUpModel signUp)
         {
             if (ModelState.IsValid)
             {
@@ -95,7 +80,7 @@ namespace ZTourist.Controllers
                     Address = signUp.Address,
                     BirthDate = signUp.BirthDate,
                     PhoneNumber = signUp.Tel,
-                    Avatar = "images/avatars/ZAvatar.png",
+                    Avatar = "https://ztourist.blob.core.windows.net/others/avatar.png",
                     RegisterDate = DateTime.Now
                 };
 
@@ -103,7 +88,10 @@ namespace ZTourist.Controllers
 
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index", "Home");
+                    if (!string.IsNullOrEmpty(signUp.ReturnUrl) && Url.IsLocalUrl(signUp.ReturnUrl))
+                        return Redirect(signUp.ReturnUrl);
+                    else
+                        return RedirectToAction("Index", "Home");
                 }
                 else
                 {
@@ -117,6 +105,8 @@ namespace ZTourist.Controllers
             {
                 SignUpModel = signUp
             };
+            ViewBag.returnUrl = signUp.ReturnUrl;
+            ViewBag.Title = "Registration";
             return View("Login", model);
         }
 
@@ -177,7 +167,11 @@ namespace ZTourist.Controllers
 
         public async Task<IActionResult> IsExistedUsername(string username)
         {
-            if (username != null)
+            if (username == null)
+            {
+                username = HttpContext.Request.Query["SignUpModel.UserName"];
+            }
+            if (!string.IsNullOrWhiteSpace(username))
                 if (await userManager.FindByNameAsync(username) != null)
                 {
                     return Json($"User name '{username}' is already taken");
@@ -187,11 +181,26 @@ namespace ZTourist.Controllers
 
         public async Task<IActionResult> IsExistedEmail(string email)
         {
-            if (email != null)
-            if (await userManager.FindByEmailAsync(email) != null)
+            if (email == null) // if param name is not 'email'
             {
-                return Json($"Email '{email}' is already taken");
+                email = HttpContext.Request.Query["SignUpModel.Email"]; // if param is from sign up
+                if (email == null)
+                    email = HttpContext.Request.Query["ProfileModel.Email"]; // if param is from edit profile
             }
+            if (!string.IsNullOrWhiteSpace(email))
+            {
+                AppUser user = await userManager.FindByEmailAsync(email);
+                if (user != null)
+                {
+                    if (User?.Identity?.Name != null)
+                    {
+                        user = await userManager.FindByNameAsync(User.Identity.Name);
+                        if (email.Equals(user.Email, StringComparison.OrdinalIgnoreCase)) // if email is requester's email
+                            return Json(true);
+                    }
+                    return Json($"Email '{email}' is already taken");
+                }
+            }                
             return Json(true);
         }
     }

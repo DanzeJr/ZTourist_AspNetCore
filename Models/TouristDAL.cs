@@ -49,6 +49,35 @@ namespace ZTourist.Models
             return result;
         }
 
+        public async Task<bool> IsAvailableTourAsync(string id)
+        {
+            bool result = false;
+
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(connectionStr))
+                {
+                    SqlCommand cmd = new SqlCommand("spIsAvailableTour", cnn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    if (cnn.State == ConnectionState.Closed)
+                        cnn.Open();
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
+                    {
+                        if (sdr.HasRows)
+                        {
+                            result = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
+        }
+
         public async Task<Tour> FindTourByTourIdAsync(string id)
         {
             Tour result = null;
@@ -1092,16 +1121,63 @@ namespace ZTourist.Models
             {
                 using (SqlConnection cnn = new SqlConnection(connectionStr))
                 {
-                    SqlCommand cmd = new SqlCommand("spAddOrder", cnn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@Id", order.Id);
-                    cmd.Parameters.AddWithValue("@UserId", order.UserId);
-                    cmd.Parameters.AddWithValue("@CouponCode", order.CouponCode);
-                    cmd.Parameters.AddWithValue("@Comment", order.Comment);
-                    cmd.Parameters.AddWithValue("@Status", order.Status);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    result = await cmd.ExecuteNonQueryAsync() > 0;
+                    using(SqlTransaction transaction = cnn.BeginTransaction())
+                    {
+                        using (SqlCommand cmd = new SqlCommand())
+                        {
+                            cmd.Connection = cnn;
+                            cmd.Transaction = transaction;
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.CommandText = "spAddOrder";
+                            try
+                            {
+                                cmd.Parameters.AddWithValue("@Id", order.Id);
+                                cmd.Parameters.AddWithValue("@UserId", order.Customer.Id);
+                                cmd.Parameters.AddWithValue("@CouponCode", order.Cart.Coupon?.Code);
+                                cmd.Parameters.AddWithValue("@Comment", order.Comment);
+                                cmd.Parameters.AddWithValue("@OrderDate", order.OrderDate);
+                                cmd.Parameters.AddWithValue("@Status", order.Status);
+                                result = await cmd.ExecuteNonQueryAsync() > 0;
+                                
+                                if (result) // if insert order customer successfully, then insert order details
+                                {
+                                    result = false;
+                                    cmd.CommandText = "spAddOrderDetail";
+                                    foreach (CartLine line in order.Cart.Lines)
+                                    {
+                                        result = false;
+                                        cmd.Parameters.Clear();
+                                        cmd.Parameters.AddWithValue("@OrderId", order.Id);
+                                        cmd.Parameters.AddWithValue("@TourId", line.Tour.Id);
+                                        cmd.Parameters.AddWithValue("@AdultTicket", line.AdultTicket);
+                                        cmd.Parameters.AddWithValue("@KidTicket", line.KidTicket);
+                                        result = await cmd.ExecuteNonQueryAsync() > 0;
+                                        if (!result)
+                                        {
+                                            transaction.Rollback(); // if insert order detail failed then roll back transaction
+                                            break; // stop for to return
+                                        }
+                                    }
+                                }
+                                
+                                transaction.Commit(); // commit transaction whether insert order is successful or not
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                                try
+                                {
+                                    transaction.Rollback(); //if an exception is throw, roll back transaction
+                                }
+                                catch (Exception rollbackEx)
+                                {
+                                    Console.WriteLine(rollbackEx.Message);
+                                }
+                            }                            
+                        }
+                    }                                            
                 }
             }
             catch (Exception)
@@ -1110,33 +1186,7 @@ namespace ZTourist.Models
             }
             return result;
         }
-
-        public async Task<bool> AddOrderDetailAsync(string orderId, string tourId, int adultTicket, int kidTicket)
-        {
-            bool result = false;
-
-            try
-            {
-                using (SqlConnection cnn = new SqlConnection(connectionStr))
-                {
-                    SqlCommand cmd = new SqlCommand("spAddOrderDetail", cnn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@OrderId", orderId);
-                    cmd.Parameters.AddWithValue("@TourId", tourId);
-                    cmd.Parameters.AddWithValue("@AdultTicket", adultTicket);
-                    cmd.Parameters.AddWithValue("@KidTicket", kidTicket);
-                    if (cnn.State == ConnectionState.Closed)
-                        cnn.Open();
-                    result = await cmd.ExecuteNonQueryAsync() > 0;
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return result;
-        }
-
+        
         #endregion
 
 

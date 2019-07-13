@@ -11,7 +11,7 @@ namespace ZTourist.Models
     {
         private List<CartLine> lineCollection = new List<CartLine>();
 
-        public string CouponCode { get; set; }
+        public CouponCode Coupon { get; set; } = new CouponCode();
 
         public virtual void AddItem(CartLine line)
         {
@@ -50,18 +50,22 @@ namespace ZTourist.Models
 
         public virtual void ApplyCoupon(string code)
         {
-            CouponCode = code;
+            Coupon.Code = code;
         }
 
         public virtual void RemoveCoupon()
         {
-            CouponCode = null;
+            Coupon = new CouponCode();
         }
 
         public virtual decimal ComputeTotalValue() =>
             lineCollection.Sum(x => x.Tour.AdultFare * (x.AdultTicket ?? 0) + x.Tour.KidFare * (x.KidTicket ?? 0));
 
-        public virtual void Clear() => lineCollection.Clear();
+        public virtual void Clear()
+        {
+            lineCollection.Clear();
+            Coupon = new CouponCode();
+        }
 
         public virtual IEnumerable<CartLine> Lines => lineCollection;
     }

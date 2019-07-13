@@ -13,7 +13,7 @@
         <div id="tg-homeslider" class="tg-homeslider tg-homeslidervtwo owl-carousel tg-haslayout">
             @foreach (Tour tour in Model.Tours)
             {
-                <figure class="item" data-vide-bg="poster: @Url.Content("~/" + tour.Image)" data-vide-options="position: 0% 50%">
+                <figure class="item" data-vide-bg="poster: @tour.Image" data-vide-options="position: 0% 50%">
                     <figcaption>
                         <div class="container">
                             <div class="row">
@@ -80,7 +80,7 @@
 }
 else
 {
-    <img src="~/images/tours/default.jpg" alt="Main Image" asp-append-version="true" />
+    <img src="https://ztourist.blob.core.windows.net/others/tour.jpg" alt="Main Image" asp-append-version="true" />
 }
 <!--************************************
                 Home Slider End

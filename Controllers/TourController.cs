@@ -78,7 +78,11 @@ namespace ZTourist.Controllers
         public async Task<IActionResult> Details(string id)
         {
             Tour tour = await touristDAL.FindTourByTourIdAsync(id);
-            if (tour != null)
+            if (tour == null)
+            {
+                return NotFound();
+            }
+            else
             {
                 tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(id);
                 tour.TakenSlot = await touristDAL.GetTakenSlotByTourIdAsync(id);

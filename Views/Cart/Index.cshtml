@@ -10,10 +10,11 @@
             color: white;
             background: #888;
         }
-
-            .btn-tourist:hover {
-                background-color: #ff7550;
-            }
+        
+        .btn-tourist:hover {
+            color: white;
+            background-color: #ff7550;
+        }
     </style>
 }
 @section JS {
@@ -26,13 +27,13 @@
     <!--************************************
     Inner Banner Start
     *************************************-->
-    <section class="tg-parallax tg-innerbanner" data-appear-top-offset="600" data-parallax="scroll" data-image-src="@Url.Content("~/images/ZTouristSWR.png")">
+    <section class="tg-parallax tg-innerbanner" data-appear-top-offset="600" data-parallax="scroll" data-image-src="https://ztourist.blob.core.windows.net/others/banner.png">
         <div class="tg-sectionspace tg-haslayout">
             <div class="container">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                        <h1>Cart</h1>
-                        <h2>View your selected tours</h2>
+                        <h1>Shopping Cart</h1>
+                        <h2>@(Model?.Cart?.Lines == null || Model.Cart.Lines.Count() <= 0 ? "Your cart is empty" : "View your selected tours")</h2>
                     </div>
                 </div>
             </div>
@@ -53,8 +54,8 @@
                         <table class="table table-responsive">
                             <tr>
                                 <th scope="col">Tour Name</th>
-                                <th scope="col">Ticket Adult</th>
-                                <th scope="col">Ticket Kid</th>
+                                <th scope="col">Adult Ticket</th>
+                                <th scope="col">Kid Ticket</th>
                                 <th scope="col">Price</th>
                                 <th scope="col">Update</th>
                                 <th scope="col">Remove</th>
@@ -71,7 +72,7 @@
                                                     <div class="tg-tourname">
                                                         <figure>
                                                             <a asp-controller="Tour" asp-action="Details" asp-route-id="@line.Tour.Id">
-                                                                <img style="width: 68px; height: 68px;" src="~/@line.Tour.Image" alt="tour image" asp-append-version="true">
+                                                                <img style="width: 68px; height: 68px;" src="@line.Tour.Image" alt="tour image" asp-append-version="true">
                                                             </a>
                                                         </figure>
                                                         <div class="tg-populartourcontent">
@@ -126,16 +127,16 @@
                         <div class="tg-widget tg-widgetpersonprice">
                             <div class="tg-widgetcontent">
                                 <ul>
-                                    <li class="tg-personprice"><div class="tg-perperson"><span>Booking Price</span></div></li>
+                                    <li class="tg-personprice"><div class="tg-perperson"><span>Number of tours: </span><em>@Model.Cart.Lines.Count()</em></div></li>
                                     <li><span>Sub Total:</span><em>@Model.Cart.ComputeTotalValue().ToString("C0")</em></li>
-                                    <li><span>Coupon Code:</span><em>@(Model?.Coupon?.Code ?? "Not applied")</em></li>
-                                    <li><span>Off Percent:</span><em>@(Model?.Coupon?.OffPercent ?? 0)%</em></li>
+                                    <li><span>Coupon Code:</span><em>@(Model?.Cart?.Coupon?.Code ?? "Not applied")</em></li>
+                                    <li><span>Off Percent:</span><em>@(Model?.Cart?.Coupon?.OffPercent ?? 0)%</em></li>
                                     <li class="tg-totalprice">
                                         <div class="tg-totalpayment">
-                                            <span>Total Price:</span><em>@((Model.Cart.ComputeTotalValue() * (100 - Model.Coupon.OffPercent) / 100).ToString("C0"))</em>
+                                            <span>Total Price:</span><em>@((Model.Cart.ComputeTotalValue() * (100 - (Model?.Cart?.Coupon?.OffPercent ?? 0)) / 100).ToString("C0"))</em>
                                         </div>
                                     </li>
-                                    <li><a class="tg-btn tg-btn-lg" asp-controller="Order" asp-action="Pay">next step</a></li>
+                                    <li><a class="tg-btn tg-btn-lg" asp-controller="Order" asp-action="Checkout">next step</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -145,7 +146,7 @@
             }
             else
             {
-                <h4 class="text-center">There is no tour in cart</h4>
+                <h3 class="text-center" style="font-weight: bold">There is no tour in cart</h3>
             }
         </div>
     </div>

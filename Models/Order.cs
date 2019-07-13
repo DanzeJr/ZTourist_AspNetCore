@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -9,20 +10,16 @@ namespace ZTourist.Models
     {
         public string Id { get; set; }
 
-        public string UserId { get; set; }
+        public AppUser Customer { get; set; }
 
-        public IEnumerable<Tour> Tours { get; set; }
+        public Cart Cart { get; set; }
 
-        public int AdultTicket { get; set; }
-
-        public int KidTicket { get; set; }
-
-        public string CouponCode { get; set; }
-
+        [MaxLength(500, ErrorMessage = "Comment can't be more than 500 characters")]
         public string Comment { get; set; }
 
         public DateTime OrderDate { get; set; }
 
         public string Status { get; set; }
+
     }
 }
