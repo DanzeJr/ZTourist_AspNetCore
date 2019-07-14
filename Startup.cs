@@ -48,12 +48,12 @@ namespace ZTourist
         {
             if (env.IsDevelopment())
             {
-                app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
-                //app.UseExceptionHandler("/Error");
+                app.UseStatusCodePages();
                 app.UseDeveloperExceptionPage();
             }
             else
             {
+                app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
                 app.UseExceptionHandler("/Error");
             }
 
@@ -64,7 +64,7 @@ namespace ZTourist
             {
                 routes.MapRoute(
                     name: "ErrorWithStatusCode",
-                    template: "Error/StatusCode{statusCode:int}",
+                    template: "Error/{statusCode:int}",
                     defaults: new { controller = "Home", action = "Error" }
                     );
                 routes.MapRoute(
