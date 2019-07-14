@@ -1,0 +1,146 @@
+﻿@model LoginModel
+
+@{ 
+    Layout = null;
+}
+<!DOCTYPE html>
+<html class="no-js" lang="">
+<head>
+    @await Html.PartialAsync("HeaderPartial")
+    <link rel="stylesheet" href="~/css/registerform.css" asp-append-version="true">
+    <title>Z Tourist Company - Login</title>
+</head>
+<body class="tg-home tg-homevthree tg-login" style="background-image: url(https://ztourist.blob.core.windows.net/others/tour.jpg); background-repeat: no-repeat; background-size: auto">
+    <div class="tg-navigationarea tg-headerfixed" style="background-color: transparent">
+        <strong class="tg-logo"><a asp-area="" asp-controller="Home" asp-action=""><img src="https://ztourist.blob.core.windows.net/others/logo.png" alt="Z Tourist logo" asp-append-version="true"></a></strong>
+    </div>
+    <!--************************************
+                    Main Start
+    *************************************-->
+    <h1 class="text-center" style="font-weight: bold; color: white">Z Tourist Company</h1>
+    <main id="tg-main" class="tg-main tg-haslayout">
+        <div class="register-form" style="width: 45%; margin-top: 4%">
+            <div class="tab-content" style="padding: 0 10%">
+                <form style="padding: 10%; margin-bottom: 20%; background-color: white" class="tg-formtheme tg-formlogin" asp-area="Company" asp-controller="Account" asp-action="Login" method="post">
+                    <input type="hidden" asp-for="ReturnUrl" value="@((string)ViewContext.TempData["returnUrl"])" />
+                    <div class="tg-dashboardcontent">
+                        <h2 class="text-center text-primary">Login</h2>
+                        <div class="tg-content">
+                            <div asp-validation-summary="ModelOnly" class="text-danger" style="font-size: larger; font-weight: bold"></div>
+                            <fieldset>
+                                <div class="form-group" style="width: 100%">
+                                    <label asp-for="UserName">Username<sup style="color: red">*</sup></label>
+                                    <input class="form-control" asp-for="UserName" placeholder="Username" />
+                                    <div><span asp-validation-for="UserName" class="text-danger" style="float: left"></span></div>
+                                </div>
+                                <div class="form-group" style="width: 100%">
+                                    <label asp-for="Password">Password<sup style="color: red">*</sup></label>
+                                    <input class="form-control" asp-for="Password" placeholder="Password" />
+                                    <div><span asp-validation-for="Password" class="text-danger" style="float: left"></span></div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="tg-checkbox">
+                                        <input class="form-control" type="checkbox" asp-for="RememberMe" />
+                                        <label asp-for="RememberMe">Remember me</label>
+                                    </div>
+                                </div>
+                                <button class="tg-btn tg-btn-lg" type="submit"><span>Sign In</span></button>
+                            </fieldset>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- tab-content -->
+        </div>
+    </main>
+    <footer id="tg-footer" class="tg-footer tg-haslayout">
+        <div class="tg-fourcolumns">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3">
+                        <div class="tg-footercolumn tg-widget tg-widgettext">
+                            <div class="tg-widgettitle">
+                                <h3>About Z Tourist</h3>
+                            </div>
+                            <div class="tg-widgetcontent">
+                                <div class="tg-description">
+                                    <p>The best tour in the multiverses</p>
+                                </div>
+                                <span>038 928 3348</span>
+                                <a href="mailto:info@ztourist.com">info@ztourist.com</a>
+                                <ul class="tg-socialicons tg-socialiconsvtwo">
+                                    <li><a href="http://www.facebook.com/Phi.Hoang99"><i class="icon-facebook-logo-outline"></i></a></li>
+                                    <li><a href="http://www.instagram.com/danzejr/"><i class="icon-instagram-social-outlined-logo"></i></a></li>
+                                    <li><a href="http://twitter.com/PhiHoangVo?"><i class="icon-twitter-social-outlined-logo"></i></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3">
+                        <div class="tg-footercolumn tg-widget tg-widgettext">
+                            <div class="tg-widgettitle">
+                                <h3>Pages</h3>
+                            </div>
+                            <div class="tg-widgetcontent">
+                                <ul>
+                                    <li><a asp-area="" asp-controller="Home" asp-action="">Home</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3">
+                        <div class="tg-footercolumn tg-widget tg-widgetdestinations">
+                            <div class="tg-widgettitle">
+                                <h3>Address</h3>
+                            </div>
+                            <div class="tg-widgetcontent">
+                                <ul>
+                                    <li><a href="javascript:void(0);">84/11 Huynh Khuong An, Go Vap, Ho Chi Minh City, Vietnam</a></li>
+                                    <li><a href="javascript:void(0);">223 Ba Trieu, District 1, Hanoi, Vietnam</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3">
+                        <div class="tg-footercolumn tg-widget tg-widgetnewsletter">
+                            <div class="tg-widgettitle">
+                                <!--                            <h3>Z Tourist was registered to GOV</h3>-->
+                            </div>
+                            <div class="tg-widgetcontent">
+                                <a href="http://online.gov.vn/HomePage.aspx"><img src="https://ztourist.blob.core.windows.net/others/gov_img.png" alt="image gov" asp-append-version="true"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tg-footerbar">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <p>Copyright &copy; @DateTime.Now.Year ZTourist. All  rights reserved</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="~/js/vendor/jquery-library.js" asp-append-version="true"></script>
+    <script src="~/js/moment.js" asp-append-version="true"></script>
+    <script src="~/js/moment-with-locales.js" asp-append-version="true"></script>
+    <script src="~/js/vendor/bootstrap.min.js" asp-append-version="true"></script>
+    <script src="~/js/bootstrap-select.min.js" asp-append-version="true"></script>
+    <script src="~/js/jquery-scrolltofixed.js" asp-append-version="true"></script>
+    <script src="~/js/owl.carousel.min.js" asp-append-version="true"></script>
+    <script src="~/js/jquery.mmenu.all.js" asp-append-version="true"></script>
+    <script src="~/js/packery.pkgd.min.js" asp-append-version="true"></script>
+    <script src="~/js/jquery.vide.min.js" asp-append-version="true"></script>
+    <script src="~/js/scrollbar.min.js" asp-append-version="true"></script>
+    <script src="~/js/prettyPhoto.js" asp-append-version="true"></script>
+    <script src="~/js/countdown.js" asp-append-version="true"></script>
+    <script src="~/js/parallax.js" asp-append-version="true"></script>
+    <script src="~/js/main.js" asp-append-version="true"></script>
+    <script src="~/js/bootstrap-datetimepicker.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validate/jquery.validate.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validate/additional-methods.min.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js" asp-append-version="true"></script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+﻿@model Order
+
+@{
+    ViewData["Title"] = "Order Result";
+}
+
+@section Slider {
+    <!--************************************
+    Inner Banner Start
+    *************************************-->
+    <section class="tg-parallax tg-innerbanner" data-appear-top-offset="600" data-parallax="scroll" data-image-src="https://ztourist.blob.core.windows.net/others/banner.png">
+        <div class="tg-sectionspace tg-haslayout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h2>Order Result</h2>
+                        <h2>Place order successfully</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--************************************
+                    Inner Banner End
+    *************************************-->
+}
+<div class="tg-sectionspace tg-haslayout">
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                <div id="tg-content" class="tg-content">
+                    <div class="tg-billingdetail">
+                        <form class="tg-formtheme tg-formbillingdetail">
+                            <fieldset>
+                                <div class="tg-bookingdetail">
+                                    <div class="tg-box">
+                                        <div class="tg-heading">
+                                            <h3>Order Details</h3>
+                                        </div>
+                                        <div class="tg-dashboardcontent">
+                                            <div class="tg-content">
+                                                <ul class="tg-liststyle">
+                                                    <li><span>Order ID:</span></li>
+                                                    <li><span>@Model.Id</span></li>
+                                                    <li><span>Full Name:</span></li>
+                                                    <li><span style="text-transform: capitalize">@Model.Customer.FirstName @Model.Customer.LastName</span></li>
+                                                    <li><span>Email Address:</span></li>
+                                                    <li><span>@Model.Customer.Email</span></li>
+                                                    <li><span>Phone:</span></li>
+                                                    <li><span>@Model.Customer.PhoneNumber</span></li>
+                                                    <li><span>Contact Address:</span></li>
+                                                    <li><span>@Model.Customer.Address</span></li>
+                                                    <li><span>Order Date:</span></li>
+                                                    <li><span>@Model.OrderDate</span></li>
+                                                    <li><span>Coupon Code:</span></li>
+                                                    <li><span>@(Model?.Cart?.Coupon?.Code ?? "Not applied")</span></li>
+                                                    <li><span>Off Percent:</span></li>
+                                                    <li><span>@(Model?.Cart?.Coupon?.OffPercent ?? 0)%</span></li>
+                                                    <li><span>Total Price:</span></li>
+                                                    <li><span>@((Model.Cart.ComputeTotalValue() * (100 - (Model?.Cart?.Coupon?.OffPercent ?? 0)) / 100).ToString("C0"))</span></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tg-bookingdetail">
+                                    <div class="tg-box tg-addtionalinfo">
+                                        <div class="tg-heading">
+                                            <h3>Number of Tours: @Model.Cart.Lines.Count()</h3>
+                                        </div>
+                                        @foreach (CartLine line in Model.Cart.Lines)
+                                        {
+                                            <div class="tg-widgetpersonprice" style="margin-bottom: 5%;">
+                                                <div class="tg-widgetcontent">
+                                                    <ul>
+                                                        <li class="tg-personprice"><div class="tg-perperson"><span>Tour: @line.Tour.Name (@line.Tour.Id)</span></div></li>
+                                                        <li><span>Adult Tickets:</span><em>@line.AdultTicket x @line.Tour.AdultFare.ToString("C0")</em></li>
+                                                        <li><span>Kid Tickets:</span><em>@line.KidTicket x @line.Tour.KidFare.ToString("C0")</em></li>
+                                                        <li class="tg-totalprice"><div class="tg-totalpayment"><span>Total Price:</span><em>@line.SubTotal().ToString("C0")</em></div></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <fieldset class="tg-paymentarea">
+                                <div class="tg-heading">
+                                    <h3>Bank Transfer Information</h3>
+                                </div>
+                                <p>
+                                    Account holder: ZTourist Travel Service
+                                    <br />
+                                    Account number: 0071370087213
+                                    <br />
+                                    Bank in Vietnam: Vietcombank
+                                    <br />
+                                    Swift code: BFTVVNVX
+                                    <br />
+                                    Transfer content: @Model.Id - <span style="text-transform: capitalize">@Model.Customer.FirstName @Model.Customer.LastName</span>
+                                </p>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

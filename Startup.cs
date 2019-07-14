@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using ZTourist.Infrastructure;
 using ZTourist.Models;
 
 namespace ZTourist
@@ -21,9 +25,43 @@ namespace ZTourist
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<RouteOptions>(options => {
+            services.Configure<RouteOptions>(options =>
+            {
                 options.LowercaseUrls = true;
             });
+
+            services.AddAuthentication()
+                .AddCookie("COMPANY", opts =>
+                {
+                    opts.LoginPath = "/company/account/login";
+                    opts.LogoutPath = "/company/account/logout";
+                    opts.AccessDeniedPath = "/company/account/accessdenied";
+                });
+
+            services.AddTransient<IAuthorizationHandler, NotRolesHandler>();
+            services.AddAuthorization(opts =>
+            {
+                opts.AddPolicy("NotCustomer", policy =>
+                {
+                    policy.AddRequirements(new NotRolesRequirement("Customer"));
+                });
+                opts.AddPolicy("NotEmployee", policy =>
+                {
+                    policy.AddRequirements(new NotRolesRequirement("Admin", "Guide"));
+                });
+                opts.AddPolicy("Customer", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole("Customer");
+                });
+                opts.AddPolicy("Employee", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole("Admin", "Guide");
+                    policy.AddAuthenticationSchemes("Identity.Application", "COMPANY");
+                });
+            });
+
             services.AddDbContext<AppIdentityDbContext>(opts =>
                 opts.UseSqlServer(Configuration["Data:ZTouristDB:ConnectionString"])
             );
@@ -63,6 +101,20 @@ namespace ZTourist
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
+                    name: "CompanyErrorWithStatusCode",
+                    template: "Company/Error/{statusCode:int}",
+                    defaults: new { area = "Company", controller = "Home", action = "Error" }
+                    );
+                routes.MapRoute(
+                    name: "CompanyError",
+                    template: "Company/Error",
+                    defaults: new { area = "Company", controller = "Home", action = "Error" }
+                    );
+                routes.MapRoute(
+                    name: "CompanyArea",
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+                    );
+                routes.MapRoute(
                     name: "ErrorWithStatusCode",
                     template: "Error/{statusCode:int}",
                     defaults: new { controller = "Home", action = "Error" }
@@ -71,11 +123,6 @@ namespace ZTourist
                     name: "Error",
                     template: "Error",
                     defaults: new { controller = "Home", action = "Error" }
-                    );
-                routes.MapRoute(
-                    name: "Home",
-                    template: "Home",
-                    defaults: new { controller = "Home", action = "Index" }
                     );
                 routes.MapRoute(
                     name: null,

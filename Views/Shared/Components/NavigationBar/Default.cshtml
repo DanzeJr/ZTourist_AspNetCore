@@ -53,11 +53,11 @@
             <ul>
                 @if (!User.Identity.IsAuthenticated)
                 {
-                    <li><a href="loginStaff.jsp">For Staff Only</a></li>
+                    <li><a asp-area="Company" asp-controller="Account" asp-action="Login">For Employee Only</a></li>
                 }
                 else if (User.IsInRole("Customer"))
                 {
-                    <li><a href="viewOrderHistory">Order History</a></li>
+                    <li><a asp-controller="Order" asp-action="History">Order History</a></li>
                 }
 
             </ul>
@@ -185,11 +185,11 @@
                                         <ul class="sub-menu">
                                             @if (!User.Identity.IsAuthenticated)
                                             {
-                                                <li><a href="loginStaff.jsp">For Staff Only</a></li>
+                                                <li><a asp-area="Company" asp-controller="Account" asp-action="Login">For Employee Only</a></li>
                                             }
                                             else if (User.IsInRole("Customer"))
                                             {
-                                                <li><a href="viewOrderHistory">Order History</a></li>
+                                                <li><a asp-controller="Order" asp-action="History">Order History</a></li>
                                             }
                                         </ul>
                                     </li>

@@ -11,6 +11,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="10.0.3" />
     <PackageReference Include="Microsoft.Azure.Storage.Common" Version="10.0.3" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Company\Data\" />
+    <Folder Include="Areas\Company\Models\" />
   </ItemGroup>
 
 </Project>

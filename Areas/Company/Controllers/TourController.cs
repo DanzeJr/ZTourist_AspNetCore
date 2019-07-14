@@ -8,8 +8,9 @@ using ZTourist.Infrastructure;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
 
-namespace ZTourist.Controllers
+namespace ZTourist.Areas.Company.Controllers
 {
+    [Area("Company")]
     [Authorize(Policy = "NotEmployee")]
     public class TourController : Controller
     {
@@ -51,7 +52,6 @@ namespace ZTourist.Controllers
             if (model == null)
                 model = new TourSearchViewModel();
             model.InitSearchValues();
-            model.IsActive = true; // customer or anomymous user only search active tour
             model.Skip = (page - 1) * model.Fetch;
             int total = await touristDAL.GetTotalSearchToursAsync(model);
             PageInfo pageInfo = new PageInfo

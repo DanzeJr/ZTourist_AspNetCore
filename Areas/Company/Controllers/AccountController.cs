@@ -8,39 +8,37 @@ using ZTourist.Infrastructure;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
 
-namespace ZTourist.Controllers
+namespace ZTourist.Areas.Company.Controllers
 {
-    [Authorize(Policy = "NotEmployee")]
+    [Area("Company")]
+    [Authorize(Policy = "NotCustomer")]
     public class AccountController : Controller
     {
         private readonly UserManager<AppUser> userManager;
-        private readonly RoleManager<IdentityRole> roleManager;
         private readonly SignInManager<AppUser> signInManager;
 
-        public AccountController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, SignInManager<AppUser> signInManager)
+        public AccountController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager)
         {
             this.userManager = userManager;
-            this.roleManager = roleManager;
             this.signInManager = signInManager;
         }
 
         [ImportModelState]
         public IActionResult Login(string returnUrl)
         {
-            ViewBag.returnUrl = returnUrl ?? (string) TempData["returnUrl"];
-            ViewBag.Title = "Login";
+            ViewBag.returnUrl = returnUrl ?? TempData["returnUrl"];
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ExportModelState]
-        public async Task<IActionResult> Login([Bind(Prefix = nameof(LoginSignUpModel.LoginModel))] LoginModel login)
+        public async Task<IActionResult> Login(LoginModel login)
         {
             if (ModelState.IsValid)
             {
                 AppUser user = await userManager.FindByNameAsync(login.UserName);
-                if (user != null && await userManager.IsInRoleAsync(user, "Customer"))
+                if (user != null && (await userManager.IsInRoleAsync(user, "Admin") || await userManager.IsInRoleAsync(user, "Guide"))) // if user's role is admin or guide
                 {
                     await signInManager.SignOutAsync();
                     Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(user, login.Password, false, false);
@@ -49,74 +47,16 @@ namespace ZTourist.Controllers
                         if (!string.IsNullOrEmpty(login.ReturnUrl) && Url.IsLocalUrl(login.ReturnUrl))
                             return Redirect(login.ReturnUrl);
                         else
-                            return RedirectToAction("Index", "Home");
+                            return RedirectToAction("", "Home");
                     }
                 }
+                // if user is not existed or is admin or guide
                 ModelState.AddModelError("", "Invalid User or Password");
             }
             TempData["returnUrl"] = login.ReturnUrl;
             return RedirectToAction(nameof(Login));
         }
-
-        [ImportModelState]
-        public IActionResult SignUp(LoginSignUpModel model)
-        {
-            ViewBag.returnUrl = model?.SignUpModel?.ReturnUrl;
-            ViewBag.Title = "Registration";
-            return View("Login", model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [ExportModelState]
-        public async Task<IActionResult> SignUp([Bind(Prefix = nameof(LoginSignUpModel.SignUpModel))] SignUpModel signUp)
-        {
-            if (ModelState.IsValid)
-            {
-                AppUser user = new AppUser
-                {
-                    UserName = signUp.UserName,
-                    Email = signUp.Email,
-                    FirstName = signUp.FirstName,
-                    LastName = signUp.LastName,
-                    Gender = signUp.Gender,
-                    Address = signUp.Address,
-                    BirthDate = signUp.BirthDate,
-                    PhoneNumber = signUp.Tel,
-                    Avatar = "https://ztourist.blob.core.windows.net/others/avatar.png",
-                    RegisterDate = DateTime.Now
-                };
-
-                IdentityResult result = await userManager.CreateAsync(user, signUp.Password);
-
-                if (result.Succeeded)
-                {
-                    result = await userManager.AddToRoleAsync(user, "Customer"); // assign customer role to user
-                    if (result.Succeeded) // if role is assigned to user
-                    {
-                        if (!string.IsNullOrEmpty(signUp.ReturnUrl) && Url.IsLocalUrl(signUp.ReturnUrl))
-                            TempData["returnUrl"] = signUp.ReturnUrl;
-                        else
-                            TempData["returnUrl"] = Url.Action("", "Home");
-                        return RedirectToAction(nameof(Login));
-                    }
-                    else
-                    {
-                        IdentityResult r = await userManager.DeleteAsync(user); // if role is not assigned to user then delete it
-                        foreach (IdentityError error in r.Errors)
-                        {
-                            ModelState.AddModelError("", error.Description);
-                        }
-                    }
-                }
-                foreach (IdentityError error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
-            }
-            return RedirectToAction(nameof(SignUp));
-        }
-
+        
         public IActionResult GoogleLogin(string returnUrl)
         {
             string redirectUrl = Url.Action("GoogleResponse", "Account",
@@ -164,7 +104,7 @@ namespace ZTourist.Controllers
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(Login));
         }
 
         [AllowAnonymous]
@@ -208,7 +148,7 @@ namespace ZTourist.Controllers
                     }
                     return Json($"Email '{email}' is already taken");
                 }
-            }
+            }                
             return Json(true);
         }
     }

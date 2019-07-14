@@ -1,0 +1,92 @@
+﻿@model AppUser
+
+@{ 
+    ViewData["Title"] = "Profile";
+}
+
+@section JS {
+    <script type="text/javascript">
+        $("#tg-main").attr("class", "tg-main tg-sectionspace tg-haslayout");
+    </script>
+}
+
+@section Slider {
+    <!--************************************
+                        Inner Banner Start
+        *************************************-->
+    <section class="tg-parallax tg-innerbanner" data-appear-top-offset="100" data-parallax="scroll" data-image-src="https://ztourist.blob.core.windows.net/others/banner.png">
+        <div class="tg-sectionspace tg-haslayout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h1>Dashboard</h1>
+                        <h2>@User.Identity.Name</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--************************************
+                    Inner Banner End
+    *************************************-->
+}
+
+<div class="container">
+    <div class="row">
+        <div id="tg-twocolumns" class="tg-twocolumns">
+            <form class="tg-formtheme tg-formdashboard">
+                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                    <aside id="tg-sidebar" class="tg-sidebar">
+                        <div class="tg-widget tg-widgetdashboard">
+                            <div class="tg-widgettitle">
+                                <h3>My Account</h3>
+                            </div>
+                            <div class="tg-widgetcontent">
+                                <ul>
+                                    <li class="selected"><a asp-controller="Profile" asp-action=""><i class="icon-user"></i><span>Dashboard</span></a></li>
+                                    <li><a asp-controller="Profile" asp-action="Edit"><i class="icon-pen2"></i><span>Edit Profile</span></a></li>
+                                    <li><a asp-controller="Profile" asp-action="ChangePassword"><i class="icon-lock-open3"></i><span>Change Password</span></a></li>
+                                    <li><a asp-controller="Order" asp-action="History"><i class="icon-basket3"></i><span>Order History</span></a></li>
+                                    <li><a asp-controller="Account" asp-action="Logout"><i class="icon-lock"></i><span>Sign Out</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+                <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+                    <div id="tg-content" class="tg-content">
+                        <div class="tg-dashboard">
+                            <div class="tg-box tg-profile">
+                                <div class="tg-heading">
+                                    <h3>My Profile</h3>
+                                    <a class="tg-btnedit" asp-controller="Profile" asp-action="Edit">Edit Profile</a>
+                                </div>
+                                <div asp-validation-summary="ModelOnly" class="text-center text-danger" style="margin: 5% 0; font-size: larger; font-weight: bold"></div>
+                                <div class="tg-dashboardcontent">
+                                    <figure><img style="width: 87px; height: 87px;" src="@Model.Avatar" alt="avatar" asp-append-version="true"></figure>
+                                    <div class="tg-content">
+                                        <ul class="tg-liststyle">
+                                            <li><span>Name</span></li>
+                                            <li><span style="text-transform: capitalize">@Model.FirstName @Model.LastName</span></li>
+                                            <li><span>Gender</span></li>
+                                            <li><span>@Model.Gender</span></li>
+                                            <li><span>Birth Date</span></li>
+                                            <li><span>@Model.BirthDate.ToString("dd/MMM/yyyy")</span></li>
+                                            <li><span>Email Address</span></li>
+                                            <li><span>@Model.Email</span></li>
+                                            <li><span>Phone</span></li>
+                                            <li><span>@Model.PhoneNumber</span></li>
+                                            <li><span>Contact Address</span></li>
+                                            <li><span>@Model.Address</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

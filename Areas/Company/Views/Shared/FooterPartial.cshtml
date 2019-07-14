@@ -1,5 +1,4 @@
-﻿@model  LoginSignUpModel
-<!--************************************
+﻿<!--************************************
                         Footer Start
  *************************************-->
 <footer id="tg-footer" class="tg-footer tg-haslayout">
@@ -28,15 +27,11 @@
                 <div class="col-xs-6 col-sm-6 col-md-3 col-lg-3">
                     <div class="tg-footercolumn tg-widget tg-widgettext">
                         <div class="tg-widgettitle">
-                            <h3>Customer Care</h3>
+                            <h3>Page</h3>
                         </div>
                         <div class="tg-widgetcontent">
                             <ul>
-                                <li><a href="javascript:void(0);">Travel insurance</a></li>
-                                <li><a href="javascript:void(0);">Privacy</a></li>
-                                <li><a href="javascript:void(0);">Terms and condition</a></li>
-                                <li><a href="javascript:void(0);">Payment online policy</a></li>
-                                <li><a href="javascript:void(0);">FAQS</a></li>
+                                <li><a asp-area="Company" asp-controller="Home" asp-action="">Home</a></li>
                             </ul>
                         </div>
                     </div>
@@ -71,7 +66,7 @@
         <div class="container">
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                    <p>Copyright &copy; @DateTime.Now.Year ZTourist. All  rights reserved</p>
+                    <p>Copyright &copy; 2019 ZTourist. All  rights reserved</p>
                 </div>
             </div>
         </div>
@@ -83,85 +78,6 @@
     </div>
 <!--************************************
                 Wrapper End
-*************************************-->
-<!--************************************
-                    Login Signup Start
-    *************************************-->
-<div id="tg-loginsingup" class="tg-loginsingup" data-vide-bg="poster: https://ztourist.blob.core.windows.net/others/signup-img.jpg" data-vide-options="position: 0% 50%">
-    <div class="tg-contentarea tg-themescrollbar">
-        <div class="tg-scrollbar">
-            <button type="button" class="close">x</button>
-            <div class="tg-logincontent">
-                <nav id="tg-loginnav" class="tg-loginnav">
-                    <h3>Z TOURIST</h3>
-                </nav>
-                <div class="tg-themetabs">
-                    <ul class="tg-navtbs" role="tablist">
-                        <li role="presentation" class="active"><a href="#home" data-toggle="tab">Sign in</a></li>
-                        <li role="presentation"><a href="#profile" data-toggle="tab">New to Z Tourist?</a></li>
-                    </ul>
-                    <div class="tg-tabcontent tab-content">
-                        <div role="tabpanel" class="tab-pane active fade in" id="home">
-                            <form class="tg-formtheme tg-formlogin" asp-controller="Account" asp-action="Login" method="post">
-                                <input type="hidden" asp-for="LoginModel.ReturnUrl" value="@(ViewBag.returnUrl ?? ViewContext.HttpContext.Request.PathAndQuery())" />
-                                <fieldset>
-                                    <div class="form-group">
-                                        <label for="UserName">Username <sup>*</sup></label>
-                                        <input class="form-control" placeholder="Username" 
-                                               asp-for="LoginModel.UserName" />
-                                        <span asp-validation-for="LoginModel.UserName"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="Password">Password <sup>*</sup></label>
-                                        <input class="form-control" placeholder="Password" type="password" 
-                                               asp-for="LoginModel.Password" />
-                                        <span asp-validation-for="LoginModel.Password"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <div class="tg-checkbox">
-                                            <input class="form-control" type="checkbox" asp-for="LoginModel.RememberMe" />
-                                            <label asp-for="LoginModel.RememberMe">Remember me</label>
-                                        </div>
-                                    </div>
-                                    <button class="tg-btn tg-btn-lg" type="submit"><span>Sign In</span></button>
-                                </fieldset>
-                            </form>
-                        </div>
-                        <div role="tabpanel" class="tab-pane fade" id="profile">
-                            <form class="tg-formtheme tg-formlogin" asp-controller="Account" asp-action="SignUp" method="get">
-                                <input type="hidden" asp-for="SignUpModel.ReturnUrl" value="@(ViewBag.returnUrl ?? ViewContext.HttpContext.Request.PathAndQuery())" />
-                                <fieldset>
-                                    <div class="form-group">
-                                        <label for="UserName">Username <sup>*</sup></label>
-                                        <input class="form-control" placeholder="Username" asp-for="SignUpModel.UserName" />
-                                        <span asp-validation-for="SignUpModel.UserName"></span>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="Email">Email <sup>*</sup></label>
-                                        <input class="form-control" placeholder="example@mail.com" asp-for="SignUpModel.Email" />
-                                        <span asp-validation-for="SignUpModel.Email"></span>
-                                    </div>
-                                    <button class="tg-btn tg-btn-lg" type="submit"><span>Sign Up</span></button>
-                                </fieldset>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="tg-shareor"><span>or</span></div>
-                <div class="tg-signupwith">
-                    <h2>Sign in With...</h2>
-                    <ul class="tg-sharesocialicon">
-                        <li class="tg-facebook"><a asp-controller="Account" asp-action="FacebookLogin"><i class="icon-facebook-1"></i><span>Facebook</span></a></li>
-                        @*<li class="tg-twitter"><a asp-controller="Account" asp-action="TwitterLogin"><i class="icon-twitter-1"></i><span>Twitter</span></a></li>*@
-                        <li class="tg-googleplus"><a asp-controller="Account" asp-action="GoogleLogin"><i class="icon-google4"></i><span>Google</span></a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-<!--************************************
-                Login Signup End
 *************************************-->
 
 <script src="~/js/vendor/jquery-library.js" asp-append-version="true"></script>

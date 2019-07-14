@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ZTourist.Infrastructure;
 using ZTourist.Models;
@@ -9,6 +10,7 @@ using ZTourist.Models.ViewModels;
 
 namespace ZTourist.Controllers
 {
+    [Authorize(Policy = "NotEmployee")]
     public class CartController : Controller
     {
         private readonly Cart cart;

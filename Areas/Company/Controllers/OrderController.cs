@@ -9,8 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 using ZTourist.Infrastructure;
 using ZTourist.Models;
 
-namespace ZTourist.Controllers
+namespace ZTourist.Areas.Company.Controllers
 {
+    [Area("Company")]
     [Authorize(Policy = "Customer")]
     public class OrderController : Controller
     {

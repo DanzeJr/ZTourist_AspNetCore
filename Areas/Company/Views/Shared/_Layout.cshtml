@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+
+<html class="no-js" lang="">
+<head>
+    @await Html.PartialAsync("HeaderPartial")
+    @RenderSection("CSS", false)
+    <title>Z Tourist - @ViewData["Title"]</title>
+</head>
+<body class="tg-home tg-homevthree tg-login">
+    @await Component.InvokeAsync("NavigationBarEmp")
+    @await RenderSectionAsync("Slider", false)
+    <!--************************************
+                    Main Start
+    *************************************-->
+    <main id="tg-main" class="tg-main tg-haslayout">
+        @RenderBody()
+    </main>
+    <!--************************************
+                    Main End
+    *************************************-->
+    @await Html.PartialAsync("FooterPartial")
+    @RenderSection("JS", false)
+</body>
+</html>

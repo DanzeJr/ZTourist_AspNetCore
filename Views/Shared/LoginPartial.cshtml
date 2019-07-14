@@ -3,7 +3,7 @@
 <div id="signin">
     <h1>Welcome Back!</h1>
     <form asp-controller="Account" asp-action="Login" method="post">
-        <input type="hidden" asp-for="LoginModel.ReturnUrl" value="@ViewBag.returnUrl" />
+        <input type="hidden" asp-for="LoginModel.ReturnUrl" value="@(ViewBag.returnUrl)" />
         <div class="tg-dashboardcontent">
             <div class="tg-content">
                 @if (ViewBag.Title == "Login")

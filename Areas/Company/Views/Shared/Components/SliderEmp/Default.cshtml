@@ -1,0 +1,104 @@
+﻿@model TourSearchViewModel
+
+@{
+    List<SelectListItem> isActiveItems = new List<SelectListItem>
+{
+        new SelectListItem { Text = "Is Active", Value = "true" },
+        new SelectListItem { Text = "Not Active", Value = "false" }
+    };
+}
+<style>
+    .bootstrap-select > .dropdown-toggle.bs-placeholder, .bootstrap-select > .dropdown-toggle.bs-placeholder:hover, .bootstrap-select > .dropdown-toggle.bs-placeholder:focus, .bootstrap-select > .dropdown-toggle.bs-placeholder:active {
+        color: #676767;
+    }
+
+    #datetimepicker1 table tr td,
+    #datetimepicker1 table tr th {
+        color: black;
+    }
+</style>
+<!--************************************
+                    Home Slider Start
+    *************************************-->
+<div class="tg-bannerholder">
+    <div class="tg-slidercontent">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                    <h1>Experience the Wonder</h1>
+                    <h2>People don’t take trips, trips take People</h2>
+                    <form class="tg-formtheme tg-formtrip" asp-controller="Tour" asp-action="Search" method="get">
+                        <fieldset>
+                            <div class="form-group">
+                                <div class="tg-select">
+                                    <select class="selectpicker" asp-for="Destination" asp-items="@Model.DestinationItems" data-live-search="true" data-width="100%">
+                                        <option value="" selected>Destination</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group date" id="datetimepicker1">
+                                    <input class="form-control" title="From Date" type="text" asp-for="FromDate" style="height: 50.5px; font-size: 14px" placeholder="From Date" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="tg-select">
+                                    <select class="selectpicker" asp-for="Duration" asp-items="@Model.DurationItems" data-live-search="true" data-width="100%">
+                                        <option value="0" selected>Duration</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="tg-select">
+                                    <select class="selectpicker" asp-for="PriceRange" asp-items="@Model.PriceItems" data-live-search="true" data-width="100%">
+                                        <option value="0" selected>Price</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset style="margin-top: 1%">
+                            <div class="form-group">
+                                <input asp-for="Id" style="height: 50.5px; width: 100%; font-size: 14px" placeholder="Tour ID" />
+                            </div>
+                            <div class="form-group">
+                                <input asp-for="Name" style="height: 50.5px; width: 100%; font-size: 14px" placeholder="Tour Name" />
+                            </div>
+                            <div class="form-group">
+                                <div class="tg-select">
+                                    <select class="selectpicker" asp-for="IsActive" asp-items="@isActiveItems" data-live-search="true" data-width="100%">
+                                        <option selected>Both</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                        </fieldset>
+                        <div class="form-group">
+                            <button class="tg-btn" type="submit" style="height: 100%"><span style="font-weight: bold">find tours</span></button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="tg-homeslider" class="tg-homeslider owl-carousel tg-haslayout">
+        @if (Model?.Tours != null && Model.Tours.Count() > 0)
+        {
+            @foreach (Tour tour in Model.Tours)
+            {
+                <figure class="item" data-vide-bg="poster: @tour.Image" data-vide-options="position: 0 % 50 % "></figure>
+            }
+        }
+        else
+        {
+            <figure class="item" data-vide-bg="poster: https://ztourist.blob.core.windows.net/others/tour.jpg" data-vide-options="position: 0 % 50 % "></figure>
+        }
+
+
+    </div>
+</div>
+<!--************************************
+                Home Slider End
+*************************************-->

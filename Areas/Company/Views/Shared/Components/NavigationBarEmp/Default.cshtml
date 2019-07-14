@@ -1,0 +1,159 @@
+﻿@model NavigationViewModel
+<!--************************************
+                        Loader Start
+*************************************-->
+<div class="loader">
+    <div class="span">
+        <div class="location_indicator"></div>
+    </div>
+</div>
+<!--************************************
+                        Loader End
+*************************************-->
+<!--************************************
+                Mobile Menu Start
+*************************************-->
+<nav id="menu">
+    <ul>
+        <li><a asp-area="Company" asp-controller="Home" asp-action="">Home</a></li>
+        <li>
+            <a asp-area="Company" asp-controller="Destination" asp-action="">Destinations</a>
+            <ul>
+                @if (User?.IsInRole("Admin") ?? false)
+                {
+                    <li><a asp-area="Company" asp-controller="Destination" asp-action="Add">Add new destination</a></li>
+                }
+            </ul>
+        </li>
+        <li>
+            <a asp-area="Company" asp-controller="Tour" asp-action="">Tours</a>
+            @if (User?.IsInRole("Admin") ?? false)
+            {
+                <ul>
+                    <li><a asp-area="Company" asp-controller="Tour" asp-action="Add">Add tour</a></li>
+                </ul>
+            }
+        </li>
+        @if (User?.IsInRole("Admin") ?? false)
+        {
+            <li>
+                <a asp-area="Company" asp-controller="User" asp-action="">Users</a>
+                <ul>
+                    <li><a asp-area="Company" asp-controller="User" asp-action="Add">Add user</a></li>
+                </ul>
+            </li>
+            <li>
+                <a asp-area="Company" asp-controller="Order" asp-action="">Orders</a>
+            </li>
+            <li><a asp-area="Company" asp-controller="Coupon" asp-action="">Coupons</a></li>
+        }
+    </ul>
+</nav>
+<!--************************************
+                Mobile Menu End
+*************************************-->
+<!--************************************
+                Wrapper Start
+*************************************-->
+<div id="tg-wrapper" class="tg-wrapper tg-haslayout">
+    <!--************************************
+                    Header Start
+    *************************************-->
+    <header id="tg-header" class="tg-header tg-headervthree tg-haslayout">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="tg-topbar">
+                    <nav class="tg-infonav">
+                        <ul>
+                            <li>
+                                <i><img src="~/images/icons/icon-01.png" alt="icon" asp-append-version="true"></i>
+                                <span>0389 283 348</span>
+                            </li>
+                        </ul>
+                    </nav>
+                    <div class="tg-addnavcartsearch">
+                        <nav class="tg-addnav">
+                            <ul>
+                                <li><a href="javascript:void(0);">about</a></li>
+                                <li><a href="javascript:void(0);">contact</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <div class="tg-navigationarea tg-headerfixed">
+                    <strong class="tg-logo"><a href="homeStaff.jsp"><img src="https://ztourist.blob.core.windows.net/others/logo.png" alt="Z Tourist logo" asp-append-version="true"></a></strong>
+                    <div class="tg-socialsignin">
+                        <ul class="tg-socialicons">
+                            <li><a href="http://www.facebook.com/Phi.Hoang99"><i class="icon-facebook-logo-outline"></i></a></li>
+                            <li><a href="http://www.instagram.com/danzejr/"><i class="icon-instagram-social-outlined-logo"></i></a></li>
+                            <li><a href="http://twitter.com/PhiHoangVo?"><i class="icon-twitter-social-outlined-logo"></i></a></li>
+                        </ul>
+                        <div class="tg-userbox">
+                            <a id="tg-btnsignin" class="tg-btn" href="#tg-loginsingup"><span>sign in</span></a>
+                            <div class="dropdown tg-dropdown">
+                                <button class="tg-btndropdown" id="tg-dropdowndashboard" type="button" data-toggle="dropdown">
+                                    <img style="width: 35px; height: 35px;" src="@Model.Avatar" alt="avatar" asp-append-version="true">
+                                    <span>@User?.Identity.Name</span>
+                                    <i class="fa fa-caret-down"></i>
+                                </button>
+                                <ul class="dropdown-menu tg-dropdownusermenu" aria-labelledby="tg-dropdowndashboard">
+                                    <li><a asp-area="Company" asp-controller="Profile" asp-action="">Dashboard</a></li>
+                                    <li><a asp-area="Company" asp-controller="Profile" asp-action="Edit">Edit Profile</a></li>
+                                    <li><a asp-area="Company" asp-controller="Account" asp-action="Logout">Sign Out</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <nav id="tg-nav" class="tg-nav">
+                        <div class="navbar-header">
+                            <a href="#menu" class="navbar-toggle collapsed">
+                                <span class="sr-only">Toggle navigation</span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                                <span class="icon-bar"></span>
+                            </a>
+                        </div>
+                        <div id="tg-navigation" class="collapse navbar-collapse tg-navigation">
+                            <ul>
+                                <li class="menu-item-has-children current-menu-item"><a asp-area="Company" asp-controller="Home" asp-action="">Home</a></li>
+                                <li class="menu-item-has-children">
+                                    <a asp-area="Company" asp-controller="Destination" asp-action="">Destinations</a>
+                                    <ul class="sub-menu">
+                                        @if (User?.IsInRole("Admin") ?? false)
+                                        {
+                                            <li><a asp-area="Company" asp-controller="Destination" asp-action="Add">Add new destination</a></li>
+                                        }
+                                    </ul>
+                                </li>
+                                <li class="menu-item-has-children">
+                                    <a asp-area="Company" asp-controller="Tour" asp-action="">Tours</a>
+                                    @if (User?.IsInRole("Admin") ?? false)
+                                    {
+                                        <ul class="sub-menu">
+                                            <li><a asp-area="Company" asp-controller="Tour" asp-action="Add">Add tour</a></li>
+                                        </ul>
+                                    }
+                                </li>
+                                @if (User?.IsInRole("Admin") ?? false)
+                                {
+                                    <li class="menu-item-has-children">
+                                        <a asp-area="Company" asp-controller="User" asp-action="">Users</a>
+                                        <ul class="sub-menu">
+                                            <li><a asp-area="Company" asp-controller="User" asp-action="Add">Add user</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="menu-item-has-children">
+                                        <a asp-area="Company" asp-controller="Order" asp-action="">Orders</a>
+                                    </li>
+                                    <li><a asp-area="Company" asp-controller="Coupon" asp-action="">Coupons</a></li>
+                                }
+                            </ul>
+                        </div>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!--************************************
+                    Header End
+    *************************************-->
