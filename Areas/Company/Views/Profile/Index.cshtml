@@ -46,7 +46,6 @@
                                     <li class="selected"><a asp-controller="Profile" asp-action=""><i class="icon-user"></i><span>Dashboard</span></a></li>
                                     <li><a asp-controller="Profile" asp-action="Edit"><i class="icon-pen2"></i><span>Edit Profile</span></a></li>
                                     <li><a asp-controller="Profile" asp-action="ChangePassword"><i class="icon-lock-open3"></i><span>Change Password</span></a></li>
-                                    <li><a asp-controller="Order" asp-action="History"><i class="icon-basket3"></i><span>Order History</span></a></li>
                                     <li><a asp-controller="Account" asp-action="Logout"><i class="icon-lock"></i><span>Sign Out</span></a></li>
                                 </ul>
                             </div>
@@ -67,17 +66,17 @@
                                     <div class="tg-content">
                                         <ul class="tg-liststyle">
                                             <li><span>Name</span></li>
-                                            <li><span style="text-transform: capitalize">@Model.FirstName @Model.LastName</span></li>
+                                            <li><span style="text-transform: capitalize">@(Model.FirstName == null && @Model.LastName == null ? "..." : Model.FirstName + " " + Model.LastName)</span></li>
                                             <li><span>Gender</span></li>
-                                            <li><span>@Model.Gender</span></li>
+                                            <li><span>@(Model.Gender ?? "...")</span></li>
                                             <li><span>Birth Date</span></li>
-                                            <li><span>@Model.BirthDate.ToString("dd/MMM/yyyy")</span></li>
+                                            <li><span>@(Model.BirthDate.ToString("dd/MM/yyyy") ?? "...")</span></li>
                                             <li><span>Email Address</span></li>
-                                            <li><span>@Model.Email</span></li>
+                                            <li><span>@(Model.Email ?? "...")</span></li>
                                             <li><span>Phone</span></li>
-                                            <li><span>@Model.PhoneNumber</span></li>
+                                            <li><span>@(Model.PhoneNumber ?? "...")</span></li>
                                             <li><span>Contact Address</span></li>
-                                            <li><span>@Model.Address</span></li>
+                                            <li><span>@(Model.Address ?? "...")</span></li>
                                         </ul>
                                     </div>
                                 </div>

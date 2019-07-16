@@ -60,6 +60,12 @@ namespace ZTourist
                     policy.RequireRole("Admin", "Guide");
                     policy.AddAuthenticationSchemes("Identity.Application", "COMPANY");
                 });
+                opts.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireRole("Admin");
+                    policy.AddAuthenticationSchemes("Identity.Application", "COMPANY");
+                });
             });
 
             services.AddDbContext<AppIdentityDbContext>(opts =>
@@ -145,7 +151,7 @@ namespace ZTourist
                     defaults: new { controller = "Home", action = "Index" }
                     );
             });
-            //SeedData.CreateRolesAndAdminAccount(app, Configuration).Wait();
+            SeedData.CreateRolesAndAdminAccount(app, Configuration).Wait();
         }
     }
 }

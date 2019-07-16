@@ -67,17 +67,17 @@
                                     <div class="tg-content">
                                         <ul class="tg-liststyle">
                                             <li><span>Name</span></li>
-                                            <li><span style="text-transform: capitalize">@Model.FirstName @Model.LastName</span></li>
+                                            <li><span style="text-transform: capitalize">@(Model.FirstName == null && @Model.LastName == null ? "..." : Model.FirstName + " " + Model.LastName)</span></li>
                                             <li><span>Gender</span></li>
-                                            <li><span>@Model.Gender</span></li>
+                                            <li><span>@(Model.Gender ?? "...")</span></li>
                                             <li><span>Birth Date</span></li>
-                                            <li><span>@Model.BirthDate.ToString("dd/MMM/yyyy")</span></li>
+                                            <li><span>@(Model.BirthDate.ToString("dd/MM/yyyy") ?? "...")</span></li>
                                             <li><span>Email Address</span></li>
-                                            <li><span>@Model.Email</span></li>
+                                            <li><span>@(Model.Email ?? "...")</span></li>
                                             <li><span>Phone</span></li>
-                                            <li><span>@Model.PhoneNumber</span></li>
+                                            <li><span>@(Model.PhoneNumber ?? "...")</span></li>
                                             <li><span>Contact Address</span></li>
-                                            <li><span>@Model.Address</span></li>
+                                            <li><span>@(Model.Address ?? "...")</span></li>
                                         </ul>
                                     </div>
                                 </div>

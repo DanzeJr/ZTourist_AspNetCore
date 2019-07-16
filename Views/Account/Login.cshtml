@@ -20,8 +20,8 @@
     <script type="text/javascript">
         $(function () {
             $('#SignUpModel_BirthDate').datetimepicker({
-                format: 'YYYY-MM-DD',
-                maxDate: moment()
+                useCurrent: true,
+                format: 'DD/MM/YYYY'
             });
         });
 
@@ -35,17 +35,15 @@
         $("#tg-main").attr("style", "background-image: url(https://ztourist.blob.core.windows.net/others/tour.jpg);");
     </script>
     <script>
-        // extend jquery range validator to work for required checkboxes
-        var defaultRangeValidator = $.validator.methods.range;
-        $.validator.methods.range = function (value, element, param) {
-            if (element.type === 'checkbox') {
-                // if it's a checkbox return true if it is checked
-                return element.checked;
-            } else {
-                // otherwise run the default validation function
-                return defaultRangeValidator.call(this, value, element, param);
-            }
-        }
+        $.validator.addMethod("mustCheck", function (value, element) {
+            return element.checked;
+        });
+
+        //add new method to unobtrusive adapter to perform
+        $.validator.unobtrusive.adapters.add("mustCheck", function (options) {
+            options.rules["mustCheck"] = true;
+            options.messages['mustCheck'] = options.message;
+        });
     </script>
 }
 

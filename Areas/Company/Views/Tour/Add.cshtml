@@ -1,0 +1,159 @@
+﻿@model TourViewModel
+
+@{
+    ViewData["Title"] = "Add Tour";
+    List<SelectListItem> isActiveItems = new List<SelectListItem>
+{
+        new SelectListItem { Text = "Active", Value = "true" },
+        new SelectListItem { Text = "Not Active", Value = "false" }
+    };
+}
+
+@section CSS {
+    <style>
+        #form-Add .bootstrap-select.btn-group .dropdown-menu li {
+            list-style: none;
+        }
+
+        #form-Add .form-group .field-validation-error span {
+            position: absolute;
+        }
+
+        .mypicker li {
+            list-style: none !important;
+        }
+
+        .mypicker tr td,
+        .mypicker tr th {
+            padding: 10px 0 !important;
+            text-align: center !important;
+        }
+    </style>
+}
+
+@section JS {
+    <script type="text/javascript">
+        $('#FromDate').datetimepicker({
+            format: 'DD/MM/YYYY HH:mm A'
+        });
+        $('#ToDate').datetimepicker({
+            useCurrent: false,
+            format: 'DD/MM/YYYY HH:mm A'
+        });
+        $("#FromeDate").on("dp.change", function (e) {
+            $('#ToDate').data("DateTimePicker").minDate(e.date);
+        });
+        $("#ToDate").on("dp.change", function (e) {
+            $('#FromDate').data("DateTimePicker").maxDate(e.date);
+        });
+        $(document).ready(function () {
+
+            $('#titleImg').change(function () { //show preview avatar
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#imgTitle').attr('src', e.target.result);
+                        $('Image').val(e.target.result);
+                    },
+                        reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }); Model.Image
+
+/**/</script>
+}
+<div style="margin-top: 3%">
+    <h1 class="text-center">Create new tour</h1>
+    <br /><br />
+    <div asp-validation-summary="ModelOnly" class="text-danger text-center" style="font-size: larger; font-weight: bold"></div>
+    <form id="form-Add" class="tg-formtheme tg-formdashboard" asp-area="Company" asp-controller="Tour" asp-action="Add" enctype="multipart/form-data">
+        <div style="width: 75%; margin: 0 auto; padding-bottom: 5%">
+            <div class="tg-dashboardcontent">
+                <div class="tg-content">
+                    <fieldset>
+                        <div class="form-group">
+                            <input type="hidden" asp-for="Image" />
+                            <figure>
+                                <center>
+                                    <img id="imgTitle" style="height: 350px" src="@Model.Image" alt="Tour Image" asp-append-version="true">
+                                    <input type="file" id="titleImg" style="display: none" asp-for="Photo" />
+                                    <div><span asp-validation-for="Photo"></span></div>
+                                </center>
+                            </figure>
+                            <div style="width: 200px; margin: 0 auto">
+                                <a style="color: white" class="tg-btn" href="javascript:void(0);" onclick="$('#titleImg').click();">Choose Image</a>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Id">ID <sup>*</sup></label>
+                            <input class="form-control" asp-for="Id" data-val="true" data-val-remote="&#x27;Id&#x27; is invalid." data-val-remote-additionalfields="*.Id" data-val-remote-url="/Company/Tour/isexistedid"/>
+                            <div><span asp-validation-for="Id" class="text-danger"></span></div><br />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Name">Title <sup>*</sup></label>
+                            <input class="form-control" asp-for="Name" />
+                            <div><span asp-validation-for="Name" class="text-danger"></span></div><br />
+                        </div>
+                        <div class="form-group mypicker">
+                            <label asp-for="FromDate">From Date <sup>*</sup></label>
+                            <input type="text" class="form-control" asp-for="FromDate" value="@(Model.FromDate == null ? Model.FromDate : DateTime.Now)"/>
+                            <div><span asp-validation-for="FromDate" class="text-danger"></span></div><br />
+                        </div>
+                        <div class="form-group mypicker">
+                            <label asp-for="ToDate">To Date <sup>*</sup></label>
+                            <input type="text" class="form-control" asp-for="ToDate" value="@(Model.ToDate == null ? Model.ToDate : DateTime.Now)"/>
+                            <div><span asp-validation-for="ToDate" class="text-danger"></span></div><br />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="AdultFare">Adult Fare <sup>*</sup></label>
+                            <input class="form-control" asp-for="AdultFare" />
+                            <div><span asp-validation-for="AdultFare" class="text-danger"></span></div><br />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="KidFare">Kid Fare <sup>*</sup></label>
+                            <input class="form-control" asp-for="KidFare" />
+                            <div><span asp-validation-for="KidFare" class="text-danger"></span></div><br />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="MaxGuest">Maximum Guest <sup>*</sup></label>
+                            <input class="form-control" asp-for="MaxGuest" />
+                            <div><span asp-validation-for="MaxGuest" class="text-danger"></span></div><br />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Transport">Transport</label>
+                            <input class="form-control" asp-for="Transport" />
+                            <div><span asp-validation-for="Transport" class="text-danger"></span></div><br />
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="form-group" style="width: 100%">
+                <label asp-for="Description">Description </label>
+                <textarea class="form-control" asp-for="Description"></textarea>
+                <div><span asp-validation-for="Description" class="text-danger"></span></div><br />
+            </div>
+            <div class="form-group" style="width: 100%">
+                <label>Destinations (1st will be the departure) <sup>*</sup></label>
+                <div>
+                    <select class="form-control selectpicker" data-live-search="true" asp-for="Destinations" asp-items="@Model.DestinationItems"></select>
+                    <div><span asp-validation-for="Destinations" class="text-danger"></span></div><br />
+                </div>
+            </div>
+            <div class="form-group" style="width: 100%">
+                <label>Guides <sup>*</sup></label>
+                <div>
+                    <select class="form-control selectpicker" data-live-search="true" asp-for="Guides" asp-items="@Model.GuideItems"></select>
+                    <div><span asp-validation-for="Guides" class="text-danger"></span></div><br />
+                </div>
+            </div>
+            <div class="form-group" style="width: 40%; margin: 0 auto">
+                <label>Status <sup>*</sup></label>
+                <select class="form-control selectpicker" asp-for="IsActive" asp-items="@isActiveItems"></select>
+                <div><span asp-validation-for="IsActive" class="text-danger"></span></div><br />
+            </div>
+            <center>
+                <button style="font-weight: bold" class="tg-btn" type="submit"><span>Create Tour</span></button>
+            </center>
+        </div>
+    </form>
+</div>

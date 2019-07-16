@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System;
 using System.ComponentModel.DataAnnotations;
 
@@ -82,11 +83,7 @@ namespace ZTourist.Models.ViewModels
         [Required(ErrorMessage = "Phone number field is required")]
         [Phone(ErrorMessage = "Please enter a valid phone number")]
         public string Tel { get; set; }
-
-        [Required(ErrorMessage = "Please accept Terms & Privacy")]
-        [Range(typeof(bool), "true", "true", ErrorMessage = "Please accept Terms & Privacy")]
-        public bool AcceptTerm { get; set; }
-
+        
         public string ReturnUrl { get; set; }
     }
 

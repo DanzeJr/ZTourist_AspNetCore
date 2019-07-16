@@ -16,7 +16,32 @@
 
   <ItemGroup>
     <Folder Include="Areas\Company\Data\" />
-    <Folder Include="Areas\Company\Models\" />
+    <Folder Include="Areas\Company\Models\ViewModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Areas\Company\Views\Order\Checkout.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Areas\Company\Views\Order\Index.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Areas\Company\Views\Order\Result.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Company\Views\Tour\Details.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Areas\Company\Views\Tour\Details.cshtml" />
+    <_ContentIncludedByDefault Remove="Areas\Company\Views\Tour\Index.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Areas\Company\Views\Tour\Index.cshtml" />
   </ItemGroup>
 
 </Project>

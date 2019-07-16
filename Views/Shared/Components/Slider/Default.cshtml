@@ -23,7 +23,7 @@
                                             Planning a Trip to @tour.Destinations?.LastOrDefault()?.Name?
                                         </h1>
                                         <h2>You Choose the Adventure We make it happen</h2>
-                                        <a class="tg-btn" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id"><span>Explore Tour</span></a>
+                                        <a class="tg-btn" asp-area="" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id"><span>Explore Tour</span></a>
                                     </div>
                                 </div>
                             </div>
@@ -36,7 +36,7 @@
             <div class="container">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                        <form class="tg-formtheme tg-formtrip" asp-controller="Tour" asp-action="Search" method="get">
+                        <form class="tg-formtheme tg-formtrip" asp-area="" asp-controller="Tour" asp-action="Search" method="get">
                             <fieldset>
                                 <div class="form-group">
                                     <div class="tg-select">

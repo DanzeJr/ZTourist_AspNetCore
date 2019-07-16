@@ -12,7 +12,7 @@ using ZTourist.Models;
 namespace ZTourist.Areas.Company.Controllers
 {
     [Area("Company")]
-    [Authorize(Policy = "Customer")]
+    [Authorize(Policy = "Admin")]
     public class OrderController : Controller
     {
         private readonly Cart cart;

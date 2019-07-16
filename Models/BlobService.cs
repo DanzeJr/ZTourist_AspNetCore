@@ -2,6 +2,7 @@
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Threading.Tasks;
 
 namespace ZTourist.Models
@@ -24,9 +25,9 @@ namespace ZTourist.Models
                 CloudBlobContainer container = client.GetContainerReference(containerName);
                 await container.CreateIfNotExistsAsync();
                 await container.SetPermissionsAsync(new BlobContainerPermissions { PublicAccess = BlobContainerPublicAccessType.Blob });
-                var blob = container.GetBlockBlobReference(fileName);
+                var blob = container.GetBlockBlobReference(fileName.ToLower());
                 await blob.UploadFromStreamAsync(file.OpenReadStream());
-                return blob.Uri.AbsoluteUri;
+                return blob.Uri.AbsoluteUri +"?v=" + DateTime.Now;
             }
             return null;
         }

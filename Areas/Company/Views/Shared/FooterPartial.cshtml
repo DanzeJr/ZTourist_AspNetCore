@@ -106,11 +106,11 @@
     $(function () {
         $('#datetimepicker1').datetimepicker({
             showTodayButton: true,
-            format: 'Y-MM-DD HH:mm:ss'
+            format: 'DD/MM/YYYY HH:mm A'
         });
     });
 
-    $('#FromDate').mousedown(function () {
+    $('#FromDateSearch').mousedown(function () {
         $('#datetimepicker1').data('DateTimePicker').show();
     });
 
@@ -168,7 +168,7 @@
         items: 1,
         loop: true,
         dots: true,
-        nav: true,
+        nav: false,
         autoplay: true,
         autoplayTimeout: 5000,
         animateIn: 'fadeIn',

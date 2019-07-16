@@ -5,7 +5,7 @@
 }
 
 @section Slider {
-    @await Component.InvokeAsync("Slider")
+    @await Component.InvokeAsync("SliderEmp")
 }
 
 @section JS {
@@ -28,17 +28,17 @@
                         {
                             <div class="tg-populartour tg-populartourvtwo">
                                 <figure>
-                                    <a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id"><img style="width: 401px; height: 285px;" src="@tour.Image" alt="tour image" asp-append-version="true"></a>
+                                    <a asp-area="Company" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id"><img style="width: 401px; height: 285px;" src="@tour.Image" alt="tour image" asp-append-version="true"></a>
                                 </figure>
                                 <div class="tg-populartourcontent">
                                     <div class="tg-populartourtitle">
-                                        <h3 style="color: #00aff0"><a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">@tour.Name (@tour.Id.ToUpper())</a></h3>
+                                        <h3 style="color: #00aff0"><a asp-area="Company" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">@tour.Id | @tour.Name</a></h3>
                                         <br />
                                         <h5>@string.Join(" - ", tour.Destinations.Select(d => d.Name))</h5>
                                     </div>
                                     <div class="tg-description">
                                         <p>@tour.Description<br /></p>
-                                        <a style="text-decoration:none;" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">View more...</a>
+                                        <a style="text-decoration:none;" asp-area="Company" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">View more...</a>
                                     </div>
                                     <div class="tg-populartourfoot">
                                         <div class="tg-durationrating">
@@ -48,13 +48,12 @@
                                     </div>
                                     <div class="tg-priceavailability">
                                         <div class="tg-availhead">
-                                            <time>@tour.FromDate.ToString("dd/MMM/yyyy") - @tour.ToDate.ToString("dd/MMM/yyyy")</time>
+                                            <time>@tour.FromDate.ToString("dd/MM/yyyy") - @tour.ToDate.ToString("dd/MM/yyyy")</time>
                                         </div>
                                         <div class="tg-pricearea">
-                                            <span>From</span>
-                                            <h4>@tour.AdultFare.ToString("C0")</h4>
+                                            <h4>@(tour.KidFare > 0 ? "" : tour.KidFare.ToString("C0") + " - ")@tour.AdultFare.ToString("C0")</h4>
                                         </div>
-                                        <a class="tg-btn" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id"><span>View Tour</span></a>
+                                        <a class="tg-btn" asp-area="Company" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id"><span>View Tour</span></a>
                                     </div>
                                 </div>
                             </div>

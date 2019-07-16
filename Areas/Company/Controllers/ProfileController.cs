@@ -13,7 +13,7 @@ using ZTourist.Models.ViewModels;
 namespace ZTourist.Areas.Company.Controllers
 {
     [Area("Company")]
-    [Authorize(Policy = "Customer")]
+    [Authorize(Policy = "Employee")]
     public class ProfileController : Controller
     {
         private readonly UserManager<AppUser> userManager;
@@ -65,7 +65,7 @@ namespace ZTourist.Areas.Company.Controllers
                 user.Gender = profile.Gender;
                 user.PhoneNumber = profile.Tel;
                 string avatar;
-                if (profile.Photo != null) // if photo is change then copy
+                if (profile.Photo != null && !string.IsNullOrWhiteSpace(profile.Photo.FileName)) // if photo is change then copy
                 {
                     string filePath = user.UserName + "." + profile.Photo.FileName.Substring(profile.Photo.FileName.LastIndexOf(".") + 1);
                     avatar = await blobService.UploadFile("avatars", filePath, profile.Photo);

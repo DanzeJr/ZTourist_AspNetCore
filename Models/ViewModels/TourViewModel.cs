@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -112,18 +113,17 @@ namespace ZTourist.Models.ViewModels
         [MaxLength(30, ErrorMessage = "Tour ID can't be more than 30 characters")]
         public string Id { get; set; }
 
-        [Display(Name = "Tour Name")]
-        [Required(ErrorMessage = "Tour name is required")]
-        [MaxLength(100, ErrorMessage = "Tour name can't be more than 100 characters")]
+        [Display(Name = "Tour Title")]
+        [Required(ErrorMessage = "Tour title is required")]
+        [MaxLength(100, ErrorMessage = "Tour title can't be more than 100 characters")]
         public string Name { get; set; }
 
         [Display(Name = "Tour Image")]
-        [Required(ErrorMessage = "Tour Image is required")]
         [MaxLength(200, ErrorMessage = "Image path is too long")]
         public string Image { get; set; }
 
         [MaxLength(500, ErrorMessage = "Description can't be more than 500 characters")]
-        public string Description { get; set; }
+        public string Description { get; set; } = "";
 
         [Display(Name = "Start Date")]
         [Required(ErrorMessage = "Start date is required")]
@@ -137,24 +137,36 @@ namespace ZTourist.Models.ViewModels
 
         [Display(Name = "Adult fare")]
         [Required(ErrorMessage = "Adult fare is required")]
-        public decimal AdultFare { get; set; }
+        [Range(0.0000001, (Double) Decimal.MaxValue, ErrorMessage = "Adult fare must be greater than zero")]
+        public decimal AdultFare { get; set; } = 0;
 
         [Display(Name = "Kid fare")]
-        public decimal KidFare { get; set; }
+        [Required(ErrorMessage = "Kid fare is required")]
+        [Range(0, (Double)Decimal.MaxValue, ErrorMessage = "Kid fare must be greater or equals to zero")]
+        public decimal KidFare { get; set; } = 0;
 
         [Display(Name = "Maximum guest")]
         [Required(ErrorMessage = "Maximum guest is required")]
+        [Range(1, Int32.MaxValue, ErrorMessage = "Maximum guest must be greater than zero")]
         public int MaxGuest { get; set; }
 
-        public string Transport { get; set; }
+        [MaxLength(50, ErrorMessage = "Transport can't be more than 50 characters")]
+        public string Transport { get; set; } = "";
         
         public bool IsActive { get; set; }
 
         public int Duration { get; set; }
 
-        public IEnumerable<Destination> Destinations { get; set; }
+        [Required(ErrorMessage = "Please select departure and destinations")]
+        public IList<string> Destinations { get; set; }
 
-        public IEnumerable<AppUser> Guides { get; set; }
+        [Required(ErrorMessage = "Please select at least a guide")]
+        public IList<string> Guides { get; set; }
 
+        public IFormFile Photo { get; set; }
+
+        public SelectList DestinationItems { get; set; }
+
+        public SelectList GuideItems { get; set; }
     }
 }

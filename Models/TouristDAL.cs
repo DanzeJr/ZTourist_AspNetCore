@@ -97,8 +97,10 @@ namespace ZTourist.Models
                         {
                             result = new Tour { Id = id };
                             result.Name = sdr.GetString(sdr.GetOrdinal("Name"));
+                            result.Description = sdr.GetString(sdr.GetOrdinal("Description"));
                             result.Image = sdr.GetString(sdr.GetOrdinal("Image"));
                             result.FromDate = sdr.GetDateTime(sdr.GetOrdinal("FromDate"));
+                            result.ToDate = sdr.GetDateTime(sdr.GetOrdinal("ToDate"));
                             result.AdultFare = sdr.GetDecimal(sdr.GetOrdinal("AdultFare"));
                             result.KidFare = sdr.GetDecimal(sdr.GetOrdinal("KidFare"));
                             result.MaxGuest = sdr.GetInt32(sdr.GetOrdinal("MaxGuest"));
@@ -131,7 +133,7 @@ namespace ZTourist.Models
                     {
                         if (await sdr.ReadAsync())
                         {
-                            result = new Tour();
+                            result = new Tour { Id = id };
                             result.Name = sdr.GetString(sdr.GetOrdinal("Name"));
                             result.Description = sdr.GetString(sdr.GetOrdinal("Description"));
                             result.Image = sdr.GetString(sdr.GetOrdinal("Image"));
@@ -140,6 +142,8 @@ namespace ZTourist.Models
                             result.AdultFare = sdr.GetDecimal(sdr.GetOrdinal("AdultFare"));
                             result.KidFare = sdr.GetDecimal(sdr.GetOrdinal("KidFare"));
                             result.MaxGuest = sdr.GetInt32(sdr.GetOrdinal("MaxGuest"));
+                            result.Transport = sdr.GetString(sdr.GetOrdinal("Transport"));
+                            result.Duration = sdr.GetInt32(sdr.GetOrdinal("Duration"));
                             result.IsActive = sdr.GetBoolean(sdr.GetOrdinal("IsActive"));
                         }
                     }
@@ -358,36 +362,6 @@ namespace ZTourist.Models
             return result;
         }
 
-        public async Task<Destination> GetFinalDestinationByTourIdAsync(string id)
-        {
-            Destination result = null;
-
-            try
-            {
-                using (SqlConnection cnn = new SqlConnection(connectionStr))
-                {
-                    SqlCommand cmd = new SqlCommand("spFindFinalDestinationByTourId", cnn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ID", id);
-                    if (cnn.State == ConnectionState.Closed)
-                        cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
-                    {
-                        if (await sdr.ReadAsync())
-                        {
-                            result = new Destination();
-                            result.Name = sdr.GetString(sdr.GetOrdinal("Name"));
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return result;
-        }
-
         public async Task<IEnumerable<AppUser>> FindGuidesByTourIdAsync(string id)
         {
             List<AppUser> result = null;
@@ -410,7 +384,7 @@ namespace ZTourist.Models
                             while (await sdr.ReadAsync())
                             {
                                 user = new AppUser();
-                                user.UserName = sdr.GetString(sdr.GetOrdinal("UserName"));
+                                user.Id = sdr.GetString(sdr.GetOrdinal("UserId"));
                                 user.FirstName = sdr.GetString(sdr.GetOrdinal("FirstName"));
                                 user.LastName = sdr.GetString(sdr.GetOrdinal("LastName"));
                                 result.Add(user);
@@ -683,31 +657,6 @@ namespace ZTourist.Models
             return result;
         }
 
-        public async Task<bool> AddTourDestinationAsync(string tourId, string destinationId, int index)
-        {
-            bool result = false;
-
-            try
-            {
-                using (SqlConnection cnn = new SqlConnection(connectionStr))
-                {
-                    SqlCommand cmd = new SqlCommand("spAddTourDestination", cnn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@TourId", tourId);
-                    cmd.Parameters.AddWithValue("@DestinationId", destinationId);
-                    cmd.Parameters.AddWithValue("@IndexNumber", index);
-                    if (cnn.State == ConnectionState.Closed)
-                        cnn.Open();
-                    result = await cmd.ExecuteNonQueryAsync() > 0;
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return result;
-        }
-
         public async Task<bool> DeleteTourDestinationsByTourIdAsync(string Id)
         {
             bool result = false;
@@ -768,30 +717,6 @@ namespace ZTourist.Models
             return result;
         }
 
-        public async Task<bool> AddTourGuideAsync(string tourId, string userId)
-        {
-            bool result = false;
-
-            try
-            {
-                using (SqlConnection cnn = new SqlConnection(connectionStr))
-                {
-                    SqlCommand cmd = new SqlCommand("AddTourGuide", cnn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@TourId", tourId);
-                    cmd.Parameters.AddWithValue("@UserId", userId);
-                    if (cnn.State == ConnectionState.Closed)
-                        cnn.Open();
-                    result = await cmd.ExecuteNonQueryAsync() > 0;
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return result;
-        }
-
         public async Task<bool> DeleteTourGuidesByTourIdAsync(string id)
         {
             bool result = false;
@@ -815,41 +740,6 @@ namespace ZTourist.Models
             return result;
         }
 
-        public async Task<IEnumerable<string>> GetGuidesByTourIdAsync(string id)
-        {
-            List<string> result = null;
-            string guide;
-
-            try
-            {
-                using (SqlConnection cnn = new SqlConnection(connectionStr))
-                {
-                    SqlCommand cmd = new SqlCommand("spGetGuidesByTourId", cnn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ID", id);
-                    if (cnn.State == ConnectionState.Closed)
-                        cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
-                    {
-                        if (sdr.HasRows)
-                        {
-                            result = new List<string>();
-                            while (await sdr.ReadAsync())
-                            {
-                                guide = sdr.GetString(sdr.GetOrdinal("UserId"));
-                                result.Add(guide);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return result;
-        }
-
         public async Task<bool> AddTourAsync(Tour tour)
         {
             bool result = false;
@@ -858,22 +748,88 @@ namespace ZTourist.Models
             {
                 using (SqlConnection cnn = new SqlConnection(connectionStr))
                 {
-                    SqlCommand cmd = new SqlCommand("spAddTour", cnn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@Id", tour.Id);
-                    cmd.Parameters.AddWithValue("@Name", tour.Name);
-                    cmd.Parameters.AddWithValue("@Description", tour.Description);
-                    cmd.Parameters.AddWithValue("@FromDate", tour.FromDate);
-                    cmd.Parameters.AddWithValue("@ToDate", tour.ToDate);
-                    cmd.Parameters.AddWithValue("@AdultFare", tour.AdultFare);
-                    cmd.Parameters.AddWithValue("@KidFare", tour.KidFare);
-                    cmd.Parameters.AddWithValue("@MaxGuest", tour.MaxGuest);
-                    cmd.Parameters.AddWithValue("@Image", tour.Image);
-                    cmd.Parameters.AddWithValue("@Transport", tour.Transport);
-                    cmd.Parameters.AddWithValue("@IsActive", tour.IsActive);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    result = await cmd.ExecuteNonQueryAsync() > 0;
+                    using (SqlTransaction transaction = cnn.BeginTransaction())
+                    {
+                        using (SqlCommand cmd = new SqlCommand())
+                        {
+                            cmd.Connection = cnn;
+                            cmd.Transaction = transaction;
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.CommandText = "spAddTour";
+                            try
+                            {
+                                cmd.Parameters.AddWithValue("@Id", tour.Id);
+                                cmd.Parameters.AddWithValue("@Name", tour.Name);
+                                cmd.Parameters.AddWithValue("@Description", tour.Description);
+                                cmd.Parameters.AddWithValue("@FromDate", tour.FromDate);
+                                cmd.Parameters.AddWithValue("@ToDate", tour.ToDate);
+                                cmd.Parameters.AddWithValue("@AdultFare", tour.AdultFare);
+                                cmd.Parameters.AddWithValue("@KidFare", tour.KidFare);
+                                cmd.Parameters.AddWithValue("@Transport", tour.Transport);
+                                cmd.Parameters.AddWithValue("@MaxGuest", tour.MaxGuest);
+                                cmd.Parameters.AddWithValue("@Image", tour.Image);
+                                cmd.Parameters.AddWithValue("@IsActive", tour.IsActive);
+                                result = await cmd.ExecuteNonQueryAsync() > 0;
+
+                                if (result) // if add tour successfully, then add details
+                                {
+                                    result = false;
+                                    cmd.CommandText = "spAddTourGuide";
+                                    foreach (AppUser guide in tour.Guides)
+                                    {
+                                        result = false;
+                                        cmd.Parameters.Clear();
+                                        cmd.Parameters.AddWithValue("@TourId", tour.Id);
+                                        cmd.Parameters.AddWithValue("@UserId", guide.Id);
+                                        cmd.Parameters.AddWithValue("@AssignDate", DateTime.Now);
+                                        result = await cmd.ExecuteNonQueryAsync() > 0;
+                                        if (!result)
+                                        {
+                                            transaction.Rollback(); // if add tour guide failed then roll back transaction
+                                            break; // stop for to return
+                                        }
+                                    }
+                                    if (result) // if add tour guides successfully
+                                    {
+                                        result = false;
+                                        int i = 0;
+                                        cmd.CommandText = "spAddTourDestination";
+                                        foreach (Destination destination in tour.Destinations)
+                                        {
+                                            result = false;
+                                            cmd.Parameters.Clear();
+                                            cmd.Parameters.AddWithValue("@TourId", tour.Id);
+                                            cmd.Parameters.AddWithValue("@DestinationId", destination.Id);
+                                            cmd.Parameters.AddWithValue("@IndexNumber", i);
+                                            i++;
+                                            result = await cmd.ExecuteNonQueryAsync() > 0;
+                                            if (!result)
+                                            {
+                                                transaction.Rollback(); // if add tour destination failed then roll back transaction
+                                                break; // stop for to return
+                                            }
+                                        }
+                                    }
+
+                                }
+                                transaction.Commit(); // commit transaction whether update tour is successful or not
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                                try
+                                {
+                                    transaction.Rollback(); //if an exception is throw, roll back transaction
+                                }
+                                catch (Exception rollbackEx)
+                                {
+                                    Console.WriteLine(rollbackEx.Message);
+                                }
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception)
@@ -891,22 +847,111 @@ namespace ZTourist.Models
             {
                 using (SqlConnection cnn = new SqlConnection(connectionStr))
                 {
-                    SqlCommand cmd = new SqlCommand("spUpdateTour", cnn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@Id", tour.Id);
-                    cmd.Parameters.AddWithValue("@Name", tour.Name);
-                    cmd.Parameters.AddWithValue("@Description", tour.Description);
-                    cmd.Parameters.AddWithValue("@FromDate", tour.FromDate);
-                    cmd.Parameters.AddWithValue("@ToDate", tour.ToDate);
-                    cmd.Parameters.AddWithValue("@AdultFare", tour.AdultFare);
-                    cmd.Parameters.AddWithValue("@KidFare", tour.KidFare);
-                    cmd.Parameters.AddWithValue("@Transport", tour.Transport);
-                    cmd.Parameters.AddWithValue("@MaxGuest", tour.MaxGuest);
-                    cmd.Parameters.AddWithValue("@Image", tour.Image);
-                    cmd.Parameters.AddWithValue("@IsActive", tour.IsActive);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    result = await cmd.ExecuteNonQueryAsync() > 0;
+                    using (SqlTransaction transaction = cnn.BeginTransaction())
+                    {
+                        using (SqlCommand cmd = new SqlCommand())
+                        {
+                            cmd.Connection = cnn;
+                            cmd.Transaction = transaction;
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.CommandText = "spUpdateTour";
+                            try
+                            {
+                                cmd.Parameters.AddWithValue("@Id", tour.Id);
+                                cmd.Parameters.AddWithValue("@Name", tour.Name);
+                                cmd.Parameters.AddWithValue("@Description", tour.Description);
+                                cmd.Parameters.AddWithValue("@FromDate", tour.FromDate);
+                                cmd.Parameters.AddWithValue("@ToDate", tour.ToDate);
+                                cmd.Parameters.AddWithValue("@AdultFare", tour.AdultFare);
+                                cmd.Parameters.AddWithValue("@KidFare", tour.KidFare);
+                                cmd.Parameters.AddWithValue("@Transport", tour.Transport);
+                                cmd.Parameters.AddWithValue("@MaxGuest", tour.MaxGuest);
+                                cmd.Parameters.AddWithValue("@Image", tour.Image);
+                                cmd.Parameters.AddWithValue("@IsActive", tour.IsActive);
+                                result = await cmd.ExecuteNonQueryAsync() > 0;
+
+                                if (result) // if update tour successfully, then update details
+                                {
+                                    result = false;
+                                    cmd.CommandText = "spDeleteTourGuidesByTourId";
+                                    cmd.Parameters.Clear();
+                                    cmd.Parameters.AddWithValue("@Id", tour.Id);
+                                    result = await cmd.ExecuteNonQueryAsync() > 0;
+                                    if (!result)
+                                    {
+                                        transaction.Rollback(); // if delete tour destination failed then roll back transaction
+                                    }
+                                    else
+                                    {
+                                        result = false;
+                                        cmd.CommandText = "spAddTourGuide";
+                                        foreach (AppUser guide in tour.Guides)
+                                        {
+                                            result = false;
+                                            cmd.Parameters.Clear();
+                                            cmd.Parameters.AddWithValue("@TourId", tour.Id);
+                                            cmd.Parameters.AddWithValue("@UserId", guide.Id);
+                                            cmd.Parameters.AddWithValue("@AssignDate", DateTime.Now);
+                                            result = await cmd.ExecuteNonQueryAsync() > 0;
+                                            if (!result)
+                                            {
+                                                transaction.Rollback(); // if update tour guide failed then roll back transaction
+                                                break; // stop for to return
+                                            }
+                                        }
+                                        if (result) // if update tour guides successfully
+                                        {
+                                            cmd.CommandText = "spDeleteTourDestinationsByTourId";
+                                            cmd.Parameters.Clear();
+                                            cmd.Parameters.AddWithValue("@Id", tour.Id);
+                                            result = await cmd.ExecuteNonQueryAsync() > 0;
+                                            if (!result)
+                                            {
+                                                transaction.Rollback(); // if delete tour destination failed then roll back transaction
+                                            }
+                                            else
+                                            {
+                                                result = false;
+                                                int i = 0;
+                                                cmd.CommandText = "spAddTourDestination";
+                                                foreach (Destination destination in tour.Destinations)
+                                                {
+                                                    result = false;
+                                                    cmd.Parameters.Clear();
+                                                    cmd.Parameters.AddWithValue("@TourId", tour.Id);
+                                                    cmd.Parameters.AddWithValue("@DestinationId", destination.Id);
+                                                    cmd.Parameters.AddWithValue("@IndexNumber", i);
+                                                    i++;
+                                                    result = await cmd.ExecuteNonQueryAsync() > 0;
+                                                    if (!result)
+                                                    {
+                                                        transaction.Rollback(); // if update tour destination failed then roll back transaction
+                                                        break; // stop for to return
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                }
+                                transaction.Commit(); // commit transaction whether update tour is successful or not
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                                try
+                                {
+                                    transaction.Rollback(); //if an exception is throw, roll back transaction
+                                }
+                                catch (Exception rollbackEx)
+                                {
+                                    Console.WriteLine(rollbackEx.Message);
+                                }
+                            }
+                        }
+                    }
                 }
             }
             catch (Exception)
@@ -929,6 +974,35 @@ namespace ZTourist.Models
                 using (SqlConnection cnn = new SqlConnection(connectionStr))
                 {
                     SqlCommand cmd = new SqlCommand("spIsExistedDestinationId", cnn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    if (cnn.State == ConnectionState.Closed)
+                        cnn.Open();
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
+                    {
+                        if (sdr.HasRows)
+                        {
+                            result = true;
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
+        }
+
+        public async Task<bool> IsAvailableDestinationAsync(string id)
+        {
+            bool result = false;
+
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(connectionStr))
+                {
+                    SqlCommand cmd = new SqlCommand("spIsAvailableDestination", cnn);
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Id", id);
                     if (cnn.State == ConnectionState.Closed)
@@ -1123,7 +1197,7 @@ namespace ZTourist.Models
                 {
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
-                    using(SqlTransaction transaction = cnn.BeginTransaction())
+                    using (SqlTransaction transaction = cnn.BeginTransaction())
                     {
                         using (SqlCommand cmd = new SqlCommand())
                         {
@@ -1140,7 +1214,7 @@ namespace ZTourist.Models
                                 cmd.Parameters.AddWithValue("@OrderDate", order.OrderDate);
                                 cmd.Parameters.AddWithValue("@Status", order.Status);
                                 result = await cmd.ExecuteNonQueryAsync() > 0;
-                                
+
                                 if (result) // if insert order customer successfully, then insert order details
                                 {
                                     result = false;
@@ -1161,7 +1235,7 @@ namespace ZTourist.Models
                                         }
                                     }
                                 }
-                                
+
                                 transaction.Commit(); // commit transaction whether insert order is successful or not
                             }
                             catch (Exception ex)
@@ -1175,9 +1249,9 @@ namespace ZTourist.Models
                                 {
                                     Console.WriteLine(rollbackEx.Message);
                                 }
-                            }                            
+                            }
                         }
-                    }                                            
+                    }
                 }
             }
             catch (Exception)
@@ -1186,7 +1260,7 @@ namespace ZTourist.Models
             }
             return result;
         }
-        
+
         #endregion
 
 

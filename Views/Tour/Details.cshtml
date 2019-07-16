@@ -25,7 +25,7 @@
             var total = ($.isNumeric(numKid) ? parseInt(numKid) : 0) * kidFare + adultFare * ($.isNumeric(numAdult) ? parseInt(numAdult) : 0);
             $("#total h4").html("Total: " + "$" + total);
         });
-        
+
         $('#AdultTicket').on("change paste keyup", function () {
             var numAdult = $("#AdultTicket").val();
             var numKid = $("#KidTicket").val();
@@ -177,7 +177,7 @@
                         }
                         <ul class="tg-tripinfo">
                             <li><span class="tg-tourduration">@Model.Tour.DurationStr()</span></li>
-                            <li><span class="tg-tourduration tg-availabilty">From @Model.Tour.FromDate.ToString("dd - MMMM - yyyy")</span></li>
+                            <li><span class="tg-tourduration tg-availabilty">@Model.Tour.FromDate.ToString("dd/MM/yyyy") - @Model.Tour.ToDate.ToString("dd/MM/yyyy")</span></li>
                             <li>
                                 <span class="tg-tourduration tg-location">
                                     @if (Model.Tour.Destinations != null)
@@ -192,14 +192,8 @@
                             }
                         </ul>
                         <div class="tg-refundshare">
-                            <div class="tg-refund">
-                                <figure><img src="~/images/img-03.jpg" alt="image description" asp-append-version="true"></figure>
-                                <div class="tg-refundinfo">
-                                    <h3>100% refundable</h3>
-                                    <div class="tg-description">
-                                        <p>Cancel up to 12 days before your trip and get a full refund, including service fees.</p>
-                                    </div>
-                                </div>
+                            <div style="width: 75%; margin: 0 auto">
+                                <h4 class="tg-wrapper text-left"><strong>Description: </strong>@Model.Tour.Description</h4>
                             </div>
                         </div>
                     </div>
