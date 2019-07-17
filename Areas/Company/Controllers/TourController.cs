@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -129,7 +128,12 @@ namespace ZTourist.Areas.Company.Controllers
             IEnumerable<Destination> destinations = await touristDAL.FindDestinationsByTourIdAsync(id);
             IEnumerable<AppUser> guides = await touristDAL.FindGuidesByTourIdAsync(id);
             if (destinations != null)
+            {
                 model.Destinations = destinations.Select(d => d.Id).ToList<string>();
+                model.Departure = model.Destinations[0];
+                model.Destinations.RemoveAt(0);
+            }
+
             if (guides != null)
                 model.Guides = guides.Select(g => g.Id).ToList<string>();
 
@@ -165,19 +169,25 @@ namespace ZTourist.Areas.Company.Controllers
                 {
                     ModelState.AddModelError("", "End Date must be greater than Start Date");
                 }
-                if (model.Destinations.Count < 2)
+                if (!await touristDAL.IsAvailableDestinationAsync(model.Departure))
                 {
-                    ModelState.AddModelError("", "Please select departure and destinations");
+                    ModelState.AddModelError("", $"Departure '{model.Departure.ToUpper()}' is not existed or available");
                 }
-                else
+                bool duplicated = false;
+                foreach (string id in model.Destinations)
                 {
-                    foreach (string id in model.Destinations)
+                    if (id.Equals(model.Departure, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (!await touristDAL.IsAvailableDestinationAsync(id))
-                        {
-                            ModelState.AddModelError("", $"Destination '{id.ToUpper()}' is not existed or available");
-                        }
+                        duplicated = true;
                     }
+                    if (!await touristDAL.IsAvailableDestinationAsync(id))
+                    {
+                        ModelState.AddModelError("", $"Destination '{id.ToUpper()}' is not existed or available");
+                    }
+                }
+                if (duplicated)
+                {
+                    ModelState.AddModelError("", "The departure can't also be destinations");
                 }
                 List<string> availableGuides = new List<string>();
                 IEnumerable<AppUser> guides = await userManager.GetUsersInRoleAsync("Guide");
@@ -201,6 +211,7 @@ namespace ZTourist.Areas.Company.Controllers
                     model.GuideItems = await InitGuideItemsAsync();
                     return View("Edit", model);
                 }
+                model.Destinations.Insert(0, model.Departure);
                 List<Destination> destinations = new List<Destination>();
                 foreach (string id in model.Destinations)
                 {
@@ -291,19 +302,25 @@ namespace ZTourist.Areas.Company.Controllers
                 {
                     ModelState.AddModelError("", "End Date must be greater than Start Date");
                 }
-                if (model.Destinations.Count < 2)
+                if (!await touristDAL.IsAvailableDestinationAsync(model.Departure))
                 {
-                    ModelState.AddModelError("", "Please select departure and destinations");
+                    ModelState.AddModelError("", $"The departure '{model.Departure.ToUpper()}' is not existed or available");
                 }
-                else
+                bool duplicated = false;
+                foreach (string id in model.Destinations)
                 {
-                    foreach (string id in model.Destinations)
+                    if (id.Equals(model.Departure, StringComparison.OrdinalIgnoreCase))
                     {
-                        if (!await touristDAL.IsAvailableDestinationAsync(id))
-                        {
-                            ModelState.AddModelError("", $"Destination '{id.ToUpper()}' is not existed or available");
-                        }
+                        duplicated = true;
                     }
+                    if (!await touristDAL.IsAvailableDestinationAsync(id))
+                    {
+                        ModelState.AddModelError("", $"Destination '{id.ToUpper()}' is not existed or available");
+                    }
+                }
+                if (duplicated)
+                {
+                    ModelState.AddModelError("", "The departure can't also be destinations");
                 }
                 List<string> availableGuides = new List<string>();
                 IEnumerable<AppUser> guides = await userManager.GetUsersInRoleAsync("Guide");

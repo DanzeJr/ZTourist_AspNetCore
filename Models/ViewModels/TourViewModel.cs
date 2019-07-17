@@ -146,13 +146,16 @@ namespace ZTourist.Models.ViewModels
 
         public int Duration { get; set; }
 
-        [Required(ErrorMessage = "Please select departure and destinations")]
+        [Required(ErrorMessage = "Please select at least a destination")]
         public IList<string> Destinations { get; set; }
 
         [Required(ErrorMessage = "Please select at least a guide")]
         public IList<string> Guides { get; set; }
 
         public IFormFile Photo { get; set; }
+
+        [Required(ErrorMessage = "Please select the departure")]
+        public string Departure { get; set; }
 
         public SelectList DestinationItems { get; set; }
 
