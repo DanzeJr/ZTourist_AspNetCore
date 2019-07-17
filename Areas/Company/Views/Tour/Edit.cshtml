@@ -30,11 +30,11 @@
 @section JS {
     <script type="text/javascript">
         $('#FromDate').datetimepicker({
-            format: 'DD/MM/YYYY HH:mm A'
+            format: 'DD/MM/YYYY HH:mm'
         });
         $('#ToDate').datetimepicker({
             useCurrent: false,
-            format: 'DD/MM/YYYY HH:mm A'
+            format: 'DD/MM/YYYY HH:mm'
         });
         $("#FromeDate").on("dp.change", function (e) {
             $('#ToDate').data("DateTimePicker").minDate(e.date);

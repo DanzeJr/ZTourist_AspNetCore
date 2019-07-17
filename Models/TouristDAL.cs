@@ -458,6 +458,7 @@ namespace ZTourist.Models
                                 tour.ToDate = sdr.GetDateTime(sdr.GetOrdinal("ToDate"));
                                 tour.Transport = sdr.GetString(sdr.GetOrdinal("Transport"));
                                 tour.AdultFare = sdr.GetDecimal(sdr.GetOrdinal("AdultFare"));
+                                tour.KidFare = sdr.GetDecimal(sdr.GetOrdinal("KidFare"));
                                 tour.Image = sdr.GetString(sdr.GetOrdinal("Image"));
                                 tour.Duration = sdr.GetInt32(sdr.GetOrdinal("Duration"));
                                 result.Add(tour);
@@ -499,8 +500,8 @@ namespace ZTourist.Models
                         cmd.Parameters.AddWithValue("@DestinationId", search.Destination);
                     if (search.FromDate != null)
                         cmd.Parameters.AddWithValue("@FromDate", search.FromDate);
-                    if (search.Duration != null)
-                        cmd.Parameters.AddWithValue("@Duration", search.Duration);
+                    if (search.Duration > 0 && search.Duration < 8)
+                        cmd.Parameters.AddWithValue("@Duration", search.Duration * 24);
                     if (search.MinPrice != null)
                         cmd.Parameters.AddWithValue("@MinPrice", search.MinPrice);
                     if (search.MaxPrice != null)
@@ -571,8 +572,8 @@ namespace ZTourist.Models
                         cmd.Parameters.AddWithValue("@DestinationId", search.Destination);
                     if (search.FromDate != null)
                         cmd.Parameters.AddWithValue("@FromDate", search.FromDate);
-                    if (search.Duration != null)
-                        cmd.Parameters.AddWithValue("@Duration", search.Duration);
+                    if (search.Duration > 0 && search.Duration < 8)
+                        cmd.Parameters.AddWithValue("@Duration", search.Duration * 24);
                     if (search.MinPrice != null)
                         cmd.Parameters.AddWithValue("@MinPrice", search.MinPrice);
                     if (search.MaxPrice != null)
@@ -613,6 +614,7 @@ namespace ZTourist.Models
                                 tour.ToDate = sdr.GetDateTime(sdr.GetOrdinal("ToDate"));
                                 tour.Transport = sdr.GetString(sdr.GetOrdinal("Transport"));
                                 tour.AdultFare = sdr.GetDecimal(sdr.GetOrdinal("AdultFare"));
+                                tour.KidFare = sdr.GetDecimal(sdr.GetOrdinal("KidFare"));
                                 tour.Image = sdr.GetString(sdr.GetOrdinal("Image"));
                                 tour.Duration = sdr.GetInt32(sdr.GetOrdinal("Duration"));
                                 result.Add(tour);

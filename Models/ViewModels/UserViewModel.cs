@@ -102,6 +102,7 @@ namespace ZTourist.Models.ViewModels
 
         [Display(Name = "Birth Date")]
         [UIHint("Text")]
+        [DataType(DataType.DateTime, ErrorMessage = "Invalid date format")]
         [Required(ErrorMessage = "Please enter your birth date")]
         public DateTime BirthDate { get; set; }
 

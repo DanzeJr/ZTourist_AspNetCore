@@ -85,7 +85,6 @@ namespace ZTourist.Areas.Company.Controllers
         [ImportModelState]
         public async Task<IActionResult> Details(string id)
         {
-            id = id ?? (string)TempData["TourID"];
             if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
             Tour tour = await touristDAL.FindTourByTourIdEmpAsync(id);
@@ -235,8 +234,7 @@ namespace ZTourist.Areas.Company.Controllers
                     tour.Image = img;
                     if (await touristDAL.UpdateTourAsync(tour))
                     {
-                        TempData["TourID"] = tour.Id;
-                        return RedirectToAction(nameof(Details));
+                        return RedirectToAction(nameof(Index));
                     }
                     else
                     {
@@ -360,8 +358,7 @@ namespace ZTourist.Areas.Company.Controllers
                     tour.Image = img;
                     if (await touristDAL.AddTourAsync(tour))
                     {
-                        TempData["TourID"] = tour.Id;
-                        return RedirectToAction(nameof(Details));
+                        return RedirectToAction(nameof(Index));
                     }
                     else
                     {

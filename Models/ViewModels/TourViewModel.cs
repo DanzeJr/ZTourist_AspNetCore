@@ -49,7 +49,6 @@ namespace ZTourist.Models.ViewModels
             {
                 MinPrice = null;
                 MaxPrice = null;
-                PriceRange = null;
             }
             else
             {
@@ -90,18 +89,8 @@ namespace ZTourist.Models.ViewModels
                     default:
                         MinPrice = null;
                         MaxPrice = null;
-                        PriceRange = null;
                         break;
                 }
-            }
-
-            //set duration
-            if (Duration != null)
-            {
-                if (Duration >= 8 || Duration <= 0)
-                    Duration = null;
-                else
-                    Duration = Duration * 24;
             }
         }
     }

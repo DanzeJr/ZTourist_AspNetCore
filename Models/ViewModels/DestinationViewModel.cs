@@ -36,4 +36,17 @@ namespace ZTourist.Models.ViewModels
 
         public IFormFile Photo { get; set; }
     }
+
+    public class DestinationSearchModel
+    {
+        public IEnumerable<Destination> Destinations { get; set; }
+
+        public PageInfo PageInfo { get; set; }
+
+        public int Skip { get; set; } = 0;
+
+        public int Fetch { get; set; } = 5;
+
+        public bool? IsActive { get; set; }
+    }
 }
