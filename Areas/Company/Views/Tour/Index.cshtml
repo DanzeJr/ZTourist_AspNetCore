@@ -10,8 +10,9 @@
 
 @section JS {
     <script type="text/javascript">
-        $("body").attr("class", "tg-home tg-homevthree tg-login");
         $("#tg-main").attr("class", "tg-main tg-sectionspace tg-haslayout tg-bglight");
+        var element = $("#tg-main");
+        $(window).scrollTop(element.offset().top - 50).scrollLeft(element.offset().left);
     </script>
 }
 <div class="container">
@@ -22,6 +23,8 @@
                     <div class="tg-sectiontitle">
                         <h2>@ViewBag.Title</h2>
                     </div>
+                    <div asp-validation-summary="ModelOnly" class="text-danger text-center" style="font-size: larger; font-weight: bold"></div>
+                    <div class="clearfix"></div>
                     @if (Model?.Tours != null)
                     {
                         @foreach (Tour tour in Model.Tours)
@@ -34,7 +37,7 @@
                                     <div class="tg-populartourtitle">
                                         <h3 style="color: #00aff0"><a asp-area="Company" asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">@tour.Id | @tour.Name</a></h3>
                                         <br />
-                                        <h5>@string.Join(" - ", tour.Destinations.Select(d => d.Name))</h5>
+                                        <h5>@(tour.Destinations == null ? "" : string.Join(" - ", tour.Destinations.Select(d => d.Name)))</h5>
                                     </div>
                                     <div class="tg-description">
                                         <p>@tour.Description<br /></p>

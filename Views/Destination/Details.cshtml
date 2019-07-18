@@ -1,0 +1,54 @@
+﻿@model Destination
+
+@{
+    ViewData["Title"] = "Destination Details";
+}
+
+@section JS {
+    <script type="text/javascript">
+        var element = $("#tg-main");
+        $(window).scrollTop(element.offset().top).scrollLeft(element.offset().left);
+    </script>
+}
+
+@section Slider {
+    @await Component.InvokeAsync("Slider")
+}
+<div id="divMain" style="margin-top: 3%">
+    <h1 class="text-center">Destination Details</h1>
+    <br /><br />
+    <div asp-validation-summary="ModelOnly" class="text-danger text-center" style="font-size: larger; font-weight: bold"></div>
+    <form class="tg-formtheme tg-formdashboard">
+        <div style="width: 75%; margin: 0 auto; padding-bottom: 5%">
+            <div class="tg-dashboardcontent">
+                <div class="tg-content">
+                    <fieldset>
+                        <div class="form-group">
+                            <figure>
+                                <center>
+                                    <img id="imgTitle" style="height: 350px" src="@Model.Image" alt="Destination Image" asp-append-version="true">
+                                </center>
+                            </figure>
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <h4><strong>Destination Name: </strong>@Model.Name</h4>
+                        </div>
+                        <div class="form-group">
+                            <h4><strong>Country: </strong>@Model.Country</h4>
+                        </div>
+                        <div class="form-group">
+                            <h4><strong>Description: </strong>@Model.Description</h4>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="text-center">
+        <a style="font-weight: bold; margin-bottom: 5%" class="tg-btn" asp-area="" asp-controller="Tour" asp-action="Search" asp-route-Destination="@Model.Id">
+            <span>Find Tours With Destination @Model.Name</span>
+        </a>
+    </div>
+</div>
+

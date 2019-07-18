@@ -30,7 +30,7 @@ namespace ZTourist.Areas.Company.Components
                 }
                 model.Tours = tours;
             }
-            Dictionary<string, string> destinations = await touristDAL.GetDestinationsIdNameAsync();
+            Dictionary<string, string> destinations = await touristDAL.GetDestinationsIdNameAsync(null);
             model.DurationItems = new List<SelectListItem>
             {
                 new SelectListItem { Text = "Below or in 2 Days", Value = "2" },

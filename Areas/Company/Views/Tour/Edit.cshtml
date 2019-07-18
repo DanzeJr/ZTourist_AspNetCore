@@ -53,7 +53,7 @@
                         reader.readAsDataURL(this.files[0]);
                 }
             });
-        });Model.Image
+        });
 
 /**/</script>
 }
@@ -121,27 +121,29 @@
             <div class="form-group" style="width: 100%">
                 <label asp-for="Description">Description </label>
                 <textarea class="form-control" asp-for="Description"></textarea>
-                <div><span asp-validation-for="Description" class="text-danger"></span></div>
+                <div><span asp-validation-for="Description" class="text-danger"></span></div><br />
             </div>
             <div class="form-group" style="width: 100%">
                 <label>Departure <sup>*</sup></label>
                 <div>
-                    <select class="form-control selectpicker" maxOptions="1" data-live-search="true" asp-for="Departure" asp-items="@Model.DestinationItems"></select>
-                    <div><span asp-validation-for="Departure" class="text-danger"></span></div>
+                    <select class="form-control selectpicker" maxOptions="1" data-live-search="true" asp-for="Departure" asp-items="@Model.DestinationItems">
+                        <option value="" selected disabled>Departure</option>
+                    </select>
+                    <div><span asp-validation-for="Departure" class="text-danger"></span></div><br />
                 </div>
             </div>
             <div class="form-group" style="width: 100%">
                 <label>Destinations <sup>*</sup></label>
                 <div>
                     <select class="form-control selectpicker" data-live-search="true" asp-for="Destinations" asp-items="@Model.DestinationItems"></select>
-                    <div><span asp-validation-for="Destinations" class="text-danger"></span></div>
+                    <div><span asp-validation-for="Destinations" class="text-danger"></span></div><br />
                 </div>
             </div>
             <div class="form-group" style="width: 100%">
                 <label>Guides <sup>*</sup></label>
                 <div>
                     <select class="form-control selectpicker" data-live-search="true" asp-for="Guides" asp-items="@Model.GuideItems"></select>
-                    <div><span asp-validation-for="Guides" class="text-danger"></span></div>
+                    <div><span asp-validation-for="Guides" class="text-danger"></span></div><br />
                 </div>
             </div>
             <div class="form-group" style="width: 40%; margin: 0 auto">

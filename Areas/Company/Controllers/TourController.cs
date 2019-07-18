@@ -95,6 +95,140 @@ namespace ZTourist.Areas.Company.Controllers
             tour.Guides = await touristDAL.FindGuidesByTourIdAsync(id);
             tour.TakenSlot = await touristDAL.GetTakenSlotByTourIdAsync(id);
             return View(tour);
+        }               
+
+        [Authorize(Policy = "Admin")]
+        public async Task<IActionResult> Add()
+        {
+            TourViewModel model = new TourViewModel
+            {
+                Image = "https://ztourist.blob.core.windows.net/others/tour.jpg"
+            };
+            model.DestinationItems = await InitDestinationItemsAsync();
+            model.GuideItems = await InitGuideItemsAsync();
+            return View(model);
+        }
+
+        [Authorize(Policy = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Add(TourViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (await touristDAL.IsExistedTourIdAsync(model.Id))
+                {
+                    ModelState.AddModelError("", $"Tour ID '{model.Id.ToUpper()}' is existed");
+                }
+                if (model.FromDate.CompareTo(DateTime.Now) <= 0)
+                {
+                    ModelState.AddModelError("", "Start Date must be greater than today");
+                }
+                else if (model.FromDate.CompareTo(DateTime.Parse("9999-12-31 12:00")) > 0)
+                {
+                    ModelState.AddModelError("", "Start Date is out of range");
+                }
+                if (model.ToDate.CompareTo(DateTime.Now) <= 0)
+                {
+                    ModelState.AddModelError("", "End Date must be greater than today");
+                }
+                else if (model.ToDate.CompareTo(DateTime.Parse("9999-12-31 12:00")) > 0)
+                {
+                    ModelState.AddModelError("", "End Dae is out of range");
+                }
+                if (model.FromDate.CompareTo(model.ToDate) >= 0)
+                {
+                    ModelState.AddModelError("", "End Date must be greater than Start Date");
+                }
+                if (!await touristDAL.IsAvailableDestinationAsync(model.Departure))
+                {
+                    ModelState.AddModelError("", $"The departure '{model.Departure.ToUpper()}' is not existed or available");
+                }
+                bool duplicated = false;
+                foreach (string id in model.Destinations)
+                {
+                    if (id.Equals(model.Departure, StringComparison.OrdinalIgnoreCase))
+                    {
+                        duplicated = true;
+                    }
+                    if (!await touristDAL.IsAvailableDestinationAsync(id))
+                    {
+                        ModelState.AddModelError("", $"Destination '{id.ToUpper()}' is not existed or available");
+                    }
+                }
+                if (duplicated)
+                {
+                    ModelState.AddModelError("", "The departure can't also be destinations");
+                }
+                List<string> availableGuides = new List<string>();
+                IEnumerable<AppUser> guides = await userManager.GetUsersInRoleAsync("Guide");
+                foreach (AppUser guide in guides)
+                {
+                    if (!await userManager.IsLockedOutAsync(guide))
+                    {
+                        availableGuides.Add(guide.Id);
+                    }
+                }
+                foreach (string id in model.Guides)
+                {
+                    if (!availableGuides.Contains(id))
+                    {
+                        ModelState.AddModelError("", $"Guide '{id.ToUpper()}' is not existed or available");
+                    }
+                }
+                if (!ModelState.IsValid)
+                {
+                    model.DestinationItems = await InitDestinationItemsAsync();
+                    model.GuideItems = await InitGuideItemsAsync();
+                    return View("Add", model);
+                }
+                model.Destinations.Insert(0, model.Departure);
+                List<Destination> destinations = new List<Destination>();
+                foreach (string id in model.Destinations)
+                {
+                    destinations.Add(new Destination { Id = id });
+                }
+                Tour tour = new Tour
+                {
+                    Id = model.Id.ToUpper(),
+                    Name = model.Name,
+                    FromDate = model.FromDate,
+                    ToDate = model.ToDate,
+                    AdultFare = model.AdultFare,
+                    KidFare = model.KidFare,
+                    Description = model.Description ?? "",
+                    MaxGuest = model.MaxGuest,
+                    Transport = model.Transport ?? "",
+                    Destinations = destinations,
+                    Guides = guides.Where(g => model.Guides.Contains(g.Id)),
+                    IsActive = model.IsActive
+                };
+                string img = model.Image ?? "https://ztourist.blob.core.windows.net/others/tour.jpg";
+                if (model.Photo != null && !string.IsNullOrWhiteSpace(model.Photo?.FileName)) // if photo is chosen then copy
+                {
+                    string filePath = model.Id + "." + model.Photo.FileName.Substring(model.Photo.FileName.LastIndexOf(".") + 1);
+                    img = await blobService.UploadFile("tours", filePath, model.Photo);
+                }
+                if (img != null)
+                {
+                    tour.Image = img;
+                    if (await touristDAL.AddTourAsync(tour))
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Add tour failed");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Can't upload image");
+                }
+            }
+            model.DestinationItems = await InitDestinationItemsAsync();
+            model.GuideItems = await InitGuideItemsAsync();
+            return View("Add", model);
         }
 
         [Authorize(Policy = "Admin")]
@@ -149,6 +283,10 @@ namespace ZTourist.Areas.Company.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (!await touristDAL.IsExistedTourIdAsync(model.Id))
+                {
+                    return NotFound();
+                }
                 if (model.FromDate.CompareTo(DateTime.Now) <= 0)
                 {
                     ModelState.AddModelError("", "Start Date must be greater than today");
@@ -263,133 +401,65 @@ namespace ZTourist.Areas.Company.Controllers
         }
 
         [Authorize(Policy = "Admin")]
-        public async Task<IActionResult> Add()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ExportModelState]
+        public async Task<IActionResult> Activate(string id)
         {
-            TourViewModel model = new TourViewModel
+            if (string.IsNullOrWhiteSpace(id) || !await touristDAL.IsExistedTourIdAsync(id))
             {
-                Image = "https://ztourist.blob.core.windows.net/others/tour.jpg"
-            };
-            model.DestinationItems = await InitDestinationItemsAsync();
-            model.GuideItems = await InitGuideItemsAsync();
-            return View(model);
+                return NotFound();
+            }
+            if (!await touristDAL.UpdateStatusTourByIdAsync(id, true))
+            {
+                ModelState.AddModelError("", "Activate tour failed");
+            }
+            return RedirectToAction(nameof(Details), new { Id = id });
         }
 
         [Authorize(Policy = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(TourViewModel model)
+        [ExportModelState]
+        public async Task<IActionResult> Deactivate(string id)
         {
-            if (ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(id) || !await touristDAL.IsExistedTourIdAsync(id))
             {
+                return NotFound();
+            }
+            if (!await touristDAL.UpdateStatusTourByIdAsync(id, false))
+            {
+                ModelState.AddModelError("", "Deactivate tour failed");
+            }
+            return RedirectToAction(nameof(Details), new { Id = id });
+        }
 
-                if (model.FromDate.CompareTo(DateTime.Now) <= 0)
+        [Authorize(Policy = "Admin")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ExportModelState]
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id) || !await touristDAL.IsExistedTourIdAsync(id))
+            {
+                return NotFound();
+            }
+            if (!await touristDAL.HasOrderByTourIdAsync(id))
+            {
+                if (!await touristDAL.DeleteTourByIdAsync(id))
                 {
-                    ModelState.AddModelError("", "Start Date must be greater than today");
-                }
-                else if (model.FromDate.CompareTo(DateTime.Parse("9999-12-31 12:00")) > 0)
-                {
-                    ModelState.AddModelError("", "Start Date is out of range");
-                }
-                if (model.ToDate.CompareTo(DateTime.Now) <= 0)
-                {
-                    ModelState.AddModelError("", "End Date must be greater than today");
-                }
-                else if (model.ToDate.CompareTo(DateTime.Parse("9999-12-31 12:00")) > 0)
-                {
-                    ModelState.AddModelError("", "End Dae is out of range");
-                }
-                if (model.FromDate.CompareTo(model.ToDate) >= 0)
-                {
-                    ModelState.AddModelError("", "End Date must be greater than Start Date");
-                }
-                if (!await touristDAL.IsAvailableDestinationAsync(model.Departure))
-                {
-                    ModelState.AddModelError("", $"The departure '{model.Departure.ToUpper()}' is not existed or available");
-                }
-                bool duplicated = false;
-                foreach (string id in model.Destinations)
-                {
-                    if (id.Equals(model.Departure, StringComparison.OrdinalIgnoreCase))
-                    {
-                        duplicated = true;
-                    }
-                    if (!await touristDAL.IsAvailableDestinationAsync(id))
-                    {
-                        ModelState.AddModelError("", $"Destination '{id.ToUpper()}' is not existed or available");
-                    }
-                }
-                if (duplicated)
-                {
-                    ModelState.AddModelError("", "The departure can't also be destinations");
-                }
-                List<string> availableGuides = new List<string>();
-                IEnumerable<AppUser> guides = await userManager.GetUsersInRoleAsync("Guide");
-                foreach (AppUser guide in guides)
-                {
-                    if (!await userManager.IsLockedOutAsync(guide))
-                    {
-                        availableGuides.Add(guide.Id);
-                    }
-                }
-                foreach (string id in model.Guides)
-                {
-                    if (!availableGuides.Contains(id))
-                    {
-                        ModelState.AddModelError("", $"Guide '{id.ToUpper()}' is not existed or available");
-                    }
-                }
-                if (!ModelState.IsValid)
-                {
-                    model.DestinationItems = await InitDestinationItemsAsync();
-                    model.GuideItems = await InitGuideItemsAsync();
-                    return View("Add", model);
-                }
-                List<Destination> destinations = new List<Destination>();
-                foreach (string id in model.Destinations)
-                {
-                    destinations.Add(new Destination { Id = id });
-                }
-                Tour tour = new Tour
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                    FromDate = model.FromDate,
-                    ToDate = model.ToDate,
-                    AdultFare = model.AdultFare,
-                    KidFare = model.KidFare,
-                    Description = model.Description ?? "",
-                    MaxGuest = model.MaxGuest,
-                    Transport = model.Transport ?? "",
-                    Destinations = destinations,
-                    Guides = guides.Where(g => model.Guides.Contains(g.Id)),
-                    IsActive = model.IsActive
-                };
-                string img = model.Image ?? "https://ztourist.blob.core.windows.net/others/tour.jpg";
-                if (model.Photo != null && !string.IsNullOrWhiteSpace(model.Photo?.FileName)) // if photo is chosen then copy
-                {
-                    string filePath = model.Id + "." + model.Photo.FileName.Substring(model.Photo.FileName.LastIndexOf(".") + 1);
-                    img = await blobService.UploadFile("tours", filePath, model.Photo);
-                }
-                if (img != null)
-                {
-                    tour.Image = img;
-                    if (await touristDAL.AddTourAsync(tour))
-                    {
-                        return RedirectToAction(nameof(Index));
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Add tour failed");
-                    }
+                    ModelState.AddModelError("", "Delete tour failed");
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Can't upload image");
+                    return RedirectToAction(nameof(Index));
                 }
             }
-            model.DestinationItems = await InitDestinationItemsAsync();
-            model.GuideItems = await InitGuideItemsAsync();
-            return View("Add", model);
+            else
+            {
+                ModelState.AddModelError("", "Delete failed\nTour already has orders");
+            }
+            return RedirectToAction(nameof(Details), new { Id = id });
         }
 
         public async Task<IActionResult> IsExistedId(string id)

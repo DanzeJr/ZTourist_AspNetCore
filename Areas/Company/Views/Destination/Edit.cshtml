@@ -1,0 +1,89 @@
+﻿@model DestinationViewModel
+
+@{
+    ViewData["Title"] = "Edit Destination";
+    List<SelectListItem> isActiveItems = new List<SelectListItem>
+{
+        new SelectListItem { Text = "Active", Value = "true" },
+        new SelectListItem { Text = "Not Active", Value = "false" }
+    };
+}
+
+@section CSS {
+    <style>
+        .countrypicker li, #form-Edit .bootstrap-select.btn-group .dropdown-menu li {
+            list-style: none;
+        }
+    </style>
+}
+
+@section JS {
+    <script src="~/js/countrypicker.min.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        $('#titleImg').change(function () { //show preview avatar
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#imgTitle').attr('src', e.target.result);
+                },
+                    reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+/**/</script>
+}
+
+<div style="margin-top: 3%">
+    <h1 class="text-center">Edit destination</h1>
+    <br /><br />
+    <div asp-validation-summary="ModelOnly" class="text-danger text-center" style="font-size: larger; font-weight: bold"></div>
+    <form id="form-Edit" class="tg-formtheme tg-formdashboard" asp-area="Company" asp-controller="Destination" asp-action="Update" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+        <div style="width: 75%; margin: 0 auto; padding-bottom: 5%">
+            <div class="tg-dashboardcontent">
+                <div class="tg-content">
+                    <fieldset>
+                        <div class="form-group">
+                            <input type="hidden" asp-for="Image" />
+                            <figure>
+                                <center>
+                                    <img id="imgTitle" style="height: 350px" src="@Model.Image" alt="Destination Image" asp-append-version="true">
+                                    <input type="file" id="titleImg" style="display: none" asp-for="Photo" />
+                                    <div><span asp-validation-for="Photo"></span></div>
+                                </center>
+                            </figure>
+                            <div style="width: 200px; margin: 0 auto">
+                                <a style="color: white" class="tg-btn" href="javascript:void(0);" onclick="$('#titleImg').click();">Choose Image</a>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Name">Destination Name <sup>*</sup></label>
+                            <input class="form-control" asp-for="Name" />
+                            <div><span asp-validation-for="Name" class="text-danger"></span></div><br />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Description">Description </label>
+                            <textarea class="form-control" asp-for="Description"></textarea>
+                            <div><span asp-validation-for="Description" class="text-danger"></span></div><br />
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Country">Country <sup>*</sup></label>
+                <div>
+                    <select class="form-control selectpicker countrypicker" data-flag="true" data-default="@Model.Country" data-live-search="true" asp-for="Country"></select>
+                    <div><span asp-validation-for="Country"></span></div><br />
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Status <sup>*</sup></label>
+                <select class="form-control selectpicker" asp-for="IsActive" asp-items="@isActiveItems"></select>
+                <div><span asp-validation-for="IsActive" class="text-danger"></span></div><br />
+            </div>
+            <div style="text-align: center">
+                <button style="font-weight: bold" class="tg-btn" type="submit"><span>Update Destination</span></button>
+            </div>
+        </div>
+    </form>
+</div>

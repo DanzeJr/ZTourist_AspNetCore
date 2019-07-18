@@ -53,7 +53,9 @@
             <ul>
                 @if (!User.Identity.IsAuthenticated)
                 {
-                    <li><a asp-area="Company" asp-controller="Account" asp-action="Login">For Employee Only</a></li>
+                    <li><a asp-area="" asp-controller="Account" asp-action="Login">Login</a></li>
+                    <li><a asp-area="" asp-controller="Account" asp-action="SignUp">Register</a></li>
+                    <li><a asp-area="Company" asp-controller="Account" asp-action="Login">Login As Employee</a></li>
                 }
                 else if (User.IsInRole("Customer"))
                 {
@@ -185,11 +187,13 @@
                                         <ul class="sub-menu">
                                             @if (!User.Identity.IsAuthenticated)
                                             {
-                                                <li><a asp-area="Company" asp-controller="Account" asp-action="Login">For Employee Only</a></li>
+                                                <li><a asp-area="" asp-controller="Account" asp-action="Login">Login</a></li>
+                                                <li><a asp-area="" asp-controller="Account" asp-action="SignUp">Register</a></li>
+                                                <li><a asp-area="Company" asp-controller="Account" asp-action="Login">Login As Employee</a></li>
                                             }
                                             else if (User.IsInRole("Customer"))
                                             {
-                                                <li><a asp-controller="Order" asp-action="History">Order History</a></li>
+                                                <li><a asp-area="" asp-controller="Order" asp-action="">Order History</a></li>
                                             }
                                         </ul>
                                     </li>

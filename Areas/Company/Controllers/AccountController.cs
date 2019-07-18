@@ -127,7 +127,7 @@ namespace ZTourist.Areas.Company.Controllers
             return Json(true);
         }
 
-        public async Task<IActionResult> IsExistedEmail(string email)
+        public async Task<IActionResult> IsExistedEmail(string email, string username)
         {
             if (email == null) // if param name is not 'email'
             {
@@ -140,10 +140,16 @@ namespace ZTourist.Areas.Company.Controllers
                 AppUser user = await userManager.FindByEmailAsync(email);
                 if (user != null)
                 {
+                    if (!string.IsNullOrWhiteSpace(username)) // if username param is pass to action
+                    {
+                        if (username.Equals(user.UserName, StringComparison.OrdinalIgnoreCase)) // if username is the same then this is email of the user with this username
+                        {
+                            return Json(true);
+                        }
+                    }
                     if (User?.Identity?.Name != null)
                     {
-                        user = await userManager.FindByNameAsync(User.Identity.Name);
-                        if (email.Equals(user.Email, StringComparison.OrdinalIgnoreCase)) // if email is requester's email
+                        if (User.Identity.Name.Equals(user.UserName, StringComparison.OrdinalIgnoreCase)) // if email is requester's email
                             return Json(true);
                     }
                     return Json($"Email '{email}' is already taken");

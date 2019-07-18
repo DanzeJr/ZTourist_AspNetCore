@@ -5,35 +5,30 @@
 }
 
 @section CSS {
-    <link href="~/css/jquery-confirm.min.css" rel="stylesheet" asp-append-version="true" />
-    <style>
-        .form-group .field-validation-error span {
-            color: orangered;
+<link href="~/css/jquery-confirm.min.css" rel="stylesheet" asp-append-version="true" />
+<style>
+    .form-group .field-validation-error span {
+        color: orangered;
+    }
+
+    .my-tour-btn {
+        width: 33%;
+        margin-top: 2%;
+    }
+
+    @@media only screen and (max-width:767px) {
+
+        .my-tour-btn {
+            width: 100%;
         }
-    </style>
+    }
+</style>
 }
 
 @section JS  {
-    <script src="~/js/jquery-confirm.min.js" asp-append-version="true"></script>
-    <script type="text/javascript">
+<script src="~/js/jquery-confirm.min.js" asp-append-version="true"></script>
+<script type="text/javascript">
         $(document).ready(function () {
-            $('#btnEdit').confirm({
-                title: "Confirm Edit",
-                content: "Are you sure to edit this tour?",
-                type: "blue",
-                buttons: {
-                    "yes, i'm sure": {
-                        btnClass: "btn btn-info",
-                        action: function () {
-                            $("#form-Edit").submit();
-                        }
-                    },
-                    no: {
-                        btnClass: "btn"
-                    }
-                }
-            });
-
             // deactivate button
             $('#btnDeactivate').confirm({
                 title: "Confirm @(Model.IsActive ? "Deactivate" : "Activate")",
@@ -63,11 +58,14 @@
                 },
                 onContentReady: function () {
                     // bind to events
-                    var jc = this;
                     this.$content.find('form').on('submit', function (e) {
                         // if the user submits the form by pressing enter in the field.
                         e.preventDefault();
-                        jc.$$formSubmit.trigger('click'); // reference the button and click it
+                        var confirm = $('.confirmMsg').val() + "";
+                        if (!confirm || confirm.toUpperCase() != "yes".toUpperCase()) {
+                            return false;
+                        }
+                        $("#form-Deactivate").submit();
                     });
                 }
             });
@@ -101,35 +99,38 @@
                 },
                 onContentReady: function () {
                     // bind to events
-                    var jc = this;
                     this.$content.find('form').on('submit', function (e) {
                         // if the user submits the form by pressing enter in the field.
                         e.preventDefault();
-                        jc.$$formSubmit.trigger('click'); // reference the button and click it
+                        var confirm = $('.confirmMsg').val() + "";
+                        if (!confirm || confirm.toUpperCase() != "yes".toUpperCase()) {
+                            return false;
+                        }
+                        $("#form-Delete").submit();
                     });
                 }
             });
         });
-    </script>
+</script>
 }
 }
 
 @section Slider {
-    <!--************************************
-                        Inner Banner Start
-    *************************************-->
-    <div class="tg-parallax tg-innerbanner" data-appear-top-offset="600" data-parallax="scroll" data-image-src="@Model.Image">
-        <div class="tg-sectionspace tg-haslayout">
-            <div class="container">
-                <div class="row">
-                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>
-                </div>
+<!--************************************
+                    Inner Banner Start
+*************************************-->
+<div class="tg-parallax tg-innerbanner" data-appear-top-offset="600" data-parallax="scroll" data-image-src="@Model.Image">
+    <div class="tg-sectionspace tg-haslayout">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12"></div>
             </div>
         </div>
     </div>
-    <!--************************************
-                    Inner Banner End
-    *************************************-->
+</div>
+<!--************************************
+                Inner Banner End
+*************************************-->
 }
 <div class="container">
     <div class="row">
@@ -151,11 +152,11 @@
                             <br /><br />
                             @if (Model.LeftSlot > 0)
                             {
-                                <h4>There’s @Model.LeftSlot spot left.</h4>
+                            <h4>There’s @Model.LeftSlot spot left.</h4>
                             }
                             else
                             {
-                                <h4>There's no spot left.</h4>
+                            <h4>There's no spot left.</h4>
                             }
                         </div>
                         <div style="width: 75%; margin: 0 auto">
@@ -170,7 +171,7 @@
                                 <span class="tg-tourduration tg-location">
                                     @if (Model.Destinations != null)
                                     {
-                                        @:@string.Join(" - ", Model.Destinations.Select(d => d.Name))
+                                    @:@string.Join(" - ", Model.Destinations.Select(d => d.Name))
                                     }
                                 </span>
                             </li>
@@ -178,28 +179,23 @@
                         </ul>
                         @if (User.IsInRole("Admin")) // if user is admin
                         {
-                            <div class="form-group">
-                                <form id="form-Edit" asp-area="Company" asp-controller="Tour" asp-action="Edit" method="get">
-                                    <input type="hidden" asp-for="Id" value="@Model.Id" />
-                                    <button id="btnEdit" style="padding: 1% 3%;" type="submit" class="btn btn-primary"><span style="font-weight: bold; font-size: x-large">Edit</span></button>
-                                </form>
-                            </div>
-                            <div class="tg-dashboardcontent">
-                                <div class="tg-content">
-                                    <div class="form-group">
-                                        <form id="form-Delete" asp-area="Company" asp-controller="Tour" asp-action="Delete" method="post">
-                                            <input type="hidden" asp-for="Id" value="@Model.Id" />
-                                            <button id="btnDelete" style="padding: 1% 3%" type="submit" class="btn btn-danger"><span style="font-weight: bold; font-size: x-large">Delete</span></button>
-                                        </form>
-                                    </div>
-                                    <div class="form-group">
-                                        <form id="form-Deactivate" asp-area="Company" asp-controller="Tour" asp-action="@(Model.IsActive ? "Deactivate" : "Activate")" method="post">
-                                            <input type="hidden" asp-for="Id" value="@Model.Id" />
-                                            <button id="btnDeactivate" style="padding: 1% 3%" type="submit" class="btn btn-warning"><span style="font-weight: bold; font-size: x-large">@(Model.IsActive ? "Deactivate" : "Activate")</span></button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="form-group my-tour-btn">
+                            <form id="form-Delete" asp-area="Company" asp-controller="Tour" asp-action="Delete" method="post">
+                                <input type="hidden" asp-for="Id" value="@Model.Id" />
+                                <button style="background-color: #d9534f" id="btnDelete" type="submit" class="tg-btn"><span>Delete</span></button>
+                            </form>
+                        </div>
+                        <div class="form-group my-tour-btn">
+                            <form id="form-Deactivate" asp-area="Company" asp-controller="Tour" asp-action="@(Model.IsActive ? "Deactivate" : "Activate" )" method="post">
+                                <input type="hidden" asp-for="Id" value="@Model.Id" />
+                                <button style="background-color: #f0ad4e;" id="btnDeactivate" type="submit" class="tg-btn"><span>@(Model.IsActive ? "Deactivate" : "Activate")</span></button>
+                            </form>
+                        </div>
+                        <div class="form-group my-tour-btn">
+                            <a class="tg-btn" asp-area="Company" asp-controller="Tour" asp-action="Edit" asp-route-id="@Model.Id">
+                                <span>Edit</span>
+                            </a>
+                        </div>
                         }
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-﻿@model  LoginSignUpModel
+﻿@model LoginSignUpModel
 <!--************************************
                         Footer Start
  *************************************-->
@@ -107,13 +107,13 @@
                                 <fieldset>
                                     <div class="form-group">
                                         <label for="UserName">Username <sup>*</sup></label>
-                                        <input class="form-control" placeholder="Username" 
+                                        <input class="form-control" placeholder="Username"
                                                asp-for="LoginModel.UserName" />
                                         <span asp-validation-for="LoginModel.UserName"></span>
                                     </div>
                                     <div class="form-group">
                                         <label for="Password">Password <sup>*</sup></label>
-                                        <input class="form-control" placeholder="Password" type="password" 
+                                        <input class="form-control" placeholder="Password" type="password"
                                                asp-for="LoginModel.Password" />
                                         <span asp-validation-for="LoginModel.Password"></span>
                                     </div>

@@ -1,0 +1,102 @@
+﻿@model UserSearchViewModel
+
+@section JS {
+    <script type="text/javascript">
+        $("#tg-main").attr("class", "tg-main tg-sectionspace tg-haslayout");
+        @if (Model?.IsLocked == null)
+        {
+            @:$("#userAll").attr("style", "font-weight: bold");
+        }
+        else if (Model.IsLocked == false)
+        {
+            @:$("#userActive").attr("style", "font-weight: bold");
+        }
+        else
+        {
+            @:$("#userLocked").attr("style", "font-weight: bold");
+        }
+    </script>
+}
+
+@section Slider {
+    <!--************************************
+    Inner Banner Start
+    *************************************-->
+    <section class="tg-parallax tg-innerbanner" data-appear-top-offset="600" data-parallax="scroll" data-image-src="https://ztourist.blob.core.windows.net/others/banner.png">
+        <div class="tg-sectionspace tg-haslayout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h1>Z Tourist Users</h1>
+                        <h2>Include admins, guides and customers</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--************************************
+                    Inner Banner End
+    *************************************-->
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div id="tg-content" class="tg-content">
+                <div class="tg-listing tg-listingvone">
+                    <div class="tg-sectiontitle">
+                        <h2>@ViewBag.Title</h2>
+                        <div>
+                            <a class="btn" id="userAll" asp-area="Company" asp-controller="User" asp-action=""><span>All</span></a>
+                            <a class="btn" id="userActive" asp-area="Company" asp-controller="User" asp-action="" asp-route-IsLocked="false"><span>Active</span></a>
+                            <a class="btn" id="userLocked" asp-area="Company" asp-controller="User" asp-action="" asp-route-IsLocked="true"><span>Locked</span></a>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    @if (Model?.Users != null && Model.Users.Count() > 0)
+                    {
+                        <div class="row">
+                            @foreach (UserViewModel user in Model.Users)
+                            {
+                                <div class="col-xs-6 col-sm-6 col-md-4 col-lg-4">
+                                    <div class="tg-populartour">
+                                        <figure>
+                                            <a asp-area="Company" asp-controller="User" asp-action="Details" asp-route-UserName="@user.Profile.UserName">
+                                                <img style="width: 401px; height: 285px;" src="@user.Profile.Avatar" alt="avatar image" asp-append-version="true">
+                                            </a>
+                                            <span class="tg-descount">@string.Join(", ", user.Roles)</span>
+                                        </figure>
+                                        <div class="tg-populartourcontent">
+                                            <div class="tg-populartourtitle">
+                                                <h3><a asp-area="Company" asp-controller="User" asp-action="Details" asp-route-UserName="@user.Profile.UserName">@user.Profile.UserName @(user.Profile.LockoutEnd != null ? "(Locked)" : "")</a></h3>
+                                            </div>
+                                            <div class="tg-description">
+                                                <p style="text-transform: capitalize">@user.Profile.FirstName @user.Profile.LastName</p>
+                                            </div>
+                                            <div class="tg-populartourfoot">
+                                                <div class="tg-durationrating">
+                                                    <span class="tg-tourduration tg-availabilty">Registration Date: @user.Profile.RegisterDate.ToString("dd/MMM/yyyy")</span>
+                                                </div>
+                                                <div class="tg-pricearea">
+                                                    <h4>@user.Profile.Gender</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="clearfix"></div>
+                        <nav class="tg-pagination" page-info="@Model.PageInfo"
+                             page-url-IsLocked="@(Model.IsLocked ?? null)"
+                             page-class-selected="tg-active"></nav>
+                    }
+                    else
+                    {
+                        <h3 class="text-center">No user found!</h3>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

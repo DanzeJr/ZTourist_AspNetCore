@@ -1,0 +1,117 @@
+﻿@model UserViewModel
+
+@{
+    ViewData["Title"] = "User Details";
+}
+
+@section CSS {
+    <link href="~/css/jquery-confirm.min.css" rel="stylesheet" asp-append-version="true" />
+}
+
+@section JS {
+    <script src="~/js/jquery-confirm.min.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // delete button
+            $('#btnDelete').confirm({
+                title: "Confirm Delete",
+                content: '' +
+                    '<form action="" class="formName">' +
+                    '<div class="form-group">' +
+                    '<label>Type \'yes\' to confirm delete this user</label>' +
+                    '<input type="text" placeholder="" class="confirmMsg form-control" required />' +
+                    '</div>' +
+                    '</form>',
+                type: "red",
+                icon: "fa fa-warning",
+                buttons: {
+                    ok: {
+                        btnClass: "btn btn-danger",
+                        text: "Ok",
+                        action: function () {
+                            var confirm = this.$content.find('.confirmMsg').val() + "";
+                            if (!confirm || confirm.toUpperCase() != "yes".toUpperCase()) {
+                                return false;
+                            }
+                            $("#form-Delete").submit();
+                        }
+                    },
+                    cancel: {
+                        btnClass: "btn"
+                    }
+                },
+                onContentReady: function () {
+                    // bind to events
+                    var jc = this;
+                    this.$content.find('form').on('submit', function (e) {
+                        // if the user submits the form by pressing enter in the field.
+                        e.preventDefault();
+                        var confirm = $('.confirmMsg').val() + "";
+                        if (!confirm || confirm.toUpperCase() != "yes".toUpperCase()) {
+                            return false;
+                        }
+                        $("#form-Delete").submit();
+                    });
+                }
+            });
+        });
+    </script>
+}
+
+<div style="margin-top: 3%">
+    <h1 class="text-center">User Details</h1>
+    <br /><br />
+    <div asp-validation-summary="ModelOnly" class="text-danger text-center" style="font-size: larger; font-weight: bold"></div>
+    <form id="form-Delete" class="tg-formtheme tg-formdashboard" asp-area="Company" asp-controller="User" asp-action="Delete" method="post">
+        <input type="hidden" asp-for="Profile.UserName" />
+        <div style="width: 75%; margin: 0 auto; padding-bottom: 5%">
+            <div class="tg-dashboardcontent">
+                <div class="tg-content">
+                    <fieldset>
+                        <div class="form-group">
+                            <figure style="margin-bottom: 35%">
+                                <center>
+                                    <img id="imgTitle" style="height: 350px" src="@Model.Profile.Avatar" alt="Destination Image" asp-append-version="true">
+                                </center>
+                            </figure>
+                        </div>
+                        <br />
+                        <div class="form-group">
+                            <h4><strong>Username: </strong>@Model.Profile.NormalizedUserName</h4>
+                        </div>
+                        <div class="form-group">
+                            <h4 style="text-transform: capitalize"><strong>Full Name: </strong>@Model.Profile.FirstName @Model.Profile.LastName</h4>
+                        </div>
+                        <div class="form-group">
+                            <h4><strong>Gender: </strong>@Model.Profile.Gender</h4>
+                        </div>
+                        <div class="form-group">
+                            <h4><strong>Birth Date: </strong>@Model.Profile.BirthDate.ToString("dd/MM/yyyy")</h4>
+                        </div>
+                        <div class="form-group">
+                            <h4><strong>Email: </strong>@Model.Profile.Email</h4>
+                        </div>
+                        <div class="form-group">
+                            <h4><strong>Phone Number: </strong>@Model.Profile.PhoneNumber</h4>
+                        </div>
+                        <div class="form-group">
+                            <h4><strong>Address: </strong>@Model.Profile.Address</h4>
+                        </div>
+                        <div class="form-group">
+                            <h4><strong>Registration Date: </strong>@Model.Profile.RegisterDate.ToString("dd/MM/yyyy HH:mm")</h4>
+                        </div>
+                        <div class="form-group">
+                            <h4><strong>Roles: </strong>@string.Join(", ", Model.Roles)</h4>
+                        </div>
+                        <div class="form-group">
+                            <h4><strong>Status: </strong>@(Model.Profile.LockoutEnd != null ? "Locked" : "Active")</h4>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+            <a style="font-weight: bold; margin-bottom: 5%" class="tg-btn" asp-area="Company" asp-controller="User" asp-action="Edit" asp-route-UserName="@Model.Profile.UserName"><span>Edit</span></a>
+            <button id="btnDelete" style="background-color: #d9534f; font-weight: bold; margin-bottom: 5%" class="tg-btn" type="submit"><span>Delete</span></button>
+    </form>
+</div>
+

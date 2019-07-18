@@ -1,21 +1,16 @@
 ﻿@model DestinationSearchViewModel
 
 @section JS {
-    <script type="text/javascript">
+    <script type="text/javascript">        
         $("#tg-main").attr("class", "tg-main tg-sectionspace tg-haslayout");
-        @if (Model?.IsActive == null)
-        {
-            @:$("#destAll").attr("style", "font-weight: bold");
-        }
-        else if (Model.IsActive == true)
-        {
-            @:$("#destActive").attr("style", "font-weight: bold");
-        }
-        else
-        {
-            @:$("#destNotActive").attr("style", "font-weight: bold");
-        }
+        var element = $("#tg-main");
+        $(window).scrollTop(element.offset().top).scrollLeft(element.offset().left);
     </script>
+}
+
+
+@section Slider {
+    @await Component.InvokeAsync("Slider")
 }
 <div class="container">
     <div class="row">
@@ -24,11 +19,6 @@
                 <div class="tg-listing tg-listingvtwo">
                     <div class="tg-sectiontitle">
                         <h2>@ViewBag.Title</h2>
-                        <div>
-                            <a class="btn" id="destAll" asp-area="Company" asp-controller="Destination" asp-action=""><span>All</span></a>
-                            <a class="btn" id="destActive" asp-area="Company" asp-controller="Destination" asp-action="" asp-route-IsActive="true"><span>Active</span></a>
-                            <a class="btn" id="destNotActive" asp-area="Company" asp-controller="Destination" asp-action="" asp-route-IsActive="false"><span>Not Active</span></a>
-                        </div>
                     </div>
                     <div asp-validation-summary="ModelOnly" class="text-danger text-center" style="font-size: larger; font-weight: bold"></div>
                     <div class="clearfix"></div>
@@ -40,19 +30,19 @@
                                 <div class="col-xs-6 col-sm-6 col-md-4 col-lg-4">
                                     <div class="tg-trendingtrip">
                                         <figure>
-                                            <a asp-area="Company" asp-controller="Destination" asp-action="Details" asp-route-id="@destination.Id">
+                                            <a asp-area="" asp-controller="Destination" asp-action="Details" asp-route-id="@destination.Id">
                                                 <img style="width: 401px; height: 250px;" src="@destination.Image" alt="destination image" asp-append-version="true">
                                                 <div class="tg-hover">
-                                                    <span class="tg-locationname">@destination.Id</span>
+                                                    <span class="tg-locationname">@destination.Country</span>
                                                     <div class="tg-pricearea">
-                                                        <h4>@destination.Country</h4>
+                                                        <h4></h4>
                                                     </div>
                                                 </div>
                                             </a>
                                         </figure>
                                         <div class="tg-populartourcontent">
                                             <div class="tg-populartourtitle">
-                                                <h3><a asp-area="Company" asp-controller="Destination" asp-action="Details" asp-route-id="@destination.Id">@destination.Name</a></h3>
+                                                <h3><a asp-area="" asp-controller="Destination" asp-action="Details" asp-route-id="@destination.Id">@destination.Name</a></h3>
                                             </div>
                                             <div class="tg-description">
                                                 <p>@destination.Description</p>
@@ -65,7 +55,7 @@
                         </div>
                         <div class="clearfix"></div>
                         <nav class="tg-pagination" page-info="@Model.PageInfo"
-                             page-url-IsActive="@(Model.IsActive ?? null)"
+                             page-url-IsActive="true"
                              page-class-selected="tg-active"></nav>
                     }
                     else

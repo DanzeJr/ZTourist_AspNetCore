@@ -89,21 +89,21 @@ namespace ZTourist.Models.ViewModels
 
     public class ProfileModel
     {
-        [Required(ErrorMessage = "Please select your gender")]
+        [Required(ErrorMessage = "Please select gender")]
         public string Gender { get; set; }
 
         [Display(Name = "First Name")]
-        [Required(ErrorMessage = "Please enter your first name")]
+        [Required(ErrorMessage = "Please enter first name")]
         public string FirstName { get; set; }
 
         [Display(Name = "Last Name")]
-        [Required(ErrorMessage = "Please enter your last name")]
+        [Required(ErrorMessage = "Please enter last name")]
         public string LastName { get; set; }
 
         [Display(Name = "Birth Date")]
         [UIHint("Text")]
         [DataType(DataType.DateTime, ErrorMessage = "Invalid date format")]
-        [Required(ErrorMessage = "Please enter your birth date")]
+        [Required(ErrorMessage = "Please enter birth date")]
         public DateTime BirthDate { get; set; }
 
         [Required(ErrorMessage = "Please enter your address")]
@@ -112,7 +112,7 @@ namespace ZTourist.Models.ViewModels
         [UIHint("Email")]
         [Required(ErrorMessage = "Email field is required")]
         [EmailAddress(ErrorMessage = "Please enter a valid email")]
-        [Remote(action: "IsExistedEmail", controller: "Account")]
+        [Remote(action: "IsExistedEmail", controller: "Account", AdditionalFields = "UserName")]
         public string Email { get; set; }
 
         [Display(Name = "Phone number")]

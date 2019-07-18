@@ -12,6 +12,8 @@
     <script type="text/javascript">
         $("body").attr("class", "tg-home tg-homevthree tg-login");
         $("#tg-main").attr("class", "tg-main tg-sectionspace tg-haslayout tg-bglight");
+        var element = $("#tg-main");
+        $(window).scrollTop(element.offset().top).scrollLeft(element.offset().left);
     </script>
 }
 <div class="container">
@@ -22,6 +24,7 @@
                     <div class="tg-sectiontitle">
                         <h2>@ViewBag.Title</h2>
                     </div>
+                    <div class="clearfix"></div>
                     @if (Model?.Tours != null)
                     {
                         @foreach (Tour tour in Model.Tours)
@@ -34,7 +37,7 @@
                                     <div class="tg-populartourtitle">
                                         <h3 style="color: #00aff0"><a asp-controller="Tour" asp-action="Details" asp-route-id="@tour.Id">@tour.Name (@tour.Id.ToUpper())</a></h3>
                                         <br />
-                                        <h5>@string.Join(" - ", tour.Destinations.Select(d => d.Name))</h5>
+                                        <h5>@(tour.Destinations == null ? "" : string.Join(" - ", tour.Destinations.Select(d => d.Name)))</h5>
                                     </div>
                                     <div class="tg-description">
                                         <p>@tour.Description<br /></p>
@@ -59,12 +62,11 @@
                                 </div>
                             </div>
                         }
-                        <nav class="tg-pagination" page-info="@Model.PageInfo" 
-                             page-url-Destination="@Model.Destination" 
-                             page-url-FromDate="@(Model.FromDate ?? null)" 
-                             page-url-Duration="@Model.Duration" 
+                        <nav class="tg-pagination" page-info="@Model.PageInfo"
+                             page-url-Destination="@Model.Destination"
+                             page-url-FromDate="@(Model.FromDate ?? null)"
+                             page-url-Duration="@Model.Duration"
                              page-url-PriceRange="@(Model.PriceRange ?? null)" 
-                             page-url-_IsActive="@(Model.IsActive ?? null)"
                              page-class-selected="tg-active"></nav>
                     }
                     else
