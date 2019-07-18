@@ -18,6 +18,80 @@ namespace ZTourist.Models
             this.connectionStr = configuration["Data:ZTouristDB:ConnectionString"];
         }
 
+        #region UserDAL
+
+        public async Task<IEnumerable<string>> FindToursByUserIdAsync(string id)
+        {
+            List<string> result = null;
+            string tourId;
+
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(connectionStr))
+                {
+                    SqlCommand cmd = new SqlCommand("spFindToursByUserId", cnn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", id);
+                    if (cnn.State == ConnectionState.Closed)
+                        cnn.Open();
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
+                    {
+                        if (sdr.HasRows)
+                        {
+                            result = new List<string>();
+                            while (await sdr.ReadAsync())
+                            {
+                                tourId = sdr.GetString(sdr.GetOrdinal("TourId"));
+                                result.Add(tourId);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
+        }
+
+        public async Task<IEnumerable<string>> FindFutureToursByUserIdAsync(string id)
+        {
+            List<string> result = null;
+            string tourId;
+
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(connectionStr))
+                {
+                    SqlCommand cmd = new SqlCommand("spFindFutureToursByUserId", cnn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@UserId", id);
+                    if (cnn.State == ConnectionState.Closed)
+                        cnn.Open();
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
+                    {
+                        if (sdr.HasRows)
+                        {
+                            result = new List<string>();
+                            while (await sdr.ReadAsync())
+                            {
+                                tourId = sdr.GetString(sdr.GetOrdinal("TourId"));
+                                result.Add(tourId);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
+        }
+
+        #endregion
+
         #region TourDAL
 
         public async Task<bool> IsExistedTourIdAsync(string id)
@@ -665,44 +739,7 @@ namespace ZTourist.Models
             }
             return result;
         }
-
-        public async Task<IEnumerable<Destination>> GetDestinationsByTourIdAsync(string id)
-        {
-            List<Destination> result = null;
-            Destination destination;
-
-            try
-            {
-                using (SqlConnection cnn = new SqlConnection(connectionStr))
-                {
-                    SqlCommand cmd = new SqlCommand("spGetDestinationsByTourId", cnn);
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    cmd.Parameters.AddWithValue("@ID", id);
-                    if (cnn.State == ConnectionState.Closed)
-                        cnn.Open();
-                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
-                    {
-                        if (sdr.HasRows)
-                        {
-                            result = new List<Destination>();
-                            while (await sdr.ReadAsync())
-                            {
-                                destination = new Destination();
-                                destination.Id = sdr.GetString(sdr.GetOrdinal("DestinationId"));
-                                destination.Name = sdr.GetString(sdr.GetOrdinal("Name"));
-                                result.Add(destination);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-            return result;
-        }
-
+        
         public async Task<bool> DeleteTourGuidesByTourIdAsync(string id)
         {
             bool result = false;
@@ -1328,7 +1365,7 @@ namespace ZTourist.Models
                         if (sdr.HasRows)
                         {
                             result = new List<string>();
-                            if (await sdr.ReadAsync())
+                            while (await sdr.ReadAsync())
                             {                                
                                 tourId = sdr.GetString(sdr.GetOrdinal("TourId"));
                                 result.Add(tourId);
@@ -1364,7 +1401,7 @@ namespace ZTourist.Models
                         if (sdr.HasRows)
                         {
                             result = new List<string>();
-                            if (await sdr.ReadAsync())
+                            while (await sdr.ReadAsync())
                             {
                                 tourId = sdr.GetString(sdr.GetOrdinal("TourId"));
                                 result.Add(tourId);

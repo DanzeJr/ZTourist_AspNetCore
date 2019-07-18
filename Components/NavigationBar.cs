@@ -28,7 +28,7 @@ namespace ZTourist.Components
             {
                 foreach (Tour tour in popularTours)
                 {
-                    tour.Destinations = await touristDAL.GetDestinationsByTourIdAsync(tour.Id);
+                    tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(tour.Id);
                 }
             }
             AppUser user = User?.Identity?.Name == null ? null : await userManager.FindByNameAsync(User.Identity.Name);

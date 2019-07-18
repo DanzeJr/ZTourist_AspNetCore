@@ -1,7 +1,7 @@
-﻿@model UserEditModel
+﻿@model UserCreateModel
 
 @{
-    ViewData["Title"] = "Edit User Details";
+    ViewData["Title"] = "Create User";
     List<SelectListItem> gender = new List<SelectListItem>
     {
         new SelectListItem { Text = "Male", Value = "Male" },
@@ -38,7 +38,8 @@
     <script type="text/javascript">
         $(function () {
             $('#BirthDate').datetimepicker({
-                format: 'MM/DD/YYYY'
+                format: 'MM/DD/YYYY',
+                defaultDate: moment()
             });
         });
 
@@ -55,26 +56,35 @@
 }
 
 <div style="margin-top: 3%">
-    <h1 class="text-center">Username: <strong>@Model.UserName</strong></h1>
+    <h1 class="text-center">Create User</h1>
     <br /><br />
     <div asp-validation-summary="ModelOnly" class="text-danger text-center" style="font-size: larger; font-weight: bold"></div>
-    <form id="form-Edit" class="tg-formtheme tg-formdashboard" asp-area="Company" asp-controller="User" asp-action="Update" method="post" enctype="multipart/form-data">
-        <input type="hidden" asp-for="UserName" />
+    <form id="form-Add" class="tg-formtheme tg-formdashboard" asp-area="Company" asp-controller="User" asp-action="Add" method="post" enctype="multipart/form-data">
         <div style="width: 75%; margin: 0 auto; padding-bottom: 5%">
             <div class="tg-dashboard">
                 <div class="tg-box tg-ediprofile">
                     <div class="tg-heading">
-                        <h3>Edit Profile</h3>
+                        <h3>User Details</h3>
                     </div>
                     <div class="tg-dashboardcontent">
                         <div class="tg-imgholder">
                             <figure><img id="avatarImg" style="width: 87px; height: 87px;" src="@Model.Avatar" alt="avatar" asp-append-version="true"></figure>
                             <input type="file" id="avatar" style="display: none" asp-for="Photo" />
                             <input type="hidden" asp-for="Avatar" value="@Model.Avatar" />
-                            <a class="tg-btn" href="javascript:void(0);" onclick="$('#avatar').click();">Change Avatar</a>
+                            <a class="tg-btn" href="javascript:void(0);" onclick="$('#avatar').click();">Choose Avatar</a>
                         </div>
                         <div class="tg-content">
                             <fieldset>
+                                <div class="form-group">
+                                    <label asp-for="UserName">Username <sup>*</sup></label>
+                                    <input class="form-control" asp-for="UserName" />
+                                    <div><span asp-validation-for="UserName" class="text-danger"></span></div><br />
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Email">Email Address <sup>*</sup></label>
+                                    <input class="form-control" asp-for="Email" />
+                                    <div><span asp-validation-for="Email" class="text-danger"></span></div><br />
+                                </div>
                                 <div class="form-group">
                                     <label asp-for="FirstName">First Name <sup>*</sup></label>
                                     <input class="form-control" asp-for="FirstName" />
@@ -96,11 +106,6 @@
                                     <div><span asp-validation-for="BirthDate" class="text-danger"></span></div><br />
                                 </div>
                                 <div class="form-group" style="width: 100%">
-                                    <label asp-for="Email">Email Address <sup>*</sup></label>
-                                    <input class="form-control" asp-for="Email"/>
-                                    <div><span asp-validation-for="Email" class="text-danger"></span></div><br />
-                                </div>
-                                <div class="form-group" style="width: 100%">
                                     <label asp-for="Tel">Phone Number <sup>*</sup></label>
                                     <input class="form-control" asp-for="Tel" />
                                     <div><span asp-validation-for="Tel" class="text-danger"></span></div><br />
@@ -109,6 +114,16 @@
                                     <label asp-for="Address">Contact Address <sup>*</sup></label>
                                     <input class="form-control" asp-for="Address" />
                                     <div><span asp-validation-for="Address" class="text-danger"></span></div><br />
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="Password">Password <sup>*</sup></label>
+                                    <input class="form-control" asp-for="Password" />
+                                    <div><span asp-validation-for="Password" class="text-danger"></span></div><br />
+                                </div>
+                                <div class="form-group">
+                                    <label asp-for="ConfirmPassword">Confirm Password <sup>*</sup></label>
+                                    <input class="form-control" asp-for="ConfirmPassword" />
+                                    <div><span asp-validation-for="ConfirmPassword" class="text-danger"></span></div><br />
                                 </div>
                             </fieldset>
                         </div>
@@ -126,7 +141,7 @@
                 </div>
             </div>
             <div style="text-align: center">
-                <button style="font-weight: bold; margin-top: 2%" class="tg-btn" type="submit"><span>Update</span></button>
+                <button style="font-weight: bold; margin-top: 2%" class="tg-btn" type="submit"><span>Create</span></button>
             </div>            
         </div>
     </form>

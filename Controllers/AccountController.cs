@@ -27,7 +27,7 @@ namespace ZTourist.Controllers
         [ImportModelState]
         public IActionResult Login(string returnUrl)
         {
-            ViewBag.returnUrl = returnUrl ?? (string) TempData["returnUrl"];
+            ViewBag.returnUrl = returnUrl;
             ViewBag.Title = "Login";
             return View();
         }
@@ -42,6 +42,11 @@ namespace ZTourist.Controllers
                 AppUser user = await userManager.FindByNameAsync(login.UserName);
                 if (user != null && await userManager.IsInRoleAsync(user, "Customer"))
                 {
+                    if (await userManager.IsLockedOutAsync(user))
+                    {
+                        ModelState.AddModelError("", "Your account has been locked");
+                        return RedirectToAction(nameof(Login), new { returnUrl = login.ReturnUrl });
+                    }
                     await signInManager.SignOutAsync();
                     Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(user, login.Password, false, false);
                     if (result.Succeeded)
@@ -54,8 +59,7 @@ namespace ZTourist.Controllers
                 }
                 ModelState.AddModelError("", "Invalid User or Password");
             }
-            TempData["returnUrl"] = login.ReturnUrl;
-            return RedirectToAction(nameof(Login));
+            return RedirectToAction(nameof(Login), new { returnUrl = login.ReturnUrl });
         }
 
         [ImportModelState]
@@ -94,11 +98,12 @@ namespace ZTourist.Controllers
                     result = await userManager.AddToRoleAsync(user, "Customer"); // assign customer role to user
                     if (result.Succeeded) // if role is assigned to user
                     {
+                        string returnUrl;
                         if (!string.IsNullOrEmpty(signUp.ReturnUrl) && Url.IsLocalUrl(signUp.ReturnUrl))
-                            TempData["returnUrl"] = signUp.ReturnUrl;
+                            returnUrl = signUp.ReturnUrl;
                         else
-                            TempData["returnUrl"] = Url.Action("", "Home");
-                        return RedirectToAction(nameof(Login));
+                            returnUrl = Url.Action("", "Home");
+                        return RedirectToAction(nameof(Login), new { returnUrl });
                     }
                     else
                     {
@@ -114,7 +119,7 @@ namespace ZTourist.Controllers
                     ModelState.AddModelError("", error.Description);
                 }
             }
-            return RedirectToAction(nameof(SignUp));
+            return RedirectToAction(nameof(SignUp), new LoginSignUpModel { SignUpModel = new SignUpModel { ReturnUrl = signUp.ReturnUrl } });
         }
 
         public IActionResult GoogleLogin(string returnUrl)

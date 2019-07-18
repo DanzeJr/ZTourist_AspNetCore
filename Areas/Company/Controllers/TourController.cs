@@ -44,7 +44,7 @@ namespace ZTourist.Areas.Company.Controllers
             {
                 foreach (Tour tour in tours)
                 {
-                    tour.Destinations = await touristDAL.GetDestinationsByTourIdAsync(tour.Id);
+                    tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(tour.Id);
                 }
                 model.Tours = tours;
             }
@@ -72,7 +72,7 @@ namespace ZTourist.Areas.Company.Controllers
             {
                 foreach (Tour tour in tours)
                 {
-                    tour.Destinations = await touristDAL.GetDestinationsByTourIdAsync(tour.Id);
+                    tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(tour.Id);
                 }
                 model.Tours = tours;
             }

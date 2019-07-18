@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -33,6 +34,21 @@ namespace ZTourist.Areas.Company.Models.ViewModels
     {
         [Required(ErrorMessage = "Username is required")]
         public string UserName { get; set; }
+
+        [Required(ErrorMessage = "Please select at least a role")]
+        public IEnumerable<string> Roles { get; set; }
+
+        [Required(ErrorMessage = "Please choose status of this user")]
+        public bool IsLocked { get; set; }
+
+        public List<SelectListItem> RoleItems { get; set; }
+    }
+
+    public class UserCreateModel : SignUpModel
+    {
+        public string Avatar { get; set; }
+
+        public IFormFile Photo { get; set; }
 
         [Required(ErrorMessage = "Please select at least a role")]
         public IEnumerable<string> Roles { get; set; }

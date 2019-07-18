@@ -85,7 +85,7 @@ namespace ZTourist.Areas.Company.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("Photo", "Can't upload avatar");
+                    ModelState.AddModelError("", "Can't upload avatar");
                 }
             }
             return RedirectToAction(nameof(Edit));

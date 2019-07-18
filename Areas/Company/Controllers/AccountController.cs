@@ -26,7 +26,7 @@ namespace ZTourist.Areas.Company.Controllers
         [ImportModelState]
         public IActionResult Login(string returnUrl)
         {
-            ViewBag.returnUrl = returnUrl ?? TempData["returnUrl"];
+            ViewBag.returnUrl = returnUrl;
             return View();
         }
 
@@ -40,6 +40,11 @@ namespace ZTourist.Areas.Company.Controllers
                 AppUser user = await userManager.FindByNameAsync(login.UserName);
                 if (user != null && (await userManager.IsInRoleAsync(user, "Admin") || await userManager.IsInRoleAsync(user, "Guide"))) // if user's role is admin or guide
                 {
+                    if (await userManager.IsLockedOutAsync(user))
+                    {
+                        ModelState.AddModelError("", "Your account has been locked");
+                        return RedirectToAction(nameof(Login), new { returnUrl = login.ReturnUrl });
+                    }
                     await signInManager.SignOutAsync();
                     Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(user, login.Password, false, false);
                     if (result.Succeeded)
@@ -53,8 +58,7 @@ namespace ZTourist.Areas.Company.Controllers
                 // if user is not existed or is admin or guide
                 ModelState.AddModelError("", "Invalid User or Password");
             }
-            TempData["returnUrl"] = login.ReturnUrl;
-            return RedirectToAction(nameof(Login));
+            return RedirectToAction(nameof(Login), new { returnUrl = login.ReturnUrl });
         }
         
         public IActionResult GoogleLogin(string returnUrl)

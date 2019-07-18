@@ -169,12 +169,7 @@ namespace ZTourist.Areas.Company.Controllers
                 if (img != null)
                 {
                     destination.Image = img;
-                    IEnumerable<string> tours = await touristDAL.FindFutureToursByDestinationIdAsync(model.Id);
-                    if (tours != null)
-                    {
-                        ModelState.AddModelError("", $"Destination is using in tours: {string.Join(", ", tours)}\nPlease remove this destination from these tours first");
-                    }
-                    else
+                    if (destination.IsActive) // if destination is not about to be deactivated
                     {
                         if (await touristDAL.UpdateDestinationAsync(destination))
                         {
@@ -185,7 +180,15 @@ namespace ZTourist.Areas.Company.Controllers
                             ModelState.AddModelError("", "Update destination failed");
                         }
                     }
-                    
+                    else // if user want to deactivate destination then check if destination is used in future tours
+                    {
+                        IEnumerable<string> tours = await touristDAL.FindFutureToursByDestinationIdAsync(model.Id);
+                        if (tours != null)
+                        {
+                            ModelState.AddModelError("", $"Destination is using in tours: {string.Join(", ", tours)}. Please remove this destination from these tours first");
+                            return View("Edit", model);
+                        }
+                    }
                 }
                 else
                 {
@@ -219,7 +222,7 @@ namespace ZTourist.Areas.Company.Controllers
             }
             else // if destination is used
             {
-                ModelState.AddModelError("", $"Destination is used in tours: {string.Join(",", tours)}\nPlease remove this destination from these tours to delete");
+                ModelState.AddModelError("", $"Destination is used in tours: {string.Join(",", tours)}. Remove this destination from these tours before delete");
             }
             return RedirectToAction(nameof(Details), new { Id = id });
         }

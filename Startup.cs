@@ -78,6 +78,9 @@ namespace ZTourist
                 })
                 .AddEntityFrameworkStores<AppIdentityDbContext>()
                 .AddDefaultTokenProviders();
+            services.Configure<SecurityStampValidatorOptions>(options => {
+                options.ValidationInterval = TimeSpan.FromSeconds(0);
+            });
             services.AddTransient<TouristDAL>();
             services.AddTransient<BlobService>();
             services.AddScoped<Cart>(sp => SessionCart.GetCart(sp));
