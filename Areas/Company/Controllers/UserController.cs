@@ -264,6 +264,7 @@ namespace ZTourist.Areas.Company.Controllers
                             return View("Edit", model);
                         }
                     }
+                    bool isSameEmail = user.Email.Equals(model.Email, StringComparison.OrdinalIgnoreCase);
                     user.FirstName = model.FirstName;
                     user.LastName = model.LastName;
                     user.Address = model.Address;
@@ -300,30 +301,46 @@ namespace ZTourist.Areas.Company.Controllers
                     {
                         user.Avatar = avatar;
                         IdentityResult result = null;
-                        result = await userManager.UpdateAsync(user);
-                        if (result.Succeeded)
+                        if (isSameEmail)
                         {
-                            if (changedStatus || !notChanged)
+                            IEnumerable<UserLoginInfo> loginInfos = await userManager.GetLoginsAsync(user);
+                            foreach (UserLoginInfo info in loginInfos)
                             {
-                                if (!notChanged)
-                                {
-                                    result = await userManager.AddToRolesAsync(user, model.Roles.Except(roles));
-                                    if (!result.Succeeded)
-                                    {
-                                        AddErrorFromResult(result);
-                                    }
-                                    result = await userManager.RemoveFromRolesAsync(user, roles.Except(model.Roles));
-                                    if (!result.Succeeded)
-                                    {
-                                        AddErrorFromResult(result);
-                                    }
-                                }
-                                await userManager.UpdateSecurityStampAsync(user);
+                                result = await userManager.RemoveLoginAsync(user, info.LoginProvider, info.ProviderKey);
                             }
-                            if (ModelState.IsValid) // if everything is ok
-                                return RedirectToAction(nameof(Index));
                         }
-                        else
+                        if (result == null || result.Succeeded) // if don't need to remove external login or remove external login successfully
+                        {
+                            result = await userManager.UpdateAsync(user);
+                            if (result.Succeeded)
+                            {
+
+                                if (changedStatus || !notChanged)
+                                {
+                                    if (!notChanged)
+                                    {
+                                        result = await userManager.AddToRolesAsync(user, model.Roles.Except(roles));
+                                        if (!result.Succeeded)
+                                        {
+                                            AddErrorFromResult(result);
+                                        }
+                                        result = await userManager.RemoveFromRolesAsync(user, roles.Except(model.Roles));
+                                        if (!result.Succeeded)
+                                        {
+                                            AddErrorFromResult(result);
+                                        }
+                                    }
+                                    await userManager.UpdateSecurityStampAsync(user);
+                                }
+                                if (ModelState.IsValid) // if everything is ok
+                                    return RedirectToAction(nameof(Details), new { userName = model.UserName });
+                            }
+                            else // if update failed
+                            {
+                                AddErrorFromResult(result);
+                            }
+                        }
+                        else // if remove external login failed
                         {
                             AddErrorFromResult(result);
                         }

@@ -56,6 +56,7 @@ namespace ZTourist.Controllers
             if (ModelState.IsValid)
             {
                 AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
+                bool isSameEmail = user.Email.Equals(profile.Email, StringComparison.OrdinalIgnoreCase);
                 user.FirstName = profile.FirstName;
                 user.LastName = profile.LastName;
                 user.Address = profile.Address;
@@ -75,10 +76,21 @@ namespace ZTourist.Controllers
                 {
                     user.Avatar = avatar;
                     IdentityResult result = null;
-                    result = await userManager.UpdateAsync(user);
-                    if (result.Succeeded)
+                    if (!isSameEmail) // remove external login when email changed
                     {
-                        return RedirectToAction(nameof(Index));
+                        IEnumerable<UserLoginInfo> loginInfos = await userManager.GetLoginsAsync(user);
+                        foreach (UserLoginInfo info in loginInfos)
+                        {
+                            result = await userManager.RemoveLoginAsync(user, info.LoginProvider, info.ProviderKey);
+                        }
+                    }
+                    if (result == null || result.Succeeded)
+                    {
+                        result = await userManager.UpdateAsync(user);
+                        if (result.Succeeded)
+                        {
+                            return RedirectToAction(nameof(Index));
+                        }                        
                     }
                     AddErrorFromResult(result);
                 }
