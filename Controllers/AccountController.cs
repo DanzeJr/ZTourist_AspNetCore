@@ -68,7 +68,10 @@ namespace ZTourist.Controllers
         [Authorize(Policy = "OnlyAnonymous")]
         [ImportModelState]
         public IActionResult SignUp(LoginSignUpModel model)
-        {
+        {            
+            string email = HttpContext.Request.Query["email"];
+            if (model.SignUpModel == null && !string.IsNullOrEmpty(email)) // if from external login
+                model = new LoginSignUpModel { SignUpModel = new SignUpModel { Email = email } };
             if (model?.SignUpModel?.BirthDate != null && model.SignUpModel.BirthDate.CompareTo(DateTime.Parse("1975-01-01 12:00")) < 0)
                 model.SignUpModel.BirthDate = DateTime.Now;
             ViewBag.returnUrl = model?.SignUpModel?.ReturnUrl ?? HttpContext.Request.Query["returnUrl"];

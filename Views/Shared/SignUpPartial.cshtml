@@ -20,7 +20,7 @@
 
                     <div class="form-group">
                         <label asp-for="SignUpModel.Email">Email<sup>*</sup></label>
-                        <input class="form-control" asp-for="SignUpModel.Email" value="@(Model?.SignUpModel?.Email ?? ViewContext.HttpContext.Request.Query["email"])"/>
+                        <input class="form-control" asp-for="SignUpModel.Email"/>
                         <div><span asp-validation-for="SignUpModel.Email" class="text-danger"></span></div><br />
                     </div>
 

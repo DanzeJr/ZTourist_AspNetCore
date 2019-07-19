@@ -1506,6 +1506,7 @@ namespace ZTourist.Models
                 using (SqlConnection cnn = new SqlConnection(connectionStr))
                 {
                     SqlCommand cmd = new SqlCommand("spGetTotalOrdersByUserId", cnn);
+                    cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@UserId", userId);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
@@ -1535,6 +1536,7 @@ namespace ZTourist.Models
                 using (SqlConnection cnn = new SqlConnection(connectionStr))
                 {
                     SqlCommand cmd = new SqlCommand("spFindOrdersByUserId", cnn);
+                    cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@UserId", userId);
                     cmd.Parameters.AddWithValue("@Skip", skip);
                     cmd.Parameters.AddWithValue("@Fetch", fetch);
@@ -1573,6 +1575,7 @@ namespace ZTourist.Models
                 using (SqlConnection cnn = new SqlConnection(connectionStr))
                 {
                     SqlCommand cmd = new SqlCommand("spGetTotalOrdersByStatus", cnn);
+                    cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Status", status);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
@@ -1601,7 +1604,8 @@ namespace ZTourist.Models
             {
                 using (SqlConnection cnn = new SqlConnection(connectionStr))
                 {
-                    SqlCommand cmd = new SqlCommand("spFindOrdersByUserId", cnn);
+                    SqlCommand cmd = new SqlCommand("spGetOrdersByStatus", cnn);
+                    cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@Status", status);
                     cmd.Parameters.AddWithValue("@Skip", skip);
                     cmd.Parameters.AddWithValue("@Fetch", fetch);
@@ -1614,11 +1618,55 @@ namespace ZTourist.Models
                             result = new List<Order>();
                             while (await sdr.ReadAsync())
                             {
-                                order = new Order();
+                                order = new Order { Customer = new AppUser(), Cart = new Cart { Coupon = new CouponCode() } };
                                 order.Id = sdr.GetString(sdr.GetOrdinal("Id"));
+                                order.Customer.UserName = sdr.GetString(sdr.GetOrdinal("UserName"));
+                                order.Cart.Coupon.Code = sdr.GetString(sdr.GetOrdinal("CouponCode"));
                                 order.OrderDate = sdr.GetDateTime(sdr.GetOrdinal("OrderDate"));
                                 order.Status = sdr.GetString(sdr.GetOrdinal("Status"));
                                 result.Add(order);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
+        }
+
+        public async Task<List<CartLine>> GetDetailsByOrderIdAsync(string id)
+        {
+            List<CartLine> result = null;
+            CartLine line;
+
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(connectionStr))
+                {
+                    SqlCommand cmd = new SqlCommand("spGetDetailsByOrderId", cnn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    if (cnn.State == ConnectionState.Closed)
+                        cnn.Open();
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
+                    {
+                        if (sdr.HasRows)
+                        {
+                            result = new List<CartLine>();                            
+                            while (await sdr.ReadAsync())
+                            {
+                                line = new CartLine { Tour = new Tour() };
+                                line.Tour.Id = sdr.GetString(sdr.GetOrdinal("TourId"));
+                                line.Tour.Name = sdr.GetString(sdr.GetOrdinal("Name"));
+                                line.Tour.AdultFare = sdr.GetDecimal(sdr.GetOrdinal("AdultFare"));
+                                line.Tour.KidFare = sdr.GetDecimal(sdr.GetOrdinal("KidFare"));
+                                line.Tour.FromDate = sdr.GetDateTime(sdr.GetOrdinal("FromDate"));
+                                line.AdultTicket = sdr.GetInt32(sdr.GetOrdinal("AdultTicket"));
+                                line.KidTicket = sdr.GetInt32(sdr.GetOrdinal("KidTicket"));
+                                result.Add(line);
                             }
                         }
                     }
@@ -1712,7 +1760,7 @@ namespace ZTourist.Models
             return result;
         }
 
-        public async Task<CouponCode> FindCouponByCodeAsync(string code)
+        public async Task<CouponCode> FindCouponByCodeAsync(string code, DateTime? date = null)
         {
             CouponCode result = null;
 
@@ -1722,7 +1770,10 @@ namespace ZTourist.Models
                 {
                     SqlCommand cmd = new SqlCommand("spFindCouponByCode", cnn);
                     cmd.CommandType = CommandType.StoredProcedure;
+                    if (date == null)
+                        date = DateTime.Now;
                     cmd.Parameters.AddWithValue("@Code", code);
+                    cmd.Parameters.AddWithValue("@Date", date);
                     if (cnn.State == ConnectionState.Closed)
                         cnn.Open();
                     using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))

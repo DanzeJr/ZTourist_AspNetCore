@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ZTourist.Infrastructure;
 using ZTourist.Models;
+using ZTourist.Models.ViewModels;
 
 namespace ZTourist.Areas.Company.Controllers
 {
@@ -26,10 +27,34 @@ namespace ZTourist.Areas.Company.Controllers
             this.touristDAL = touristDAL;
         }
 
-        public IActionResult Index(string status, int page = 1)
+        public async Task<IActionResult> Index(string status = "Processing", int page = 1)
         {
-
-            return View();
+            OrderViewModel model = new OrderViewModel { Status = status };
+            model.Skip = (page - 1) * model.Fetch;
+            int total = await touristDAL.GetTotalOrdersByStatusAsync(model.Status);
+            PageInfo pageInfo = new PageInfo
+            {
+                TotalItems = total,
+                ItemPerPage = model.Fetch,
+                PageAction = nameof(Index),
+                CurrentPage = page
+            };
+            model.Orders = await touristDAL.GetOrdersByStatusAsync(model.Status, model.Skip, model.Fetch);
+            if (model.Orders != null && model.Orders.Count() > 0)
+            {
+                foreach (Order order in model.Orders)
+                {
+                    order.Cart.Lines = await touristDAL.GetDetailsByOrderIdAsync(order.Id);
+                }
+            }
+            model.PageInfo = pageInfo;
+            if (model.Status.Equals("Accepted", StringComparison.OrdinalIgnoreCase))
+                ViewBag.Title = "Accepted Order";
+            else if (model.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
+                ViewBag.Title = "Cancelled Order";
+            else
+                ViewBag.Title = "Pending Order";
+            return View(model);
         }
 
 

@@ -3,21 +3,17 @@
 @section JS {
     <script type="text/javascript">
         $("#tg-main").attr("class", "tg-main tg-sectionspace tg-haslayout");
-        @if (Model?.Status == null)
-        {
-            @:$("#orderAll").attr("style", "font-weight: bold");
-        }
-        else if (Model.Status.Equals("Processing", StringComparison.OrdinalIgnoreCase))
-        {
-            @:$("#orderProcessing").attr("style", "font-weight: bold");
-        }
-        else if (Model.Status.Equals("Accepted", StringComparison.OrdinalIgnoreCase))
+        @if (Model.Status.Equals("Accepted", StringComparison.OrdinalIgnoreCase))
         {
             @:$("#orderAccepted").attr("style", "font-weight: bold");
         }
         else if (Model.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
         {
             @:$("#orderCancelled").attr("style", "font-weight: bold");
+        }
+        else
+        {
+            @:$("#orderProcessing").attr("style", "font-weight: bold");
         }
     </script>
 }
@@ -51,9 +47,9 @@
                     <div class="tg-sectiontitle">
                         <h2>@ViewBag.Title</h2>
                         <div>
-                            <a class="btn" id="userAll" asp-area="Company" asp-controller="User" asp-action=""><span>All</span></a>
-                            <a class="btn" id="userActive" asp-area="Company" asp-controller="User" asp-action="" asp-route-IsLocked="false"><span>Active</span></a>
-                            <a class="btn" id="userLocked" asp-area="Company" asp-controller="User" asp-action="" asp-route-IsLocked="true"><span>Locked</span></a>
+                            <a class="btn" id="orderProcessing" asp-area="Company" asp-controller="Order" asp-action="" asp-route-Status="Processing"><span>Pending</span></a>
+                            <a class="btn" id="orderAccepted" asp-area="Company" asp-controller="Order" asp-action="" asp-route-Status="Accepted"><span>Accepted</span></a>
+                            <a class="btn" id="orderCancelled" asp-area="Company" asp-controller="Order" asp-action="" asp-route-Status="Cancelled"><span>Cancelled</span></a>
                         </div>
                     </div>
                     <div class="clearfix"></div>
@@ -72,6 +68,7 @@
                                                     <table class="table table-responsive">
                                                         <tr>
                                                             <th scope="col">Order ID</th>
+                                                            <th scope="col">Username</th>
                                                             <th scope="col">Order Date</th>
                                                             <th scope="col">Total</th>
                                                             <th scope="col">Status</th>
@@ -82,6 +79,7 @@
                                                             {
                                                                 <tr>
                                                                     <td data-title="tour name">@order.Id</td>
+                                                                    <td data-title="tour name">@order.Customer.UserName</td>
                                                                     <td data-title="tour date">@order.OrderDate.ToString("dd/MM/yyyy")</td>
                                                                     <td data-title="total"><strong>@order.Cart.ComputeTotalValue().ToString("C0")</strong></td>
                                                                     <td class="tg-status" data-title="status">@order.Status</td>

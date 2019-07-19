@@ -11,6 +11,12 @@ namespace ZTourist.Models
     {
         private List<CartLine> lineCollection = new List<CartLine>();
 
+        public virtual List<CartLine> Lines
+        {
+            get { return lineCollection; }
+            set { lineCollection = value; }
+        }
+
         public CouponCode Coupon { get; set; } = new CouponCode();
 
         public virtual void AddItem(CartLine line)
@@ -65,9 +71,8 @@ namespace ZTourist.Models
         {
             lineCollection.Clear();
             Coupon = new CouponCode();
-        }
+        }               
 
-        public virtual IEnumerable<CartLine> Lines => lineCollection;
     }
 
     public class CartLine
