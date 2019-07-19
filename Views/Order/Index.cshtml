@@ -1,5 +1,119 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model OrderViewModel
+
 @{
+    ViewData["Title"] = "Order History";
 }
+
+@section JS {
+    <script type="text/javascript">
+        $("#tg-main").attr("class", "tg-main tg-sectionspace tg-haslayout");
+    </script>
+}
+
+@section Slider {
+    <!--************************************
+                        Inner Banner Start
+        *************************************-->
+    <section class="tg-parallax tg-innerbanner" data-appear-top-offset="100" data-parallax="scroll" data-image-src="https://ztourist.blob.core.windows.net/others/banner.png">
+        <div class="tg-sectionspace tg-haslayout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h1>Order History</h1>
+                        <h2>@User.Identity.Name</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--************************************
+                    Inner Banner End
+    *************************************-->
+}
+
+<div class="container">
+    <div class="row">
+        <div id="tg-twocolumns" class="tg-twocolumns">
+            <form class="tg-formtheme tg-formdashboard">
+                <div class="col-xs-12 col-sm-4 col-md-4 col-lg-4">
+                    <aside id="tg-sidebar" class="tg-sidebar">
+                        <div class="tg-widget tg-widgetdashboard">
+                            <div class="tg-widgettitle">
+                                <h3>My Account</h3>
+                            </div>
+                            <div class="tg-widgetcontent">
+                                <ul>
+                                    <li class="selected"><a asp-controller="Profile" asp-action=""><i class="icon-user"></i><span>Dashboard</span></a></li>
+                                    <li><a asp-controller="Profile" asp-action="Edit"><i class="icon-pen2"></i><span>Edit Profile</span></a></li>
+                                    <li><a asp-controller="Profile" asp-action="ChangePassword"><i class="icon-lock-open3"></i><span>Change Password</span></a></li>
+                                    <li><a asp-controller="Order" asp-action="History"><i class="icon-basket3"></i><span>Order History</span></a></li>
+                                    <li><a asp-controller="Account" asp-action="Logout"><i class="icon-lock"></i><span>Sign Out</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </aside>
+                </div>
+                <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+                    <div id="tg-content" class="tg-content">
+                        <div class="tg-dashboard">
+                            <div class="tg-box tg-mybooking">
+                                <div class="tg-heading">
+                                    <h3>Order History</h3>
+                                </div>
+                                @if (Model?.Orders != null && Model.Orders.Count() > 0)
+                                {
+                                    <div class="tg-dashboardcontent">
+                                        <div class="tg-content">
+                                            <table class="table table-responsive">
+                                                <tr>
+                                                    <th scope="col">Order ID</th>
+                                                    <th scope="col">Order Date</th>
+                                                    <th scope="col">Total</th>
+                                                    <th scope="col">Status</th>
+                                                    <th scope="col">Actions</th>
+                                                </tr>
+                                                <tbody>
+                                                    @{ string color; }
+                                                    @foreach (Order order in Model.Orders)
+                                                    {
+                                                        if (order.Status == "Accepted")
+                                                        {
+                                                            color = "green";
+                                                        }
+                                                        else if (order.Status == "Cancelled")
+                                                        {
+                                                            color = "red";
+                                                        }
+                                                        else
+                                                        {
+                                                            color = "dodgerblue";
+                                                        }
+                                                        <tr>
+                                                            <td data-title="tour name">@order.Id</td>
+                                                            <td data-title="tour date">@order.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                                                            <td data-title="total"><strong>@((order.Cart.ComputeTotalValue() * (100 - (order.Cart.Coupon?.OffPercent ?? 0)) / 100).ToString("C0"))</strong></td>
+                                                            <td class="tg-status" style="color: @color; font-weight: bold" data-title="status">@order.Status</td>
+                                                            <td data-title="action">
+                                                                <a class="tg-btnview" asp-area="" asp-controller="Order" asp-action="Details" asp-route-id="@order.Id">view</a>
+                                                            </td>
+                                                        </tr>
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <h3 class="text-center">No order found!</h3>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+

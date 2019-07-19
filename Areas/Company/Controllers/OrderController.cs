@@ -45,6 +45,8 @@ namespace ZTourist.Areas.Company.Controllers
                 foreach (Order order in model.Orders)
                 {
                     order.Cart.Lines = await touristDAL.GetDetailsByOrderIdAsync(order.Id);
+                    if (!string.IsNullOrEmpty(order.Cart.Coupon.Code))
+                        order.Cart.Coupon = await touristDAL.FindCouponByCodeAsync(order.Cart.Coupon.Code, order.OrderDate);
                 }
             }
             model.PageInfo = pageInfo;
@@ -57,17 +59,75 @@ namespace ZTourist.Areas.Company.Controllers
             return View(model);
         }
 
-
-
-        public IActionResult Result()
+        [ImportModelState]
+        public async Task<IActionResult> Details(string id)
         {
-            Order order = TempData.Get<Order>("Order");
-            if (order == null)
+            if (string.IsNullOrWhiteSpace(id))
             {
-                return NotFound(); // if tempdate does not contain order, which means this request is not redirected from Pay action, so response with 404 not found
+                return NotFound();
             }
-            //if contain order
+            Order order = await touristDAL.FindOrderByIdAsync(id);
+            if (order == null) // if order is not existed
+            {
+                return NotFound();
+            }
+            order.Customer = await userManager.FindByIdAsync(order.Customer.Id);
+            order.Cart.Lines = await touristDAL.GetDetailsByOrderIdAsync(id);
+            if (!string.IsNullOrWhiteSpace(order.Cart.Coupon.Code))
+                order.Cart.Coupon = await touristDAL.FindCouponByCodeAsync(order.Cart.Coupon.Code, order.OrderDate);
             return View(order);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ExportModelState]
+        public async Task<IActionResult> Accept(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return NotFound();
+            }
+            Order order = await touristDAL.FindOrderByIdAsync(id);
+            if (order == null) // if order is not existed
+            {
+                return NotFound();
+            }
+            else if (order.Status != "Processing")
+            {
+                ModelState.AddModelError("", "Not allowed to update order status after accept or cancel");
+            }
+            else
+            {
+                if (await touristDAL.UpdateOrderStatusById(id, "Accepted"))
+                    ModelState.AddModelError("", "Error occurs when accept order. Please try later");
+            }
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ExportModelState]
+        public async Task<IActionResult> Cancel(string id)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return NotFound();
+            }
+            Order order = await touristDAL.FindOrderByIdAsync(id);
+            if (order == null) // if order is not existed
+            {
+                return NotFound();
+            }
+            else if (order.Status != "Processing")
+            {
+                ModelState.AddModelError("", "Not allowed to update order status after accept or cancel");
+            }
+            else
+            {
+                if (await touristDAL.UpdateOrderStatusById(id, "Cancelled"))
+                    ModelState.AddModelError("", "Error occurs when cancel order. Please try later");
+            }
+            return RedirectToAction(nameof(Details), new { id });
         }
     }
 }

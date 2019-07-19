@@ -155,7 +155,7 @@ namespace ZTourist
                     defaults: new { controller = "Home", action = "Index" }
                     );
             });
-            //SeedData.CreateRolesAndAdminAccount(app, Configuration).Wait();
+            SeedData.CreateRolesAndAdminAccount(app, Configuration).Wait();
         }
     }
 }

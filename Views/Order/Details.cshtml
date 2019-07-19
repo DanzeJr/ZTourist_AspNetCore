@@ -1,7 +1,59 @@
 ﻿@model Order
 
 @{
-    ViewData["Title"] = "Order Result";
+    ViewData["Title"] = "Order Details";
+}
+
+@section CSS {
+    <link href="~/css/jquery-confirm.min.css" rel="stylesheet" asp-append-version="true" />
+}
+
+@section JS {
+    <script src="~/js/jquery-confirm.min.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // cancel button
+            $('#btnCancel').confirm({
+                title: "Confirm Cancel",
+                content: '' +
+                    '<form action="" class="formName">' +
+                    '<div class="form-group">' +
+                    '<label>Type \'yes\' to confirm cancel this order</label>' +
+                    '<input type="text" placeholder="" class="confirmMsg form-control" required />' +
+                    '</div>' +
+                    '</form>',
+                type: "red",
+                icon: "fa fa-warning",
+                buttons: {
+                    ok: {
+                        btnClass: "btn btn-danger",
+                        action: function () {
+                            var confirm = this.$content.find('.confirmMsg').val() + "";
+                            if (!confirm || confirm.toUpperCase() != "yes".toUpperCase()) {
+                                return false;
+                            }
+                            $("#form-Cancel").submit();
+                        }
+                    },
+                    cancel: {
+                        btnClass: "btn"
+                    }
+                },
+                onContentReady: function () {
+                    // bind to events
+                    this.$content.find('form').on('submit', function (e) {
+                        // if the user submits the form by pressing enter in the field.
+                        e.preventDefault();
+                        var confirm = $('.confirmMsg').val() + "";
+                        if (!confirm || confirm.toUpperCase() != "yes".toUpperCase()) {
+                            return false;
+                        }
+                        $("#form-Cancel").submit();
+                    });
+                }
+            });
+        });
+    </script>
 }
 
 @section Slider {
@@ -13,8 +65,8 @@
             <div class="container">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                        <h2>Order Result</h2>
-                        <h2>Place order successfully</h2>
+                        <h1>Order Details</h1>
+                        <h2>Status: @Model.Status</h2>
                     </div>
                 </div>
             </div>
@@ -30,7 +82,8 @@
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <div id="tg-content" class="tg-content">
                     <div class="tg-billingdetail">
-                        <form class="tg-formtheme tg-formbillingdetail">
+                        <form id="form-Cancel" class="tg-formtheme tg-formbillingdetail" asp-area="" asp-controller="Order" asp-action="Cancel" method="post">
+                            <input type="hidden" asp-for="Id" />
                             <fieldset>
                                 <div class="tg-bookingdetail">
                                     <div class="tg-box">
@@ -61,6 +114,17 @@
                                                 </ul>
                                             </div>
                                         </div>
+                                        <div class="tg-heading" style="margin-top: 17%">
+                                            <h3>Addition Information</h3>
+                                        </div>
+                                        <div class="tg-dashboardcontent">
+                                            <div class="tg-content">
+                                                <ul class="tg-liststyle">
+                                                    <li><span>Comment:</span></li>
+                                                    <li><span>@Model.Comment</span></li>
+                                                </ul>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="tg-bookingdetail">
@@ -74,6 +138,7 @@
                                                 <div class="tg-widgetcontent">
                                                     <ul>
                                                         <li class="tg-personprice"><div class="tg-perperson"><span>Tour: @line.Tour.Name (@line.Tour.Id)</span></div></li>
+                                                        <li><span>Travel Date:</span><em>@line.Tour.FromDate.ToString("dd/MM/yyyy HH:mm")</em></li>
                                                         <li><span>Adult Tickets:</span><em>@line.AdultTicket x @line.Tour.AdultFare.ToString("C0")</em></li>
                                                         <li><span>Kid Tickets:</span><em>@line.KidTicket x @line.Tour.KidFare.ToString("C0")</em></li>
                                                         <li class="tg-totalprice"><div class="tg-totalpayment"><span>Total Price:</span><em>@line.SubTotal().ToString("C0")</em></div></li>
@@ -100,6 +165,14 @@
                                     Transfer content: @Model.Id - <span style="text-transform: capitalize">@Model.Customer.FirstName @Model.Customer.LastName</span>
                                 </p>
                             </fieldset>
+                            @if (Model.Status.Equals("Processing"))
+                            {
+                                <fieldset class="tg-paymentarea">
+                                    <div style="text-align: center">
+                                        <button id="btnCancel" style="background-color: #d9534f; font-weight: bold; margin-top: 2%" class="tg-btn" type="submit"><span>Cancel Order</span></button>
+                                    </div>
+                                </fieldset>
+                            }
                         </form>
                     </div>
                 </div>

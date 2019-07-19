@@ -740,7 +740,7 @@ namespace ZTourist.Models
             }
             return result;
         }
-        
+
         public async Task<bool> DeleteTourGuidesByTourIdAsync(string id)
         {
             bool result = false;
@@ -1030,7 +1030,7 @@ namespace ZTourist.Models
                 throw;
             }
             return result;
-        }  
+        }
 
         #endregion
 
@@ -1367,12 +1367,12 @@ namespace ZTourist.Models
                         {
                             result = new List<string>();
                             while (await sdr.ReadAsync())
-                            {                                
+                            {
                                 tourId = sdr.GetString(sdr.GetOrdinal("TourId"));
                                 result.Add(tourId);
                             }
                         }
-                        
+
                     }
                 }
             }
@@ -1382,7 +1382,7 @@ namespace ZTourist.Models
             }
             return result;
         }
-        
+
         public async Task<IEnumerable<string>> FindFutureToursByDestinationIdAsync(string id)
         {
             List<string> result = null;
@@ -1497,6 +1497,41 @@ namespace ZTourist.Models
             return result;
         }
 
+        public async Task<Order> FindOrderByIdAsync(string id)
+        {
+            Order result = null;
+
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(connectionStr))
+                {
+                    SqlCommand cmd = new SqlCommand("spFindOrderById", cnn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    if (cnn.State == ConnectionState.Closed)
+                        cnn.Open();
+                    using (SqlDataReader sdr = await cmd.ExecuteReaderAsync(CommandBehavior.SequentialAccess))
+                    {
+                        if (await sdr.ReadAsync())
+                        {
+                            result = new Order { Id = id.ToUpper(), Customer = new AppUser(), Cart = new Cart { Coupon = new CouponCode() } };
+                            result.Customer.Id = sdr.GetString(sdr.GetOrdinal("UserId"));
+                            if (!sdr.IsDBNull(sdr.GetOrdinal("CouponCode")))
+                                result.Cart.Coupon.Code = sdr.GetString(sdr.GetOrdinal("CouponCode"));
+                            result.Comment = sdr.GetString(sdr.GetOrdinal("Comment"));
+                            result.OrderDate = sdr.GetDateTime(sdr.GetOrdinal("OrderDate"));
+                            result.Status = sdr.GetString(sdr.GetOrdinal("Status"));
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
+        }
+
         public async Task<int> GetTotalOrdersByUserIdAsync(string userId)
         {
             int result = 0;
@@ -1549,8 +1584,10 @@ namespace ZTourist.Models
                             result = new List<Order>();
                             while (await sdr.ReadAsync())
                             {
-                                order = new Order();
+                                order = new Order { Cart = new Cart { Coupon = new CouponCode() } };
                                 order.Id = sdr.GetString(sdr.GetOrdinal("Id"));
+                                if (!sdr.IsDBNull(sdr.GetOrdinal("CouponCode")))
+                                    order.Cart.Coupon.Code = sdr.GetString(sdr.GetOrdinal("CouponCode"));
                                 order.OrderDate = sdr.GetDateTime(sdr.GetOrdinal("OrderDate"));
                                 order.Status = sdr.GetString(sdr.GetOrdinal("Status"));
                                 result.Add(order);
@@ -1621,7 +1658,8 @@ namespace ZTourist.Models
                                 order = new Order { Customer = new AppUser(), Cart = new Cart { Coupon = new CouponCode() } };
                                 order.Id = sdr.GetString(sdr.GetOrdinal("Id"));
                                 order.Customer.UserName = sdr.GetString(sdr.GetOrdinal("UserName"));
-                                order.Cart.Coupon.Code = sdr.GetString(sdr.GetOrdinal("CouponCode"));
+                                if (!sdr.IsDBNull(sdr.GetOrdinal("CouponCode")))
+                                    order.Cart.Coupon.Code = sdr.GetString(sdr.GetOrdinal("CouponCode"));
                                 order.OrderDate = sdr.GetDateTime(sdr.GetOrdinal("OrderDate"));
                                 order.Status = sdr.GetString(sdr.GetOrdinal("Status"));
                                 result.Add(order);
@@ -1655,7 +1693,7 @@ namespace ZTourist.Models
                     {
                         if (sdr.HasRows)
                         {
-                            result = new List<CartLine>();                            
+                            result = new List<CartLine>();
                             while (await sdr.ReadAsync())
                             {
                                 line = new CartLine { Tour = new Tour() };

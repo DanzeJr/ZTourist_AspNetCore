@@ -54,15 +54,6 @@ namespace ZTourist.Models
                         IdentityResult ir = await roleManager.CreateAsync(new IdentityRole(name));
                     }
                 }
-                AppUser guide = new AppUser
-                {
-                    UserName = "ken",
-                    Email = "Ken@microsoft.com",
-                    Avatar = avatar,
-                    RegisterDate = DateTime.Now
-                };
-                await userManager.CreateAsync(guide, "Ken123*");
-                await userManager.AddToRoleAsync(guide, "Guide");
             }
         }
     }

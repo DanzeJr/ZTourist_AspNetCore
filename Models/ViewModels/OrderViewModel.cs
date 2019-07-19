@@ -11,7 +11,7 @@ namespace ZTourist.Models.ViewModels
 
         public int Skip { get; set; } = 0;
 
-        public int Fetch { get; set; } = 6;
+        public int Fetch { get; set; } = 10;
 
         public string Status { get; set; }
 
