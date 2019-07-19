@@ -38,6 +38,10 @@ namespace ZTourist.Models
                         UserName = username,
                         Email = email,
                         Avatar = avatar,
+                        Gender = "Male",
+                        FirstName = "Admin",
+                        LastName = "ZTourist",
+                        BirthDate = DateTime.Now,
                         RegisterDate = DateTime.Now
                     };
                     IdentityResult result = await userManager.CreateAsync(user, password);

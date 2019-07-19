@@ -478,7 +478,7 @@ namespace ZTourist.Areas.Company.Controllers
         private async Task<SelectList> InitDestinationItemsAsync()
         {
             Dictionary<string, string> destinationItems = await touristDAL.GetDestinationsIdNameAsync();
-            return new SelectList(destinationItems, "Key", "Value");
+            return destinationItems == null ? null : new SelectList(destinationItems, "Key", "Value");
         }
 
         [NonAction]
@@ -493,7 +493,7 @@ namespace ZTourist.Areas.Company.Controllers
                     guideItems.Add(user.Id, user.FirstName + " " + user.LastName + " (" + user.NormalizedUserName + ")");
                 }
             }
-            return new SelectList(guideItems, "Key", "Value");
+            return guideItems == null ? null : new SelectList(guideItems, "Key", "Value");
         }
     }
 }
