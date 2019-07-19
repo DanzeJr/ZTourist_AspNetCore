@@ -15,6 +15,7 @@ namespace ZTourist.Controllers
             return View();
         }
 
+        [AllowAnonymous]
         public IActionResult Error(int? statusCode = null)
         {
             if (statusCode.HasValue)

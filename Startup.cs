@@ -121,16 +121,6 @@ namespace ZTourist
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
-                    name: "CompanyErrorWithStatusCode",
-                    template: "Company/Error/{statusCode:int}",
-                    defaults: new { area = "Company", controller = "Home", action = "Error" }
-                    );
-                routes.MapRoute(
-                    name: "CompanyError",
-                    template: "Company/Error",
-                    defaults: new { area = "Company", controller = "Home", action = "Error" }
-                    );
-                routes.MapRoute(
                     name: "CompanyArea",
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
                     );
