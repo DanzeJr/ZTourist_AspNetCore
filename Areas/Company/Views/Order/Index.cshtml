@@ -1,5 +1,116 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
+﻿@model OrderViewModel
+
+@section JS {
+    <script type="text/javascript">
+        $("#tg-main").attr("class", "tg-main tg-sectionspace tg-haslayout");
+        @if (Model?.Status == null)
+        {
+            @:$("#orderAll").attr("style", "font-weight: bold");
+        }
+        else if (Model.Status.Equals("Processing", StringComparison.OrdinalIgnoreCase))
+        {
+            @:$("#orderProcessing").attr("style", "font-weight: bold");
+        }
+        else if (Model.Status.Equals("Accepted", StringComparison.OrdinalIgnoreCase))
+        {
+            @:$("#orderAccepted").attr("style", "font-weight: bold");
+        }
+        else if (Model.Status.Equals("Cancelled", StringComparison.OrdinalIgnoreCase))
+        {
+            @:$("#orderCancelled").attr("style", "font-weight: bold");
+        }
+    </script>
 }
+
+@section Slider {
+    <!--************************************
+    Inner Banner Start
+    *************************************-->
+    <section class="tg-parallax tg-innerbanner" data-appear-top-offset="600" data-parallax="scroll" data-image-src="https://ztourist.blob.core.windows.net/others/banner.png">
+        <div class="tg-sectionspace tg-haslayout">
+            <div class="container">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                        <h1>Orders</h1>
+                        <h2>@Model.Status</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--************************************
+                    Inner Banner End
+    *************************************-->
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+            <div id="tg-content" class="tg-content">
+                <div class="tg-listing tg-listingvone">
+                    <div class="tg-sectiontitle">
+                        <h2>@ViewBag.Title</h2>
+                        <div>
+                            <a class="btn" id="userAll" asp-area="Company" asp-controller="User" asp-action=""><span>All</span></a>
+                            <a class="btn" id="userActive" asp-area="Company" asp-controller="User" asp-action="" asp-route-IsLocked="false"><span>Active</span></a>
+                            <a class="btn" id="userLocked" asp-area="Company" asp-controller="User" asp-action="" asp-route-IsLocked="true"><span>Locked</span></a>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    @if (Model?.Orders != null && Model.Orders.Count() > 0)
+                    {
+                        <div class="row">
+                            <div class="col-xs-6 col-sm-6 col-md-4 col-lg-4">
+                                <div id="tg-content" class="tg-content">
+                                    <div class="tg-dashboard">
+                                        <div class="tg-box tg-mybooking">
+                                            <div class="tg-heading">
+                                                <h3></h3>
+                                            </div>
+                                            <div class="tg-dashboardcontent">
+                                                <div class="tg-content">
+                                                    <table class="table table-responsive">
+                                                        <tr>
+                                                            <th scope="col">Order ID</th>
+                                                            <th scope="col">Order Date</th>
+                                                            <th scope="col">Total</th>
+                                                            <th scope="col">Status</th>
+                                                            <th scope="col">Actions</th>
+                                                        </tr>
+                                                        <tbody>
+                                                            @foreach (Order order in Model.Orders)
+                                                            {
+                                                                <tr>
+                                                                    <td data-title="tour name">@order.Id</td>
+                                                                    <td data-title="tour date">@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                                                                    <td data-title="total"><strong>@order.Cart.ComputeTotalValue().ToString("C0")</strong></td>
+                                                                    <td class="tg-status" data-title="status">@order.Status</td>
+                                                                    <td data-title="action">
+                                                                        <a class="tg-btnview" asp-area="Company" asp-controller="Order" asp-action="Details" asp-route-id="@order.Id">View</a>
+                                                                    </td>
+                                                                </tr>
+
+                                                            }
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <nav class="tg-pagination" page-info="@Model.PageInfo"
+                             page-url-Status="@Model.Status"
+                             page-class-selected="tg-active"></nav>
+                    }
+                    else
+                    {
+                        <h3 class="text-center">No order found!</h3>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

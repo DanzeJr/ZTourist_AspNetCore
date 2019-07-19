@@ -7,5 +7,14 @@ namespace ZTourist.Models.ViewModels
 {
     public class OrderViewModel
     {
+        public IEnumerable<Order> Orders { get; set; }
+
+        public int Skip { get; set; } = 0;
+
+        public int Fetch { get; set; } = 6;
+
+        public string Status { get; set; }
+
+        public PageInfo PageInfo { get; set; }
     }
 }

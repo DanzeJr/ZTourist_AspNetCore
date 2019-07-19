@@ -17,11 +17,13 @@ namespace ZTourist.Areas.Company.Controllers
     public class ProfileController : Controller
     {
         private readonly UserManager<AppUser> userManager;
+        private readonly SignInManager<AppUser> signInManager;
         private readonly BlobService blobService;
 
-        public ProfileController(UserManager<AppUser> userManager, BlobService blobService)
+        public ProfileController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, BlobService blobService)
         {
             this.userManager = userManager;
+            this.signInManager = signInManager;
             this.blobService = blobService;
         }
 
@@ -126,6 +128,7 @@ namespace ZTourist.Areas.Company.Controllers
                     IdentityResult result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
                     if (result.Succeeded)
                     {
+                        await signInManager.SignInAsync(user, false); //prevent validate security stamp log user out
                         return RedirectToAction(nameof(Index));
                     }
                     AddErrorFromResult(result);

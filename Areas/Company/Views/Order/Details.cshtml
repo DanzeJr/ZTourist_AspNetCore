@@ -75,6 +75,7 @@
                                                 <div class="tg-widgetcontent">
                                                     <ul>
                                                         <li class="tg-personprice"><div class="tg-perperson"><span>Tour: @line.Tour.Name (@line.Tour.Id)</span></div></li>
+                                                        <li><span>Travel Date:</span><em>@line.Tour.FromDate</em></li>
                                                         <li><span>Adult Tickets:</span><em>@line.AdultTicket x @line.Tour.AdultFare.ToString("C0")</em></li>
                                                         <li><span>Kid Tickets:</span><em>@line.KidTicket x @line.Tour.KidFare.ToString("C0")</em></li>
                                                         <li class="tg-totalprice"><div class="tg-totalpayment"><span>Total Price:</span><em>@line.SubTotal().ToString("C0")</em></div></li>
@@ -87,7 +88,7 @@
                             </fieldset>
                             <fieldset class="tg-paymentarea">
                                 <div style="text-align: center">
-                                    <button style="font-weight: bold; margin-top: 2%" class="tg-btn" type="submit"><span>Update</span></button>
+                                    <button style="font-weight: bold; margin-top: 2%" class="tg-btn" type="submit"><span>Accept</span></button>
                                 </div>
                             </fieldset>
                         </form>

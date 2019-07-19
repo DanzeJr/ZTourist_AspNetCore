@@ -69,8 +69,9 @@ namespace ZTourist.Controllers
         [ImportModelState]
         public IActionResult SignUp(LoginSignUpModel model)
         {
+            if (model?.SignUpModel?.BirthDate != null && model.SignUpModel.BirthDate.CompareTo(DateTime.Parse("1975-01-01 12:00")) < 0)
+                model.SignUpModel.BirthDate = DateTime.Now;
             ViewBag.returnUrl = model?.SignUpModel?.ReturnUrl ?? HttpContext.Request.Query["returnUrl"];
-            ViewBag.email = HttpContext.Request.Query["email"];
             ViewBag.Title = "Registration";
             return View("Login", model);
         }
@@ -125,7 +126,7 @@ namespace ZTourist.Controllers
                     ModelState.AddModelError("", error.Description);
                 }
             }
-            return RedirectToAction(nameof(SignUp), new { SignUpModel = new SignUpModel { ReturnUrl = signUp.ReturnUrl } });
+            return RedirectToAction(nameof(SignUp), new { signUp.ReturnUrl });
         }
 
         [Authorize(Policy = "OnlyAnonymous")]
