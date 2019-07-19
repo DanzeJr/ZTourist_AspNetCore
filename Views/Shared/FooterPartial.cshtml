@@ -95,6 +95,13 @@
                 <nav id="tg-loginnav" class="tg-loginnav">
                     <h3>Z TOURIST</h3>
                 </nav>
+                @{
+                    var myReturnUrl = ViewContext.HttpContext.Request.PathAndQuery();
+                    if (myReturnUrl.Contains("/Account/")) // if current page is login or registration or any page related to account controller
+                    {
+                        myReturnUrl = "";
+                    }
+                }
                 <div class="tg-themetabs">
                     <ul class="tg-navtbs" role="tablist">
                         <li role="presentation" class="active"><a href="#home" data-toggle="tab">Sign in</a></li>
@@ -103,7 +110,7 @@
                     <div class="tg-tabcontent tab-content">
                         <div role="tabpanel" class="tab-pane active fade in" id="home">
                             <form class="tg-formtheme tg-formlogin" asp-controller="Account" asp-action="Login" method="post">
-                                <input type="hidden" asp-for="LoginModel.ReturnUrl" value="@(ViewBag.returnUrl ?? ViewContext.HttpContext.Request.PathAndQuery())" />
+                                <input type="hidden" asp-for="LoginModel.ReturnUrl" value="@(ViewBag.returnUrl ?? myReturnUrl)" />
                                 <fieldset>
                                     <div class="form-group">
                                         <label for="UserName">Username <sup>*</sup></label>
@@ -129,7 +136,7 @@
                         </div>
                         <div role="tabpanel" class="tab-pane fade" id="profile">
                             <form class="tg-formtheme tg-formlogin" asp-controller="Account" asp-action="SignUp" method="get">
-                                <input type="hidden" asp-for="SignUpModel.ReturnUrl" value="@(ViewBag.returnUrl ?? ViewContext.HttpContext.Request.PathAndQuery())" />
+                                <input type="hidden" asp-for="SignUpModel.ReturnUrl" value="@(ViewBag.returnUrl ?? myReturnUrl)" />
                                 <fieldset>
                                     <div class="form-group">
                                         <label for="UserName">Username <sup>*</sup></label>
@@ -151,9 +158,9 @@
                 <div class="tg-signupwith">
                     <h2>Sign in With...</h2>
                     <ul class="tg-sharesocialicon">
-                        <li class="tg-facebook"><a asp-controller="Account" asp-action="FacebookLogin"><i class="icon-facebook-1"></i><span>Facebook</span></a></li>
+                        <li class="tg-facebook"><a asp-controller="Account" asp-action="FacebookLogin" asp-route-returnUrl="@(ViewBag.returnUrl ?? myReturnUrl)"><i class="icon-facebook-1"></i><span>Facebook</span></a></li>
                         @*<li class="tg-twitter"><a asp-controller="Account" asp-action="TwitterLogin"><i class="icon-twitter-1"></i><span>Twitter</span></a></li>*@
-                        <li class="tg-googleplus"><a asp-controller="Account" asp-action="GoogleLogin"><i class="icon-google4"></i><span>Google</span></a></li>
+                        <li class="tg-googleplus"><a asp-controller="Account" asp-action="GoogleLogin" asp-route-returnUrl="@(ViewBag.returnUrl ?? myReturnUrl)"><i class="icon-google4"></i><span>Google</span></a></li>
                     </ul>
                 </div>
             </div>

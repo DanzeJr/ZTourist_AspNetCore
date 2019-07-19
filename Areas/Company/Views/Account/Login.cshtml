@@ -28,7 +28,7 @@
     <main id="tg-main" class="tg-main tg-haslayout">
         <div class="register-form" style="width: 45%; margin-top: 4%">
             <div class="tab-content" style="padding: 0 10%">
-                <form style="padding: 10%; margin-bottom: 20%; background-color: white" class="tg-formtheme tg-formlogin" asp-area="Company" asp-controller="Account" asp-action="Login" method="post">
+                <form style="padding: 10%; background-color: white" class="tg-formtheme tg-formlogin" asp-area="Company" asp-controller="Account" asp-action="Login" method="post">
                     <input type="hidden" asp-for="ReturnUrl" value="@ViewBag.returnUrl" />
                     <div class="tg-dashboardcontent">
                         <h2 class="text-center text-primary">Login</h2>
@@ -57,6 +57,13 @@
                     </div>
                 </form>
             </div><!-- tab-content -->
+            <div class="tg-signupwith" style="margin-bottom: 5%">
+                <ul class="tg-sharesocialicon">
+                    <li class="tg-facebook"><a asp-area="Company" asp-controller="Account" asp-action="FacebookLogin" asp-route-returnUrl="@(ViewBag.returnUrl)"><i class="icon-facebook-1"></i><span>Facebook</span></a></li>
+                    @*<li class="tg-twitter"><a asp-controller="Account" asp-action="TwitterLogin"><i class="icon-twitter-1"></i><span>Twitter</span></a></li>*@
+                    <li class="tg-googleplus"><a asp-area="Company" asp-controller="Account" asp-action="GoogleLogin" asp-route-returnUrl="@(ViewBag.returnUrl)"><i class="icon-google4"></i><span>Google</span></a></li>
+                </ul>
+            </div>
         </div>
     </main>
     <footer id="tg-footer" class="tg-footer tg-haslayout">

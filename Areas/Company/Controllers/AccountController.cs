@@ -22,14 +22,16 @@ namespace ZTourist.Areas.Company.Controllers
             this.userManager = userManager;
             this.signInManager = signInManager;
         }
-
+        
+        [Authorize(Policy = "OnlyAnonymous")]
         [ImportModelState]
         public IActionResult Login(string returnUrl)
         {
             ViewBag.returnUrl = returnUrl;
             return View();
         }
-
+        
+        [Authorize(Policy = "OnlyAnonymous")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ExportModelState]
@@ -61,50 +63,71 @@ namespace ZTourist.Areas.Company.Controllers
             return RedirectToAction(nameof(Login), new { returnUrl = login.ReturnUrl });
         }
         
+        [Authorize(Policy = "OnlyAnonymous")]
         public IActionResult GoogleLogin(string returnUrl)
         {
-            string redirectUrl = Url.Action("GoogleResponse", "Account",
-            new { ReturnUrl = returnUrl });
-            var properties = signInManager
-            .ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            string redirectUrl = Url.Action("ExternalResponse", "Account", new { ReturnUrl = returnUrl });
+            var properties = signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
             return new ChallengeResult("Google", properties);
         }
+        
+        [Authorize(Policy = "OnlyAnonymous")]
+        public IActionResult FaceBookLogin(string returnUrl)
+        {
+            string redirectUrl = Url.Action("ExternalResponse", "Account", new { ReturnUrl = returnUrl });
+            var properties = signInManager.ConfigureExternalAuthenticationProperties("FaceBook", redirectUrl);
+            return new ChallengeResult("FaceBook", properties);
+        }
 
-        public async Task<IActionResult> GoogleResponse(string returnUrl = "/")
+        [Authorize(Policy = "OnlyAnonymous")]
+        [ExportModelState]
+        public async Task<IActionResult> ExternalResponse(string returnUrl = "/company")
         {
             ExternalLoginInfo info = await signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
+            if (info == null) // if external login info is not available then redirect to login
             {
                 return RedirectToAction(nameof(Login));
             }
-            var result = await signInManager.ExternalLoginSignInAsync(
-            info.LoginProvider, info.ProviderKey, false);
-            if (result.Succeeded)
+            // if external login info is available
+            string email = info.Principal.FindFirst(ClaimTypes.Email).Value;
+            AppUser user = await userManager.FindByEmailAsync(email);
+            if (user != null) // if there is a user with this email
             {
-                return Redirect(returnUrl);
-            }
-            else
-            {
-                AppUser user = new AppUser
+                if (await userManager.IsInRoleAsync(user, "Admin") || await userManager.IsInRoleAsync(user, "Guide")) // if user is admin or guide
                 {
-                    Email = info.Principal.FindFirst(ClaimTypes.Email).Value,
-                    UserName = info.Principal.FindFirst(ClaimTypes.Email).Value
-                };
-                IdentityResult identResult = await userManager.CreateAsync(user);
-                if (identResult.Succeeded)
-                {
-                    identResult = await userManager.AddLoginAsync(user, info);
-                    if (identResult.Succeeded)
+                    if (await userManager.IsLockedOutAsync(user)) // if user is locked, then redirect to login and display message
                     {
-                        await signInManager.SignInAsync(user, false);
+                        ModelState.AddModelError("", "Your account has been locked");
+                        return RedirectToAction(nameof(Login), new { returnUrl });
+                    }
+
+                    var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
+                    if (result.Succeeded) // if login successfully
+                    {
                         return Redirect(returnUrl);
                     }
+                    else // if login with external login failed
+                    {
+                        IdentityResult identityResult = await userManager.AddLoginAsync(user, info); // add external login to that user
+                        if (identityResult.Succeeded)
+                        {
+                            await signInManager.SignInAsync(user, false);
+                            return Redirect(returnUrl);
+                        }
+                        else // if add external login failed then redirect to login with message
+                        {
+                            ModelState.AddModelError("", "Error occurs! Try again later");
+                        }
+                        return RedirectToAction(nameof(Login), new { returnUrl });
+                    }
                 }
-                return AccessDenied();
             }
+            // if user is not found or is not admin/guide, then redirect to login with invalid message
+            ModelState.AddModelError("", "Invalid User or Password");
+            return RedirectToAction(nameof(Login), new { returnUrl });
         }
 
-        [Authorize]
+        [Authorize(Policy = "Employee")]
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();

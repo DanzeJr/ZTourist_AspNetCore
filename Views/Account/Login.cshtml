@@ -56,4 +56,13 @@
         @await Html.PartialAsync("SignUpPartial", Model)
         @await Html.PartialAsync("LoginPartial", Model)
     </div><!-- tab-content -->
+    <div class="tg-shareor"><span>or</span></div>
+    <div class="tg-signupwith" style="margin-bottom: 5%">
+        <h2 style="color: white">Sign in With...</h2>
+        <ul class="tg-sharesocialicon">
+            <li class="tg-facebook"><a asp-controller="Account" asp-action="FacebookLogin" asp-route-returnUrl="@(ViewBag.returnUrl)"><i class="icon-facebook-1"></i><span>Facebook</span></a></li>
+            @*<li class="tg-twitter"><a asp-controller="Account" asp-action="TwitterLogin"><i class="icon-twitter-1"></i><span>Twitter</span></a></li>*@
+            <li class="tg-googleplus"><a asp-controller="Account" asp-action="GoogleLogin" asp-route-returnUrl="@(ViewBag.returnUrl)"><i class="icon-google4"></i><span>Google</span></a></li>
+        </ul>
+    </div>
 </div>

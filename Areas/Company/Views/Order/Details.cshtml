@@ -1,7 +1,7 @@
 ﻿@model Order
 
 @{
-    ViewData["Title"] = "Order Result";
+    ViewData["Title"] = "Order Details";
 }
 
 @section Slider {
@@ -13,8 +13,8 @@
             <div class="container">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-                        <h2>Order Result</h2>
-                        <h2>Place order successfully</h2>
+                        <h2>Order Details</h2>
+                        <h2>Status: @Model.Status</h2>
                     </div>
                 </div>
             </div>
@@ -30,7 +30,8 @@
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
                 <div id="tg-content" class="tg-content">
                     <div class="tg-billingdetail">
-                        <form class="tg-formtheme tg-formbillingdetail">
+                        <form class="tg-formtheme tg-formbillingdetail" asp-area="Company" asp-controller="Order" asp-action="Accept" method="post">
+                            <input type="hidden" asp-for="Id" />
                             <fieldset>
                                 <div class="tg-bookingdetail">
                                     <div class="tg-box">
@@ -85,20 +86,9 @@
                                 </div>
                             </fieldset>
                             <fieldset class="tg-paymentarea">
-                                <div class="tg-heading">
-                                    <h3>Bank Transfer Information</h3>
+                                <div style="text-align: center">
+                                    <button style="font-weight: bold; margin-top: 2%" class="tg-btn" type="submit"><span>Update</span></button>
                                 </div>
-                                <p>
-                                    Account holder: ZTourist Travel Service
-                                    <br />
-                                    Account number: 0071370087213
-                                    <br />
-                                    Bank in Vietnam: Vietcombank
-                                    <br />
-                                    Swift code: BFTVVNVX
-                                    <br />
-                                    Transfer content: @Model.Id - <span style="text-transform: capitalize">@Model.Customer.FirstName @Model.Customer.LastName</span>
-                                </p>
                             </fieldset>
                         </form>
                     </div>

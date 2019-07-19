@@ -30,17 +30,13 @@ namespace ZTourist
                 options.LowercaseUrls = true;
             });
 
-            services.AddAuthentication()
-                .AddCookie("COMPANY", opts =>
-                {
-                    opts.LoginPath = "/company/account/login";
-                    opts.LogoutPath = "/company/account/logout";
-                    opts.AccessDeniedPath = "/company/account/accessdenied";
-                });
-
             services.AddTransient<IAuthorizationHandler, NotRolesHandler>();
             services.AddAuthorization(opts =>
             {
+                opts.AddPolicy("OnlyAnonymous", policy =>
+                {
+                    policy.AddRequirements(new NotRolesRequirement("Customer", "Admin", "Guide"));
+                });
                 opts.AddPolicy("NotCustomer", policy =>
                 {
                     policy.AddRequirements(new NotRolesRequirement("Customer"));
@@ -67,7 +63,6 @@ namespace ZTourist
                     policy.AddAuthenticationSchemes("Identity.Application", "COMPANY");
                 });
             });
-
             services.AddDbContext<AppIdentityDbContext>(opts =>
                 opts.UseSqlServer(Configuration["Data:ZTouristDB:ConnectionString"])
             );
@@ -78,6 +73,22 @@ namespace ZTourist
                 })
                 .AddEntityFrameworkStores<AppIdentityDbContext>()
                 .AddDefaultTokenProviders();
+            services.AddAuthentication()
+                .AddCookie("COMPANY", opts =>
+                {
+                    opts.LoginPath = "/company/account/login";
+                    opts.LogoutPath = "/company/account/logout";
+                    opts.AccessDeniedPath = "/company/account/accessdenied";
+                })
+                .AddGoogle(opts => {
+                    opts.ClientId = Configuration["google:client_id"];
+                    opts.ClientSecret = Configuration["google:client_secret"];
+                })
+                .AddFacebook(opts => {
+                    opts.AppId = Configuration["facebook:app_id"];
+                    opts.AppSecret = Configuration["facebook:app_secret"];
+                });
+
             services.Configure<SecurityStampValidatorOptions>(options => {
                 options.ValidationInterval = TimeSpan.FromSeconds(0);
             });

@@ -92,6 +92,7 @@ namespace ZTourist.Models
 
         #endregion
 
+
         #region TourDAL
 
         public async Task<bool> IsExistedTourIdAsync(string id)
@@ -1621,6 +1622,30 @@ namespace ZTourist.Models
                             }
                         }
                     }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return result;
+        }
+
+        public async Task<bool> UpdateOrderStatusById(string id, string status)
+        {
+            bool result = false;
+
+            try
+            {
+                using (SqlConnection cnn = new SqlConnection(connectionStr))
+                {
+                    SqlCommand cmd = new SqlCommand("spUpdateOrderStatusById", cnn);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Id", id);
+                    cmd.Parameters.AddWithValue("@Status", status);
+                    if (cnn.State == ConnectionState.Closed)
+                        cnn.Open();
+                    result = await cmd.ExecuteNonQueryAsync() > 0;
                 }
             }
             catch (Exception)

@@ -24,6 +24,7 @@ namespace ZTourist.Controllers
             this.signInManager = signInManager;
         }
 
+        [Authorize(Policy = "OnlyAnonymous")]
         [ImportModelState]
         public IActionResult Login(string returnUrl)
         {
@@ -32,6 +33,8 @@ namespace ZTourist.Controllers
             return View();
         }
 
+
+        [Authorize(Policy = "OnlyAnonymous")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ExportModelState]
@@ -62,14 +65,17 @@ namespace ZTourist.Controllers
             return RedirectToAction(nameof(Login), new { returnUrl = login.ReturnUrl });
         }
 
+        [Authorize(Policy = "OnlyAnonymous")]
         [ImportModelState]
         public IActionResult SignUp(LoginSignUpModel model)
         {
-            ViewBag.returnUrl = model?.SignUpModel?.ReturnUrl;
+            ViewBag.returnUrl = model?.SignUpModel?.ReturnUrl ?? HttpContext.Request.Query["returnUrl"];
+            ViewBag.email = HttpContext.Request.Query["email"];
             ViewBag.Title = "Registration";
             return View("Login", model);
         }
 
+        [Authorize(Policy = "OnlyAnonymous")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ExportModelState]
@@ -119,53 +125,74 @@ namespace ZTourist.Controllers
                     ModelState.AddModelError("", error.Description);
                 }
             }
-            return RedirectToAction(nameof(SignUp), new LoginSignUpModel { SignUpModel = new SignUpModel { ReturnUrl = signUp.ReturnUrl } });
+            return RedirectToAction(nameof(SignUp), new { SignUpModel = new SignUpModel { ReturnUrl = signUp.ReturnUrl } });
         }
 
+        [Authorize(Policy = "OnlyAnonymous")]
         public IActionResult GoogleLogin(string returnUrl)
         {
-            string redirectUrl = Url.Action("GoogleResponse", "Account",
-            new { ReturnUrl = returnUrl });
-            var properties = signInManager
-            .ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            string redirectUrl = Url.Action("ExternalResponse", "Account", new { returnUrl });
+            var properties = signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
             return new ChallengeResult("Google", properties);
         }
 
-        public async Task<IActionResult> GoogleResponse(string returnUrl = "/")
+        [Authorize(Policy = "OnlyAnonymous")]
+        public IActionResult FacebookLogin(string returnUrl)
+        {
+            string redirectUrl = Url.Action("ExternalResponse", "Account", new { returnUrl });
+            var properties = signInManager.ConfigureExternalAuthenticationProperties("Facebook", redirectUrl);
+            return new ChallengeResult("Facebook", properties);
+        }
+
+        [Authorize(Policy = "OnlyAnonymous")]
+        [ExportModelState]
+        public async Task<IActionResult> ExternalResponse(string returnUrl = "/")
         {
             ExternalLoginInfo info = await signInManager.GetExternalLoginInfoAsync();
-            if (info == null)
+            if (info == null) // if external login info is not available then redirect to login
             {
                 return RedirectToAction(nameof(Login));
             }
-            var result = await signInManager.ExternalLoginSignInAsync(
-            info.LoginProvider, info.ProviderKey, false);
-            if (result.Succeeded)
+            // if external login info is available
+            string email = info.Principal.FindFirst(ClaimTypes.Email).Value;
+            AppUser user = await userManager.FindByEmailAsync(email);
+            if (user != null) // if there is a user with this email
             {
-                return Redirect(returnUrl);
-            }
-            else
-            {
-                AppUser user = new AppUser
+                if (!await userManager.IsInRoleAsync(user, "Customer")) // if user is not customer then redirect to login with invalid message
                 {
-                    Email = info.Principal.FindFirst(ClaimTypes.Email).Value,
-                    UserName = info.Principal.FindFirst(ClaimTypes.Email).Value
-                };
-                IdentityResult identResult = await userManager.CreateAsync(user);
-                if (identResult.Succeeded)
+                    ModelState.AddModelError("", "Invalid User or Password");
+                    return RedirectToAction(nameof(Login), new { returnUrl });
+                }
+                else if (await userManager.IsLockedOutAsync(user)) // if user is locked customer, then redirect to login and display message
                 {
-                    identResult = await userManager.AddLoginAsync(user, info);
-                    if (identResult.Succeeded)
+                    ModelState.AddModelError("", "Your account has been locked");
+                    return RedirectToAction(nameof(Login), new { returnUrl });
+                }
+                var result = await signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false);
+                if (result.Succeeded) // if login successfully
+                {
+                    return Redirect(returnUrl);
+                }
+                else // if login with external login failed
+                {
+                    IdentityResult identityResult = await userManager.AddLoginAsync(user, info); // add external login to that user
+                    if (identityResult.Succeeded)
                     {
                         await signInManager.SignInAsync(user, false);
                         return Redirect(returnUrl);
                     }
+                    else // if add external login failed then redirect to login with message
+                    {
+                        ModelState.AddModelError("", "Error occurs! Try again later");
+                    }
+                    return RedirectToAction(nameof(Login), new { returnUrl });
                 }
-                return AccessDenied();
             }
+            // if email is not belong to any user, then redirect to sign up
+            return RedirectToAction(nameof(SignUp), new { email, returnUrl });
         }
 
-        [Authorize]
+        [Authorize(Policy = "Customer")]
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
