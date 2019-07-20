@@ -568,9 +568,9 @@ namespace ZTourist.Models
                     }
                     cmd.CommandType = CommandType.StoredProcedure;
                     if (!string.IsNullOrEmpty(search.Id))
-                        cmd.Parameters.AddWithValue("@Id", search.Id);
+                        cmd.Parameters.AddWithValue("@Id", $"%{search.Id}%");
                     if (!string.IsNullOrEmpty(search.Name))
-                        cmd.Parameters.AddWithValue("@Name", search.Name);
+                        cmd.Parameters.AddWithValue("@Name", $"%{search.Name}%");
                     if (!string.IsNullOrEmpty(search.Destination))
                         cmd.Parameters.AddWithValue("@DestinationId", search.Destination);
                     if (search.FromDate != null)
@@ -632,9 +632,9 @@ namespace ZTourist.Models
                     cmd.Parameters.AddWithValue("@Skip", search.Skip);
                     cmd.Parameters.AddWithValue("@Fetch", search.Fetch);
                     if (!string.IsNullOrEmpty(search.Id))
-                        cmd.Parameters.AddWithValue("@Id", search.Id);
+                        cmd.Parameters.AddWithValue("@Id", $"%{search.Id}%");
                     if (!string.IsNullOrEmpty(search.Name))
-                        cmd.Parameters.AddWithValue("@Name", search.Name);
+                        cmd.Parameters.AddWithValue("@Name", $"%{search.Name}%");
                     if (!string.IsNullOrEmpty(search.Destination))
                         cmd.Parameters.AddWithValue("@DestinationId", search.Destination);
                     if (search.FromDate != null)
