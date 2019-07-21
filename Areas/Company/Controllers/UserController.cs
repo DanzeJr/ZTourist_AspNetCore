@@ -279,9 +279,12 @@ namespace ZTourist.Areas.Company.Controllers
                         bool notChanged = model.Roles.OrderBy(r => r).SequenceEqual(roles.OrderBy(r => r)); // compare to determine if role has changed
                         if (!notChanged) // if role is change
                         {
-                            if (model.UserName.Equals(User.Identity.Name, StringComparison.OrdinalIgnoreCase) && !model.Roles.Contains("Admin")) // if current user is try to remove role admin from his/her account
+                            if (model.UserName.Equals(User.Identity.Name, StringComparison.OrdinalIgnoreCase)) // if current user is try to remove role admin from his/her account or lock his/her account
                             {
-                                ModelState.AddModelError("", "You are not allowed to remove 'Admin' role from your account");
+                                if (!model.Roles.Contains("Admin"))
+                                    ModelState.AddModelError("", "You are not allowed to remove 'Admin' role from your account");
+                                if (!model.IsLocked)
+                                    ModelState.AddModelError("", "You are not allowed to lock your account");
                             }
                             else if (roles.Contains("Customer") && !model.Roles.Contains("Customer")) //if user is a customer and updating remove customer role from user
                             {
