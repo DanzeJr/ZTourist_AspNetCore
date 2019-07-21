@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using ZTourist.Areas.Company.Models.ViewModels;
+using ZTourist.Infrastructure;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
 
@@ -85,9 +86,10 @@ namespace ZTourist.Areas.Company.Controllers
             {
                 logger.Error(ex.Message);
                 throw;
-            }            
+            }
         }
 
+        [ImportModelState]
         public async Task<IActionResult> Details(string userName)
         {
             try
@@ -108,7 +110,7 @@ namespace ZTourist.Areas.Company.Controllers
             {
                 logger.Error(ex.Message);
                 throw;
-            }            
+            }
         }
 
         public IActionResult Add()
@@ -131,7 +133,7 @@ namespace ZTourist.Areas.Company.Controllers
             {
                 logger.Error(ex.Message);
                 throw;
-            }            
+            }
         }
 
         [HttpPost]
@@ -189,7 +191,7 @@ namespace ZTourist.Areas.Company.Controllers
                                     AddErrorFromResult(result);
                                 }
                                 if (ModelState.IsValid) // if everything is ok
-                                    return RedirectToAction(nameof(Index));
+                                    return RedirectToAction(nameof(Details), new { model.UserName });
                             }
                             else
                             {
@@ -213,7 +215,7 @@ namespace ZTourist.Areas.Company.Controllers
             {
                 logger.Error(ex.Message);
                 throw;
-            }            
+            }
         }
 
         public async Task<IActionResult> Edit(string userName)
@@ -250,7 +252,7 @@ namespace ZTourist.Areas.Company.Controllers
             {
                 logger.Error(ex.Message);
                 throw;
-            }            
+            }
         }
 
         [HttpPost]
@@ -410,7 +412,61 @@ namespace ZTourist.Areas.Company.Controllers
                 logger.Error(ex.Message);
                 throw;
             }
-            
+
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ExportModelState]
+        public async Task<IActionResult> Delete(UserViewModel model)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(model?.Profile?.UserName))
+                {
+                    return NotFound();
+                }
+                AppUser user = await userManager.FindByNameAsync(model.Profile.UserName);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                if (user.UserName.Equals(User.Identity.Name, StringComparison.OrdinalIgnoreCase))
+                {
+                    ModelState.AddModelError("", "Not allowed to delete your acccount by yourself");
+                }
+                else
+                {
+                    IEnumerable<string> roles = await userManager.GetRolesAsync(user);
+                    if (roles.Contains("Customer"))
+                    {
+                        ModelState.AddModelError("", "Not allowed to delete customer account");
+                    }
+                    if (roles.Contains("Guide"))
+                    {
+                        IEnumerable<string> tours = await tourDAL.FindToursByUserIdAsync(user.Id);
+                        if (tours != null) // if guide is used in any tours then it can't be remove
+                            ModelState.AddModelError("", $"Can't delete this account. This guide is used in tours: {string.Join(", ", tours)}");
+                        else
+                        {
+                            IdentityResult result = await userManager.DeleteAsync(user);
+                            if (result.Succeeded)
+                            {
+                                return RedirectToAction(nameof(Index));
+                            }
+                            AddErrorFromResult(result);
+                        }
+                    }
+
+                }
+
+                return RedirectToAction(nameof(Details), new { model.Profile.UserName });
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+                throw;
+            }
         }
 
         [NonAction]

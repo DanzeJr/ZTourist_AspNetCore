@@ -110,8 +110,11 @@
                 </div>
             </div>
         </div>
-            <a style="font-weight: bold; margin-bottom: 5%" class="tg-btn" asp-area="Company" asp-controller="User" asp-action="Edit" asp-route-UserName="@Model.Profile.UserName"><span>Edit</span></a>
+        <a style="font-weight: bold; margin-bottom: 5%" class="tg-btn" asp-area="Company" asp-controller="User" asp-action="Edit" asp-route-UserName="@Model.Profile.UserName"><span>Edit</span></a>
+        @if (!Model.Roles.Contains("Customer") && !Model.Profile.UserName.Equals(User.Identity.Name, StringComparison.OrdinalIgnoreCase))
+        {
             <button id="btnDelete" style="background-color: #d9534f; font-weight: bold; margin-bottom: 5%" class="tg-btn" type="submit"><span>Delete</span></button>
+        }
     </form>
 </div>
 
