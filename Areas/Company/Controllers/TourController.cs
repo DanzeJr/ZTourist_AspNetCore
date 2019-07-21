@@ -255,7 +255,7 @@ namespace ZTourist.Areas.Company.Controllers
                         tour.Image = img;
                         if (await tourDAL.AddTourAsync(tour))
                         {
-                            return RedirectToAction(nameof(Index));
+                            return RedirectToAction(nameof(Details), new { tour.Id });
                         }
                         else
                         {

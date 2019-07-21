@@ -125,7 +125,7 @@ namespace ZTourist.Areas.Company.Controllers
                         destination.Image = img;
                         if (await destinationDAL.AddDestinationAsync(destination))
                         {
-                            return RedirectToAction(nameof(Index));
+                            return RedirectToAction(nameof(Details), new { model.Id });
                         }
                         else
                         {
