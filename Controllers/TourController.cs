@@ -4,7 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 using ZTourist.Infrastructure;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
@@ -17,10 +18,11 @@ namespace ZTourist.Controllers
         private readonly TourDAL tourDAL;
         private readonly ILogger logger;
 
-        public TourController(TourDAL tourDAL, ILogger logger)
+        public TourController(TourDAL tourDAL, IConfiguration configuration)
         {
             this.tourDAL = tourDAL;
-            this.logger = logger;
+            this.logger = new LoggerConfiguration()
+                .WriteTo.AzureBlobStorage(configuration["Data:StorageAccount"], Serilog.Events.LogEventLevel.Information, $"logs", "{yyyy}/{MM}/{dd}/log.txt").CreateLogger();
         }
 
         public async Task<IActionResult> Index(int page = 1)
@@ -52,7 +54,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }
             
@@ -90,7 +92,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }
@@ -115,7 +117,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }
             

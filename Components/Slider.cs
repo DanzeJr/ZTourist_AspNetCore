@@ -1,12 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
+using ILogger = Serilog.ILogger;
 
 namespace ZTourist.Components
 {
@@ -16,11 +19,12 @@ namespace ZTourist.Components
         private readonly DestinationDAL destinationDAL;
         private readonly ILogger logger;
 
-        public Slider(TourDAL tourDAL, DestinationDAL destinationDAL, ILogger logger)
+        public Slider(TourDAL tourDAL, DestinationDAL destinationDAL, IConfiguration configuration)
         {
             this.tourDAL = tourDAL;
             this.destinationDAL = destinationDAL;
-            this.logger = logger;
+            this.logger = new LoggerConfiguration()
+                .WriteTo.AzureBlobStorage(configuration["Data:StorageAccount"], Serilog.Events.LogEventLevel.Information, $"logs", "{yyyy}/{MM}/{dd}/log.txt").CreateLogger();
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
@@ -62,7 +66,7 @@ namespace ZTourist.Components
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }

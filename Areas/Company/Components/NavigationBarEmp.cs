@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
+using ILogger = Serilog.ILogger;
 
 namespace ZTourist.Areas.Company.Components
 {
@@ -15,10 +16,11 @@ namespace ZTourist.Areas.Company.Components
         private readonly UserManager<AppUser> userManager;
         private readonly ILogger logger;
 
-        public NavigationBarEmp(UserManager<AppUser> userManager, ILogger logger)
+        public NavigationBarEmp(UserManager<AppUser> userManager, IConfiguration configuration)
         {
             this.userManager = userManager;
-            this.logger = logger;
+            this.logger = new LoggerConfiguration()
+                .WriteTo.AzureBlobStorage(configuration["Data:StorageAccount"], Serilog.Events.LogEventLevel.Information, $"logs", "{yyyy}/{MM}/{dd}/log.txt").CreateLogger();
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
@@ -37,7 +39,7 @@ namespace ZTourist.Areas.Company.Components
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }

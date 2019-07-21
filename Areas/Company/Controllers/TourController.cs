@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 using ZTourist.Infrastructure;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
@@ -23,13 +24,14 @@ namespace ZTourist.Areas.Company.Controllers
         private readonly BlobService blobService;
         private readonly ILogger logger;
 
-        public TourController(TourDAL tourDAL, DestinationDAL destinationDAL, UserManager<AppUser> userManager, BlobService blobService, ILogger logger)
+        public TourController(TourDAL tourDAL, DestinationDAL destinationDAL, UserManager<AppUser> userManager, BlobService blobService, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             this.tourDAL = tourDAL;
             this.destinationDAL = destinationDAL;
             this.userManager = userManager;
             this.blobService = blobService;
-            this.logger = logger;
+            this.logger = new LoggerConfiguration()
+                .WriteTo.AzureBlobStorage(configuration["Data:StorageAccount"], Serilog.Events.LogEventLevel.Information, $"logs", "{yyyy}/{MM}/{dd}/log.txt").CreateLogger();
         }
 
         public async Task<IActionResult> Index(int page = 1)
@@ -61,7 +63,7 @@ namespace ZTourist.Areas.Company.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }
@@ -97,7 +99,7 @@ namespace ZTourist.Areas.Company.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }
@@ -121,7 +123,7 @@ namespace ZTourist.Areas.Company.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }               
@@ -271,7 +273,7 @@ namespace ZTourist.Areas.Company.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }
@@ -324,7 +326,7 @@ namespace ZTourist.Areas.Company.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }
@@ -456,7 +458,7 @@ namespace ZTourist.Areas.Company.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }
@@ -481,7 +483,7 @@ namespace ZTourist.Areas.Company.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }
             
@@ -507,7 +509,7 @@ namespace ZTourist.Areas.Company.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }
@@ -543,7 +545,7 @@ namespace ZTourist.Areas.Company.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }
@@ -563,7 +565,7 @@ namespace ZTourist.Areas.Company.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }

@@ -4,7 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 using ZTourist.Infrastructure;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
@@ -19,12 +20,13 @@ namespace ZTourist.Controllers
         private readonly CouponDAL couponDAL;
         private readonly ILogger logger;
 
-        public CartController(Cart cart, TourDAL tourDAL, CouponDAL couponDAL, ILogger logger)
+        public CartController(Cart cart, TourDAL tourDAL, CouponDAL couponDAL, IConfiguration configuration)
         {
             this.cart = cart;
             this.tourDAL = tourDAL;
             this.couponDAL = couponDAL;
-            this.logger = logger;
+            this.logger = new LoggerConfiguration()
+                .WriteTo.AzureBlobStorage(configuration["Data:StorageAccount"], Serilog.Events.LogEventLevel.Information, $"logs", "{yyyy}/{MM}/{dd}/log.txt").CreateLogger();
         }
 
         [ImportModelState]
@@ -74,7 +76,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }
         }
@@ -128,7 +130,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }
@@ -181,7 +183,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }
@@ -206,7 +208,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }
             
@@ -239,7 +241,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }
             

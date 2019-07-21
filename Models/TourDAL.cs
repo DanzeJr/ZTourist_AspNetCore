@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,10 +15,11 @@ namespace ZTourist.Models
         private readonly string connectionStr;
         private readonly ILogger logger;
 
-        public TourDAL(IConfiguration configuration, ILogger logger)
+        public TourDAL(IConfiguration configuration)
         {
             this.connectionStr = configuration["Data:ZTouristDB:ConnectionString"];
-            this.logger = logger;
+            this.logger = new LoggerConfiguration()
+                .WriteTo.AzureBlobStorage(configuration["Data:StorageAccount"], Serilog.Events.LogEventLevel.Information, $"logs", "{yyyy}/{MM}/{dd}/log.txt").CreateLogger();
         }
 
         #region TourDAL
@@ -840,14 +841,14 @@ namespace ZTourist.Models
                             }
                             catch (Exception ex)
                             {
-                                logger.LogError(ex.Message);
+                                logger.Error(ex.Message);
                                 try
                                 {
                                     transaction.Rollback(); //if an exception is throw, roll back transaction
                                 }
                                 catch (Exception rollbackEx)
                                 {
-                                    logger.LogError(rollbackEx.Message);
+                                    logger.Error(rollbackEx.Message);
                                 }
                             }
                         }
@@ -962,14 +963,14 @@ namespace ZTourist.Models
                             }
                             catch (Exception ex)
                             {
-                                logger.LogError(ex.Message);
+                                logger.Error(ex.Message);
                                 try
                                 {
                                     transaction.Rollback(); //if an exception is throw, roll back transaction
                                 }
                                 catch (Exception rollbackEx)
                                 {
-                                    logger.LogError(rollbackEx.Message);
+                                    logger.Error(rollbackEx.Message);
                                 }
                             }
                         }

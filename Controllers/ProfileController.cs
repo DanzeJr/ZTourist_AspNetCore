@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using ZTourist.Infrastructure;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
@@ -21,12 +21,13 @@ namespace ZTourist.Controllers
         private readonly BlobService blobService;
         private readonly ILogger logger;
 
-        public ProfileController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, BlobService blobService, ILogger logger)
+        public ProfileController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, BlobService blobService, IConfiguration configuration)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.blobService = blobService;
-            this.logger = logger;
+            this.logger = new LoggerConfiguration()
+                .WriteTo.AzureBlobStorage(configuration["Data:StorageAccount"], Serilog.Events.LogEventLevel.Information, $"logs", "{yyyy}/{MM}/{dd}/log.txt").CreateLogger();
         }
 
         public async Task<IActionResult> Index()
@@ -38,7 +39,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }            
         }
@@ -64,7 +65,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }
             
@@ -127,7 +128,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }
             
@@ -168,7 +169,7 @@ namespace ZTourist.Controllers
             }
             catch (Exception ex)
             {
-                logger.LogError(ex.Message);
+                logger.Error(ex.Message);
                 throw;
             }
             

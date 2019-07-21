@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -107,10 +106,11 @@ namespace ZTourist
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            var logger = new LoggerConfiguration().WriteTo.AzureBlobStorage(Configuration["Data:StorageAccount"], Serilog.Events.LogEventLevel.Information, "logs", "{yyyy}/{MM}/{dd}/log.txt").CreateLogger();
-            loggerFactory.AddSerilog(logger);
+            var logger = new LoggerConfiguration()
+                .WriteTo.AzureBlobStorage(Configuration["Data:StorageAccount"], Serilog.Events.LogEventLevel.Information, $"logs", "{yyyy}/{MM}/{dd}/log.txt").CreateLogger();
+            logger.Information("Z Tourist Initializing...");
             if (env.IsDevelopment())
             {
                 app.UseStatusCodePages();
