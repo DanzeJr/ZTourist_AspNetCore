@@ -51,16 +51,16 @@ namespace ZTourist.Controllers
                 {
                     AppUser user = await userManager.FindByNameAsync(login.UserName);
                     if (user != null && await userManager.IsInRoleAsync(user, "Customer"))
-                    {
-                        if (await userManager.IsLockedOutAsync(user))
-                        {
-                            ModelState.AddModelError("", "Your account has been locked");
-                            return RedirectToAction(nameof(Login), new { returnUrl = login.ReturnUrl });
-                        }
+                    {                        
                         await signInManager.SignOutAsync();
                         Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(user, login.Password, false, false);
                         if (result.Succeeded)
                         {
+                            if (await userManager.IsLockedOutAsync(user))
+                            {
+                                ModelState.AddModelError("", "Your account has been locked");
+                                return RedirectToAction(nameof(Login), new { returnUrl = login.ReturnUrl });
+                            }
                             if (!string.IsNullOrEmpty(login.ReturnUrl) && Url.IsLocalUrl(login.ReturnUrl))
                                 return Redirect(login.ReturnUrl);
                             else
