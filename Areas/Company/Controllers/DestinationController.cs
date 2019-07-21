@@ -13,12 +13,12 @@ namespace ZTourist.Areas.Company.Controllers
     [Authorize(Policy = "Employee")]
     public class DestinationController : Controller
     {
-        private readonly TouristDAL touristDAL;
+        private readonly DestinationDAL destinationDAL;
         private readonly BlobService blobService;
 
-        public DestinationController(TouristDAL touristDAL, BlobService blobService)
+        public DestinationController(DestinationDAL destinationDAL, BlobService blobService)
         {
-            this.touristDAL = touristDAL;
+            this.destinationDAL = destinationDAL;
             this.blobService = blobService;
         }
 
@@ -26,7 +26,7 @@ namespace ZTourist.Areas.Company.Controllers
         {
             DestinationSearchViewModel model = new DestinationSearchViewModel { IsActive = isActive };
             model.Skip = (page - 1) * model.Fetch;
-            int total = await touristDAL.GetTotalDestinationsAsync(model.IsActive);
+            int total = await destinationDAL.GetTotalDestinationsAsync(model.IsActive);
             PageInfo pageInfo = new PageInfo
             {
                 TotalItems = total,
@@ -34,7 +34,7 @@ namespace ZTourist.Areas.Company.Controllers
                 PageAction = nameof(Index),
                 CurrentPage = page
             };
-            model.Destinations = await touristDAL.GetAllDestinationsAsync(model.IsActive, model.Skip, model.Fetch);
+            model.Destinations = await destinationDAL.GetAllDestinationsAsync(model.IsActive, model.Skip, model.Fetch);
             model.PageInfo = pageInfo;
             if (isActive == null)
                 ViewBag.Title = "All Destinations";
@@ -50,7 +50,7 @@ namespace ZTourist.Areas.Company.Controllers
         {
             if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
-            Destination destination = await touristDAL.FindDestinationByIdAsync(id);
+            Destination destination = await destinationDAL.FindDestinationByIdAsync(id);
             if (destination == null)
             {
                 return NotFound();
@@ -75,7 +75,7 @@ namespace ZTourist.Areas.Company.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (await touristDAL.IsExistedDestinationIdAsync(model.Id))
+                if (await destinationDAL.IsExistedDestinationIdAsync(model.Id))
                 {
                     ModelState.AddModelError("", $"Destination ID '{model.Id.ToUpper()}' is existed");
                 }
@@ -100,7 +100,7 @@ namespace ZTourist.Areas.Company.Controllers
                 if (img != null)
                 {
                     destination.Image = img;
-                    if (await touristDAL.AddDestinationAsync(destination))
+                    if (await destinationDAL.AddDestinationAsync(destination))
                     {
                         return RedirectToAction(nameof(Index));
                     }
@@ -124,7 +124,7 @@ namespace ZTourist.Areas.Company.Controllers
             {
                 return NotFound();
             }
-            Destination destination = await touristDAL.FindDestinationByIdAsync(id);
+            Destination destination = await destinationDAL.FindDestinationByIdAsync(id);
             if (destination == null)
             {
                 return NotFound();
@@ -148,7 +148,7 @@ namespace ZTourist.Areas.Company.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (!await touristDAL.IsExistedDestinationIdAsync(model.Id))
+                if (!await destinationDAL.IsExistedDestinationIdAsync(model.Id))
                 {
                     return NotFound();
                 }
@@ -171,7 +171,7 @@ namespace ZTourist.Areas.Company.Controllers
                     destination.Image = img;
                     if (destination.IsActive) // if destination is not about to be deactivated
                     {
-                        if (await touristDAL.UpdateDestinationAsync(destination))
+                        if (await destinationDAL.UpdateDestinationAsync(destination))
                         {
                             return RedirectToAction(nameof(Index));
                         }
@@ -182,7 +182,7 @@ namespace ZTourist.Areas.Company.Controllers
                     }
                     else // if user want to deactivate destination then check if destination is used in future tours
                     {
-                        IEnumerable<string> tours = await touristDAL.FindFutureToursByDestinationIdAsync(model.Id);
+                        IEnumerable<string> tours = await destinationDAL.FindFutureToursByDestinationIdAsync(model.Id);
                         if (tours != null)
                         {
                             ModelState.AddModelError("", $"Destination is using in tours: {string.Join(", ", tours)}. Please remove this destination from these tours first");
@@ -204,14 +204,14 @@ namespace ZTourist.Areas.Company.Controllers
         [ExportModelState]
         public async Task<IActionResult> Delete(string id)
         {
-            if (string.IsNullOrWhiteSpace(id) || !await touristDAL.IsExistedDestinationIdAsync(id))
+            if (string.IsNullOrWhiteSpace(id) || !await destinationDAL.IsExistedDestinationIdAsync(id))
             {
                 return NotFound();
             }
-            IEnumerable<string> tours = await touristDAL.GetToursByDestinationIdAsync(id);
+            IEnumerable<string> tours = await destinationDAL.GetToursByDestinationIdAsync(id);
             if (tours == null)
             {
-                if (!await touristDAL.DeleteDestinationByIdAsync(id))
+                if (!await destinationDAL.DeleteDestinationByIdAsync(id))
                 {
                     ModelState.AddModelError("", $"Delete destination failed");
                 }
@@ -231,7 +231,7 @@ namespace ZTourist.Areas.Company.Controllers
         {
             if (!string.IsNullOrWhiteSpace(id))
             {
-                if (await touristDAL.IsExistedDestinationIdAsync(id))
+                if (await destinationDAL.IsExistedDestinationIdAsync(id))
                 {
                     return Json($"Destination ID '{id}' is already existed");
                 }

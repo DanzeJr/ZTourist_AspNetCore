@@ -14,12 +14,14 @@ namespace ZTourist.Controllers
     public class CartController : Controller
     {
         private readonly Cart cart;
-        private readonly TouristDAL touristDAL;
+        private readonly TourDAL tourDAL;
+        private readonly CouponDAL couponDAL;
 
-        public CartController(Cart cart, TouristDAL touristDAL)
+        public CartController(Cart cart, TourDAL tourDAL, CouponDAL couponDAL)
         {
             this.cart = cart;
-            this.touristDAL = touristDAL;
+            this.tourDAL = tourDAL;
+            this.couponDAL = couponDAL;
         }
 
         [ImportModelState]
@@ -28,7 +30,7 @@ namespace ZTourist.Controllers
             CouponCode cp = null;
             if (!string.IsNullOrEmpty(cart.Coupon?.Code)) // check if cart contains coupon code
             {
-                cp = await touristDAL.FindCouponByCodeAsync(cart.Coupon.Code);
+                cp = await couponDAL.FindCouponByCodeAsync(cart.Coupon.Code);
                 if (cp == null) // if coupon code is not found or outdated
                 {
                     ModelState.AddModelError("", "Coupon Code " + cart.Coupon.Code.ToUpper() + " is not existed or out of date");
@@ -43,14 +45,14 @@ namespace ZTourist.Controllers
             {
                 foreach (CartLine cartLine in cart.Lines)
                 {
-                    Tour tour = await touristDAL.FindTourByTourIdAsync(cartLine.Tour.Id); //find tour which is active
+                    Tour tour = await tourDAL.FindTourByTourIdAsync(cartLine.Tour.Id); //find tour which is active
                     if (tour == null || tour.FromDate < DateTime.Now)
                     {
                         ModelState.AddModelError("", "Tour " + cartLine.Tour.Id.ToUpper() + " is not existed or available");
                     } else
                     {
                         cartLine.Tour = tour;
-                        cartLine.Tour.TakenSlot = await touristDAL.GetTakenSlotByTourIdAsync(cartLine.Tour.Id);
+                        cartLine.Tour.TakenSlot = await tourDAL.GetTakenSlotByTourIdAsync(cartLine.Tour.Id);
                         if ((cartLine.AdultTicket + cartLine.KidTicket) > (cartLine.Tour.MaxGuest - cartLine.Tour.TakenSlot))
                         {
                             ModelState.AddModelError("", "Not enough tickets of tour " + cartLine.Tour.Id.ToUpper());
@@ -83,7 +85,7 @@ namespace ZTourist.Controllers
                 {
                     bool isAvailableTour = false;
                     if (!string.IsNullOrWhiteSpace(model.Tour.Id))
-                        isAvailableTour = await touristDAL.IsAvailableTourAsync(model.Tour.Id);
+                        isAvailableTour = await tourDAL.IsAvailableTourAsync(model.Tour.Id);
                     if (!isAvailableTour)
                     {
                         ModelState.AddModelError("", "Tour " + model.Tour.Id.ToUpper() + " is not existed or available");
@@ -91,8 +93,8 @@ namespace ZTourist.Controllers
                     }
                     else
                     {
-                        int takenSlot = await touristDAL.GetTakenSlotByTourIdAsync(model.Tour.Id);
-                        int maxGuest = await touristDAL.GetMaxGuestByTourIdAsync(model.Tour.Id);
+                        int takenSlot = await tourDAL.GetTakenSlotByTourIdAsync(model.Tour.Id);
+                        int maxGuest = await tourDAL.GetMaxGuestByTourIdAsync(model.Tour.Id);
                         CartLine line = cart.Lines.FirstOrDefault(x => x.Tour.Id == model.Tour.Id); // find if tour is in cart
                         int totalTicket = (line?.AdultTicket ?? 0) + (line?.KidTicket ?? 0);
                         if ((totalTicket + model.AdultTicket + model.KidTicket) > (maxGuest - takenSlot))
@@ -132,15 +134,15 @@ namespace ZTourist.Controllers
                 {
                     bool isAvailableTour = false;
                     if (!string.IsNullOrWhiteSpace(model.Tour.Id))
-                        isAvailableTour = await touristDAL.IsAvailableTourAsync(model.Tour.Id);
+                        isAvailableTour = await tourDAL.IsAvailableTourAsync(model.Tour.Id);
                     if (!isAvailableTour)
                     {
                         ModelState.AddModelError("", "Tour " + model.Tour.Id.ToUpper() + " is not existed or available");
                     }
                     else
                     {
-                        int takenSlot = await touristDAL.GetTakenSlotByTourIdAsync(model.Tour.Id);
-                        int maxGuest = await touristDAL.GetMaxGuestByTourIdAsync(model.Tour.Id);
+                        int takenSlot = await tourDAL.GetTakenSlotByTourIdAsync(model.Tour.Id);
+                        int maxGuest = await tourDAL.GetMaxGuestByTourIdAsync(model.Tour.Id);
                         if ((model.AdultTicket + model.KidTicket) > (maxGuest - takenSlot))
                         {
                             ModelState.AddModelError("", "Not enough tickets");
@@ -182,7 +184,7 @@ namespace ZTourist.Controllers
             }
             else
             {
-                CouponCode cp = await touristDAL.FindCouponByCodeAsync(couponCode);
+                CouponCode cp = await couponDAL.FindCouponByCodeAsync(couponCode);
                 if (cp == null) // if coupon code is not found or outdated
                 {
                     ModelState.AddModelError("", "Coupon Code " + couponCode.ToUpper() + " is not existed or out of date");

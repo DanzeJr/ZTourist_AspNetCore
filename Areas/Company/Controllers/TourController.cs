@@ -16,13 +16,15 @@ namespace ZTourist.Areas.Company.Controllers
     [Authorize(Policy = "Employee")]
     public class TourController : Controller
     {
-        private readonly TouristDAL touristDAL;
+        private readonly TourDAL tourDAL;
+        private readonly DestinationDAL destinationDAL;
         private readonly UserManager<AppUser> userManager;
         private readonly BlobService blobService;
 
-        public TourController(TouristDAL touristDAL, UserManager<AppUser> userManager, BlobService blobService)
+        public TourController(TourDAL tourDAL, DestinationDAL destinationDAL, UserManager<AppUser> userManager, BlobService blobService)
         {
-            this.touristDAL = touristDAL;
+            this.tourDAL = tourDAL;
+            this.destinationDAL = destinationDAL;
             this.userManager = userManager;
             this.blobService = blobService;
         }
@@ -31,7 +33,7 @@ namespace ZTourist.Areas.Company.Controllers
         {
             TourSearchViewModel model = new TourSearchViewModel { IsActive = true };
             model.Skip = (page - 1) * model.Fetch;
-            int total = await touristDAL.GetTotalToursAsync();
+            int total = await tourDAL.GetTotalToursAsync();
             PageInfo pageInfo = new PageInfo
             {
                 TotalItems = total,
@@ -39,12 +41,12 @@ namespace ZTourist.Areas.Company.Controllers
                 PageAction = nameof(Index),
                 CurrentPage = page
             };
-            IEnumerable<Tour> tours = await touristDAL.GetAllToursAsync(model.Skip, model.Fetch);
+            IEnumerable<Tour> tours = await tourDAL.GetAllToursAsync(model.Skip, model.Fetch);
             if (tours != null)
             {
                 foreach (Tour tour in tours)
                 {
-                    tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(tour.Id);
+                    tour.Destinations = await tourDAL.FindDestinationsByTourIdAsync(tour.Id);
                 }
                 model.Tours = tours;
             }
@@ -59,7 +61,7 @@ namespace ZTourist.Areas.Company.Controllers
                 model = new TourSearchViewModel();
             model.InitSearchValues();
             model.Skip = (page - 1) * model.Fetch;
-            int total = await touristDAL.GetTotalSearchToursAsync(model);
+            int total = await tourDAL.GetTotalSearchToursAsync(model);
             PageInfo pageInfo = new PageInfo
             {
                 TotalItems = total,
@@ -67,12 +69,12 @@ namespace ZTourist.Areas.Company.Controllers
                 PageAction = nameof(Search),
                 CurrentPage = page
             };
-            IEnumerable<Tour> tours = await touristDAL.SearchToursAsync(model);
+            IEnumerable<Tour> tours = await tourDAL.SearchToursAsync(model);
             if (tours != null)
             {
                 foreach (Tour tour in tours)
                 {
-                    tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(tour.Id);
+                    tour.Destinations = await tourDAL.FindDestinationsByTourIdAsync(tour.Id);
                 }
                 model.Tours = tours;
             }
@@ -86,14 +88,14 @@ namespace ZTourist.Areas.Company.Controllers
         {
             if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
-            Tour tour = await touristDAL.FindTourByTourIdEmpAsync(id);
+            Tour tour = await tourDAL.FindTourByTourIdEmpAsync(id);
             if (tour == null)
             {
                 return NotFound();
             }
-            tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(id);
-            tour.Guides = await touristDAL.FindGuidesByTourIdAsync(id);
-            tour.TakenSlot = await touristDAL.GetTakenSlotByTourIdAsync(id);
+            tour.Destinations = await tourDAL.FindDestinationsByTourIdAsync(id);
+            tour.Guides = await tourDAL.FindGuidesByTourIdAsync(id);
+            tour.TakenSlot = await tourDAL.GetTakenSlotByTourIdAsync(id);
             return View(tour);
         }               
 
@@ -116,7 +118,7 @@ namespace ZTourist.Areas.Company.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (await touristDAL.IsExistedTourIdAsync(model.Id))
+                if (await tourDAL.IsExistedTourIdAsync(model.Id))
                 {
                     ModelState.AddModelError("", $"Tour ID '{model.Id.ToUpper()}' is existed");
                 }
@@ -140,7 +142,7 @@ namespace ZTourist.Areas.Company.Controllers
                 {
                     ModelState.AddModelError("", "End Date must be greater than Start Date");
                 }
-                if (!await touristDAL.IsAvailableDestinationAsync(model.Departure))
+                if (!await destinationDAL.IsAvailableDestinationAsync(model.Departure))
                 {
                     ModelState.AddModelError("", $"The departure '{model.Departure.ToUpper()}' is not existed or available");
                 }
@@ -151,7 +153,7 @@ namespace ZTourist.Areas.Company.Controllers
                     {
                         duplicated = true;
                     }
-                    if (!await touristDAL.IsAvailableDestinationAsync(id))
+                    if (!await destinationDAL.IsAvailableDestinationAsync(id))
                     {
                         ModelState.AddModelError("", $"Destination '{id.ToUpper()}' is not existed or available");
                     }
@@ -212,7 +214,7 @@ namespace ZTourist.Areas.Company.Controllers
                 if (img != null)
                 {
                     tour.Image = img;
-                    if (await touristDAL.AddTourAsync(tour))
+                    if (await tourDAL.AddTourAsync(tour))
                     {
                         return RedirectToAction(nameof(Index));
                     }
@@ -238,7 +240,7 @@ namespace ZTourist.Areas.Company.Controllers
             {
                 return NotFound();
             }
-            Tour tour = await touristDAL.FindTourByTourIdEmpAsync(id);
+            Tour tour = await tourDAL.FindTourByTourIdEmpAsync(id);
             if (tour == null)
             {
                 return NotFound();
@@ -259,8 +261,8 @@ namespace ZTourist.Areas.Company.Controllers
             };
 
             // get related destinations and guides
-            IEnumerable<Destination> destinations = await touristDAL.FindDestinationsByTourIdAsync(id);
-            IEnumerable<AppUser> guides = await touristDAL.FindGuidesByTourIdAsync(id);
+            IEnumerable<Destination> destinations = await tourDAL.FindDestinationsByTourIdAsync(id);
+            IEnumerable<AppUser> guides = await tourDAL.FindGuidesByTourIdAsync(id);
             if (destinations != null)
             {
                 model.Destinations = destinations.Select(d => d.Id).ToList<string>();
@@ -283,7 +285,7 @@ namespace ZTourist.Areas.Company.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (!await touristDAL.IsExistedTourIdAsync(model.Id))
+                if (!await tourDAL.IsExistedTourIdAsync(model.Id))
                 {
                     return NotFound();
                 }
@@ -307,7 +309,7 @@ namespace ZTourist.Areas.Company.Controllers
                 {
                     ModelState.AddModelError("", "End Date must be greater than Start Date");
                 }
-                if (!await touristDAL.IsAvailableDestinationAsync(model.Departure))
+                if (!await destinationDAL.IsAvailableDestinationAsync(model.Departure))
                 {
                     ModelState.AddModelError("", $"Departure '{model.Departure.ToUpper()}' is not existed or available");
                 }
@@ -318,7 +320,7 @@ namespace ZTourist.Areas.Company.Controllers
                     {
                         duplicated = true;
                     }
-                    if (!await touristDAL.IsAvailableDestinationAsync(id))
+                    if (!await destinationDAL.IsAvailableDestinationAsync(id))
                     {
                         ModelState.AddModelError("", $"Destination '{id.ToUpper()}' is not existed or available");
                     }
@@ -381,7 +383,7 @@ namespace ZTourist.Areas.Company.Controllers
                 if (img != null)
                 {
                     tour.Image = img;
-                    if (await touristDAL.UpdateTourAsync(tour))
+                    if (await tourDAL.UpdateTourAsync(tour))
                     {
                         return RedirectToAction(nameof(Index));
                     }
@@ -406,11 +408,11 @@ namespace ZTourist.Areas.Company.Controllers
         [ExportModelState]
         public async Task<IActionResult> Activate(string id)
         {
-            if (string.IsNullOrWhiteSpace(id) || !await touristDAL.IsExistedTourIdAsync(id))
+            if (string.IsNullOrWhiteSpace(id) || !await tourDAL.IsExistedTourIdAsync(id))
             {
                 return NotFound();
             }
-            if (!await touristDAL.UpdateStatusTourByIdAsync(id, true))
+            if (!await tourDAL.UpdateStatusTourByIdAsync(id, true))
             {
                 ModelState.AddModelError("", "Activate tour failed");
             }
@@ -423,11 +425,11 @@ namespace ZTourist.Areas.Company.Controllers
         [ExportModelState]
         public async Task<IActionResult> Deactivate(string id)
         {
-            if (string.IsNullOrWhiteSpace(id) || !await touristDAL.IsExistedTourIdAsync(id))
+            if (string.IsNullOrWhiteSpace(id) || !await tourDAL.IsExistedTourIdAsync(id))
             {
                 return NotFound();
             }
-            if (!await touristDAL.UpdateStatusTourByIdAsync(id, false))
+            if (!await tourDAL.UpdateStatusTourByIdAsync(id, false))
             {
                 ModelState.AddModelError("", "Deactivate tour failed");
             }
@@ -440,13 +442,13 @@ namespace ZTourist.Areas.Company.Controllers
         [ExportModelState]
         public async Task<IActionResult> Delete(string id)
         {
-            if (string.IsNullOrWhiteSpace(id) || !await touristDAL.IsExistedTourIdAsync(id))
+            if (string.IsNullOrWhiteSpace(id) || !await tourDAL.IsExistedTourIdAsync(id))
             {
                 return NotFound();
             }
-            if (!await touristDAL.HasOrderByTourIdAsync(id))
+            if (!await tourDAL.HasOrderByTourIdAsync(id))
             {
-                if (!await touristDAL.DeleteTourByIdAsync(id))
+                if (!await tourDAL.DeleteTourByIdAsync(id))
                 {
                     ModelState.AddModelError("", "Delete tour failed");
                 }
@@ -466,7 +468,7 @@ namespace ZTourist.Areas.Company.Controllers
         {
             if (!string.IsNullOrWhiteSpace(id))
             {
-                if (await touristDAL.IsExistedTourIdAsync(id))
+                if (await tourDAL.IsExistedTourIdAsync(id))
                 {
                     return Json($"Tour ID '{id}' is already existed");
                 }
@@ -477,7 +479,7 @@ namespace ZTourist.Areas.Company.Controllers
         [NonAction]
         private async Task<SelectList> InitDestinationItemsAsync()
         {
-            Dictionary<string, string> destinationItems = await touristDAL.GetDestinationsIdNameAsync();
+            Dictionary<string, string> destinationItems = await destinationDAL.GetDestinationsIdNameAsync();
             return destinationItems == null ? null : new SelectList(destinationItems, "Key", "Value");
         }
 

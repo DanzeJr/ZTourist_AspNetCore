@@ -13,18 +13,18 @@ namespace ZTourist.Controllers
     [Authorize(Policy = "NotEmployee")]
     public class TourController : Controller
     {
-        private readonly TouristDAL touristDAL;
+        private readonly TourDAL tourDAL;
 
-        public TourController(TouristDAL touristDAL)
+        public TourController(TourDAL tourDAL)
         {
-            this.touristDAL = touristDAL;
+            this.tourDAL = tourDAL;
         }
 
         public async Task<IActionResult> Index(int page = 1)
         {
             TourSearchViewModel model = new TourSearchViewModel { IsActive = true };
             model.Skip = (page - 1) * model.Fetch;
-            int total = await touristDAL.GetTotalToursAsync();
+            int total = await tourDAL.GetTotalToursAsync();
             PageInfo pageInfo = new PageInfo
             {
                 TotalItems = total,
@@ -32,12 +32,12 @@ namespace ZTourist.Controllers
                 PageAction = nameof(Index),
                 CurrentPage = page
             };
-            IEnumerable<Tour> tours = await touristDAL.GetAllToursAsync(model.Skip, model.Fetch);
+            IEnumerable<Tour> tours = await tourDAL.GetAllToursAsync(model.Skip, model.Fetch);
             if (tours != null)
             {
                 foreach (Tour tour in tours)
                 {
-                    tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(tour.Id);
+                    tour.Destinations = await tourDAL.FindDestinationsByTourIdAsync(tour.Id);
                 }
                 model.Tours = tours;
             }
@@ -53,7 +53,7 @@ namespace ZTourist.Controllers
             model.InitSearchValues();
             model.IsActive = true; // customer or anomymous user only search active tour
             model.Skip = (page - 1) * model.Fetch;
-            int total = await touristDAL.GetTotalSearchToursAsync(model);
+            int total = await tourDAL.GetTotalSearchToursAsync(model);
             PageInfo pageInfo = new PageInfo
             {
                 TotalItems = total,
@@ -61,12 +61,12 @@ namespace ZTourist.Controllers
                 PageAction = nameof(Search),
                 CurrentPage = page
             };
-            IEnumerable<Tour> tours = await touristDAL.SearchToursAsync(model);
+            IEnumerable<Tour> tours = await tourDAL.SearchToursAsync(model);
             if (tours != null)
             {
                 foreach (Tour tour in tours)
                 {
-                    tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(tour.Id);
+                    tour.Destinations = await tourDAL.FindDestinationsByTourIdAsync(tour.Id);
                 }
                 model.Tours = tours;
             }
@@ -78,15 +78,15 @@ namespace ZTourist.Controllers
         [ImportModelState]
         public async Task<IActionResult> Details(string id)
         {
-            Tour tour = await touristDAL.FindTourByTourIdAsync(id);
+            Tour tour = await tourDAL.FindTourByTourIdAsync(id);
             if (tour == null)
             {
                 return NotFound();
             }
             else
             {
-                tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(id);
-                tour.TakenSlot = await touristDAL.GetTakenSlotByTourIdAsync(id);
+                tour.Destinations = await tourDAL.FindDestinationsByTourIdAsync(id);
+                tour.TakenSlot = await tourDAL.GetTakenSlotByTourIdAsync(id);
             }                
             CartLine model = new CartLine { Tour = tour };
             return View(model);

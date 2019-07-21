@@ -11,26 +11,28 @@ namespace ZTourist.Components
 {
     public class Slider : ViewComponent
     {
-        private readonly TouristDAL touristDAL;
+        private readonly TourDAL tourDAL;
+        private readonly DestinationDAL destinationDAL;
 
-        public Slider(TouristDAL touristDAL)
+        public Slider(TourDAL tourDAL, DestinationDAL destinationDAL)
         {
-            this.touristDAL = touristDAL;
+            this.tourDAL = tourDAL;
+            this.destinationDAL = destinationDAL;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
             TourSearchViewModel model = new TourSearchViewModel();
-            IEnumerable<Tour> tours = await touristDAL.GetNearestToursAsync();
+            IEnumerable<Tour> tours = await tourDAL.GetNearestToursAsync();
             if (tours != null)
             {
                 foreach (Tour tour in tours)
                 {
-                    tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(tour.Id);
+                    tour.Destinations = await tourDAL.FindDestinationsByTourIdAsync(tour.Id);
                 }
                 model.Tours = tours;
             }
-            Dictionary<string, string> destinations = await touristDAL.GetDestinationsIdNameAsync();
+            Dictionary<string, string> destinations = await destinationDAL.GetDestinationsIdNameAsync();
             model.DurationItems = new List<SelectListItem>
             {
                 new SelectListItem { Text = "Below or in 2 Days", Value = "2" },

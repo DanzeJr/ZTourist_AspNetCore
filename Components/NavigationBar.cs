@@ -10,25 +10,25 @@ namespace ZTourist.Components
 {
     public class NavigationBar : ViewComponent
     {
-        private readonly TouristDAL touristDAL;
+        private readonly TourDAL tourDAL;
         private readonly UserManager<AppUser> userManager;
         private readonly Cart cart;
 
-        public NavigationBar(TouristDAL touristDAL, UserManager<AppUser> userManager, Cart cart)
+        public NavigationBar(TourDAL tourDAL, UserManager<AppUser> userManager, Cart cart)
         {
-            this.touristDAL = touristDAL;
+            this.tourDAL = tourDAL;
             this.userManager = userManager;
             this.cart = cart;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            IEnumerable<Tour> popularTours = await touristDAL.GetTrendingToursAsync();
+            IEnumerable<Tour> popularTours = await tourDAL.GetTrendingToursAsync();
             if (popularTours != null)
             {
                 foreach (Tour tour in popularTours)
                 {
-                    tour.Destinations = await touristDAL.FindDestinationsByTourIdAsync(tour.Id);
+                    tour.Destinations = await tourDAL.FindDestinationsByTourIdAsync(tour.Id);
                 }
             }
             AppUser user = User?.Identity?.Name == null ? null : await userManager.FindByNameAsync(User.Identity.Name);
@@ -40,7 +40,7 @@ namespace ZTourist.Components
             {
                 foreach (CartLine cartLine in cart.Lines)
                 {
-                    cartLine.Tour = await touristDAL.FindTourByTourIdAsync(cartLine.Tour.Id);
+                    cartLine.Tour = await tourDAL.FindTourByTourIdAsync(cartLine.Tour.Id);
                 }
             }
             NavigationViewModel model = new NavigationViewModel {

@@ -92,7 +92,10 @@ namespace ZTourist
             services.Configure<SecurityStampValidatorOptions>(options => {
                 options.ValidationInterval = TimeSpan.FromSeconds(0);
             });
-            services.AddTransient<TouristDAL>();
+            services.AddTransient<TourDAL>();
+            services.AddTransient<DestinationDAL>();
+            services.AddTransient<OrderDAL>();
+            services.AddTransient<CouponDAL>();
             services.AddTransient<BlobService>();
             services.AddScoped<Cart>(sp => SessionCart.GetCart(sp));
             services.AddHttpContextAccessor();

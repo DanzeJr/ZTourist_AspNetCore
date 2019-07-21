@@ -10,12 +10,10 @@ namespace ZTourist.Areas.Company.Components
 {
     public class NavigationBarEmp : ViewComponent
     {
-        private readonly TouristDAL touristDAL;
         private readonly UserManager<AppUser> userManager;
 
-        public NavigationBarEmp(TouristDAL touristDAL, UserManager<AppUser> userManager, Cart cart)
+        public NavigationBarEmp(UserManager<AppUser> userManager)
         {
-            this.touristDAL = touristDAL;
             this.userManager = userManager;
         }
 

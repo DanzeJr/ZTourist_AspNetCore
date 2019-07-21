@@ -20,14 +20,14 @@ namespace ZTourist.Areas.Company.Controllers
     {
         private readonly UserManager<AppUser> userManager;
         private readonly RoleManager<IdentityRole> roleManager;
-        private readonly TouristDAL touristDAL;
+        private readonly TourDAL tourDAL;
         private readonly BlobService blobService;
 
-        public UserController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, TouristDAL touristDAL, BlobService blobService)
+        public UserController(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, TourDAL tourDAL, BlobService blobService)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
-            this.touristDAL = touristDAL;
+            this.tourDAL = tourDAL;
             this.blobService = blobService;
         }
 
@@ -243,13 +243,13 @@ namespace ZTourist.Areas.Company.Controllers
                         {
                             if (!model.Roles.Contains("Guide"))  // if updating remove guide role from user
                             {
-                                IEnumerable<string> tours = await touristDAL.FindToursByUserIdAsync(user.Id);
+                                IEnumerable<string> tours = await tourDAL.FindToursByUserIdAsync(user.Id);
                                 if (tours != null) // if guide is used in any tours then it can't be remove
                                     ModelState.AddModelError("", $"Can't remove 'Guide' role. This guide is used in tours: {string.Join(", ", tours)}");
                             }
                             if (model.IsLocked) // if want to lock this guide
                             {
-                                IEnumerable<string> tours = await touristDAL.FindFutureToursByUserIdAsync(user.Id);
+                                IEnumerable<string> tours = await tourDAL.FindFutureToursByUserIdAsync(user.Id);
                                 if (tours != null)
                                     ModelState.AddModelError("", $"Can't lock this user. Remove this guide from the following tours before lock: {string.Join(", ", tours)}");
                             }

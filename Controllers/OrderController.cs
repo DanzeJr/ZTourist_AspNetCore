@@ -17,13 +17,17 @@ namespace ZTourist.Controllers
     {
         private readonly Cart cart;
         private readonly UserManager<AppUser> userManager;
-        private readonly TouristDAL touristDAL;
+        private readonly TourDAL tourDAL; 
+        private readonly OrderDAL orderDAL;
+        private readonly CouponDAL couponDAL;
 
-        public OrderController(Cart cart, UserManager<AppUser> userManager, TouristDAL touristDAL)
+        public OrderController(Cart cart, UserManager<AppUser> userManager, TourDAL tourDAL, OrderDAL orderDAL, CouponDAL couponDAL)
         {
             this.cart = cart;
             this.userManager = userManager;
-            this.touristDAL = touristDAL;
+            this.tourDAL = tourDAL;
+            this.orderDAL = orderDAL;
+            this.couponDAL = couponDAL;
         }
 
         public async Task<IActionResult> Index(int page = 1)
@@ -31,7 +35,7 @@ namespace ZTourist.Controllers
             OrderViewModel model = new OrderViewModel();
             model.Skip = (page - 1) * model.Fetch;
             AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
-            int total = await touristDAL.GetTotalOrdersByUserIdAsync(user.Id);
+            int total = await orderDAL.GetTotalOrdersByUserIdAsync(user.Id);
             PageInfo pageInfo = new PageInfo
             {
                 TotalItems = total,
@@ -39,14 +43,14 @@ namespace ZTourist.Controllers
                 PageAction = nameof(Index),
                 CurrentPage = page
             };
-            model.Orders = await touristDAL.FindOrdersByUserIdAsync(user.Id, model.Skip, model.Fetch);
+            model.Orders = await orderDAL.FindOrdersByUserIdAsync(user.Id, model.Skip, model.Fetch);
             if (model.Orders != null && model.Orders.Count() > 0)
             {
                 foreach (Order order in model.Orders)
                 {
-                    order.Cart.Lines = await touristDAL.GetDetailsByOrderIdAsync(order.Id);
+                    order.Cart.Lines = await orderDAL.GetDetailsByOrderIdAsync(order.Id);
                     if (!string.IsNullOrEmpty(order.Cart.Coupon.Code))
-                        order.Cart.Coupon = await touristDAL.FindCouponByCodeAsync(order.Cart.Coupon.Code, order.OrderDate);
+                        order.Cart.Coupon = await couponDAL.FindCouponByCodeAsync(order.Cart.Coupon.Code, order.OrderDate);
                 }
             }
             model.PageInfo = pageInfo;
@@ -65,7 +69,7 @@ namespace ZTourist.Controllers
             {
                 foreach (CartLine cartLine in cart.Lines) //load and check tours in cart is valid
                 {
-                    Tour tour = await touristDAL.FindTourByTourIdAsync(cartLine.Tour.Id); //find tour which is active
+                    Tour tour = await tourDAL.FindTourByTourIdAsync(cartLine.Tour.Id); //find tour which is active
                     if (tour == null || tour.FromDate < DateTime.Now)
                     {
                         ModelState.AddModelError("", "Tour " + cartLine.Tour.Id.ToUpper() + " is not existed or available");
@@ -73,7 +77,7 @@ namespace ZTourist.Controllers
                     else
                     {
                         cartLine.Tour = tour;
-                        cartLine.Tour.TakenSlot = await touristDAL.GetTakenSlotByTourIdAsync(cartLine.Tour.Id);
+                        cartLine.Tour.TakenSlot = await tourDAL.GetTakenSlotByTourIdAsync(cartLine.Tour.Id);
                         if ((cartLine.AdultTicket + cartLine.KidTicket) > (cartLine.Tour.MaxGuest - cartLine.Tour.TakenSlot))
                         {
                             ModelState.AddModelError("", "Not enough tickets of tour " + cartLine.Tour.Id.ToUpper());
@@ -84,7 +88,7 @@ namespace ZTourist.Controllers
                 AppUser customer = await userManager.FindByNameAsync(User.Identity.Name); //get user infomation
                 if (!string.IsNullOrEmpty(cart.Coupon.Code))
                 {
-                    CouponCode cp = await touristDAL.FindCouponByCodeAsync(cart.Coupon.Code);
+                    CouponCode cp = await couponDAL.FindCouponByCodeAsync(cart.Coupon.Code);
                     if (cp == null)
                     {
                         ModelState.AddModelError("", "Coupon Code " + cart.Coupon.Code.ToUpper() + " is not existed or out of date");
@@ -127,7 +131,7 @@ namespace ZTourist.Controllers
                 {
                     foreach (CartLine cartLine in cart.Lines) //load and check tours in cart is valid
                     {
-                        Tour tour = await touristDAL.FindTourByTourIdAsync(cartLine.Tour.Id); //find tour which is active
+                        Tour tour = await tourDAL.FindTourByTourIdAsync(cartLine.Tour.Id); //find tour which is active
                         if (tour == null || tour.FromDate < DateTime.Now)
                         {
                             ModelState.AddModelError("", "Tour " + cartLine.Tour.Id.ToUpper() + " is not existed or available");
@@ -135,7 +139,7 @@ namespace ZTourist.Controllers
                         else
                         {
                             cartLine.Tour = tour;
-                            cartLine.Tour.TakenSlot = await touristDAL.GetTakenSlotByTourIdAsync(cartLine.Tour.Id);
+                            cartLine.Tour.TakenSlot = await tourDAL.GetTakenSlotByTourIdAsync(cartLine.Tour.Id);
                             if ((cartLine.AdultTicket + cartLine.KidTicket) > (cartLine.Tour.MaxGuest - cartLine.Tour.TakenSlot))
                             {
                                 ModelState.AddModelError("", "Not enough tickets of tour " + cartLine.Tour.Id.ToUpper());
@@ -145,7 +149,7 @@ namespace ZTourist.Controllers
 
                     if (!string.IsNullOrEmpty(cart.Coupon.Code))
                     {
-                        CouponCode cp = await touristDAL.FindCouponByCodeAsync(cart.Coupon.Code);
+                        CouponCode cp = await couponDAL.FindCouponByCodeAsync(cart.Coupon.Code);
                         if (cp == null)
                         {
                             ModelState.AddModelError("", "Coupon Code " + cart.Coupon.Code.ToUpper() + " is not existed or out of date");
@@ -169,7 +173,7 @@ namespace ZTourist.Controllers
                 order.OrderDate = DateTime.Now;
                 order.Customer = await userManager.FindByNameAsync(User.Identity.Name);
                 order.Cart = cart;
-                if (!await touristDAL.AddOrderAsync(order))
+                if (!await orderDAL.AddOrderAsync(order))
                 {
                     ModelState.AddModelError("", "Place order failed! Please recheck your items and infomation or try a moment later");
                 }
@@ -189,15 +193,15 @@ namespace ZTourist.Controllers
             {
                 return NotFound();
             }
-            Order order = await touristDAL.FindOrderByIdAsync(id);
+            Order order = await orderDAL.FindOrderByIdAsync(id);
             if (order == null) // if order is not existed
             {
                 return NotFound();
             }
             order.Customer = await userManager.FindByIdAsync(order.Customer.Id);
-            order.Cart.Lines = await touristDAL.GetDetailsByOrderIdAsync(id);
+            order.Cart.Lines = await orderDAL.GetDetailsByOrderIdAsync(id);
             if (!string.IsNullOrWhiteSpace(order.Cart.Coupon.Code))
-                order.Cart.Coupon = await touristDAL.FindCouponByCodeAsync(order.Cart.Coupon.Code, order.OrderDate);
+                order.Cart.Coupon = await couponDAL.FindCouponByCodeAsync(order.Cart.Coupon.Code, order.OrderDate);
             return View(order);
         }
 
@@ -210,7 +214,7 @@ namespace ZTourist.Controllers
             {
                 return NotFound();
             }
-            Order order = await touristDAL.FindOrderByIdAsync(id);
+            Order order = await orderDAL.FindOrderByIdAsync(id);
             if (order == null) // if order is not existed
             {
                 return NotFound();
@@ -221,7 +225,7 @@ namespace ZTourist.Controllers
             }
             else
             {
-                if (await touristDAL.UpdateOrderStatusById(id, "Cancelled"))
+                if (await orderDAL.UpdateOrderStatusById(id, "Cancelled"))
                     ModelState.AddModelError("", "Error occurs when cancel order. Please try later");
             }            
             return RedirectToAction(nameof(Details), new { id });

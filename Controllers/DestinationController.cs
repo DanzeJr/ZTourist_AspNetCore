@@ -12,18 +12,18 @@ namespace ZTourist.Controllers
     [Authorize(Policy = "NotEmployee")]
     public class DestinationController : Controller
     {
-        private readonly TouristDAL touristDAL;
+        private readonly DestinationDAL destinationDAL;
 
-        public DestinationController(TouristDAL touristDAL)
+        public DestinationController(DestinationDAL destinationDAL)
         {
-            this.touristDAL = touristDAL;
+            this.destinationDAL = destinationDAL;
         }
 
         public async Task<IActionResult> Index(int page = 1)
         {
             DestinationSearchViewModel model = new DestinationSearchViewModel { IsActive = true };
             model.Skip = (page - 1) * model.Fetch;
-            int total = await touristDAL.GetTotalDestinationsAsync(model.IsActive);
+            int total = await destinationDAL.GetTotalDestinationsAsync(model.IsActive);
             PageInfo pageInfo = new PageInfo
             {
                 TotalItems = total,
@@ -31,7 +31,7 @@ namespace ZTourist.Controllers
                 PageAction = nameof(Index),
                 CurrentPage = page
             };
-            model.Destinations = await touristDAL.GetAllDestinationsAsync(model.IsActive, model.Skip, model.Fetch);
+            model.Destinations = await destinationDAL.GetAllDestinationsAsync(model.IsActive, model.Skip, model.Fetch);
             model.PageInfo = pageInfo;
             ViewBag.Title = "All Destinations";
             return View(model);
@@ -41,7 +41,7 @@ namespace ZTourist.Controllers
         {
             if (string.IsNullOrWhiteSpace(id))
                 return NotFound();
-            Destination destination = await touristDAL.FindDestinationByIdAsync(id, true);
+            Destination destination = await destinationDAL.FindDestinationByIdAsync(id, true);
             if (destination == null)
             {
                 return NotFound();
