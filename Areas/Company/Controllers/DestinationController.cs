@@ -212,7 +212,7 @@ namespace ZTourist.Areas.Company.Controllers
                         {
                             if (await destinationDAL.UpdateDestinationAsync(destination))
                             {
-                                return RedirectToAction(nameof(Index));
+                                return RedirectToAction(nameof(Details), new { destination.Id });
                             }
                             else
                             {

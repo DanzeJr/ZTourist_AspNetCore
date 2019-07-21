@@ -440,7 +440,7 @@ namespace ZTourist.Areas.Company.Controllers
                         tour.Image = img;
                         if (await tourDAL.UpdateTourAsync(tour))
                         {
-                            return RedirectToAction(nameof(Index));
+                            return RedirectToAction(nameof(Details), new { tour.Id });
                         }
                         else
                         {
