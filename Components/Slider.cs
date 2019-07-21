@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,34 +14,38 @@ namespace ZTourist.Components
     {
         private readonly TourDAL tourDAL;
         private readonly DestinationDAL destinationDAL;
+        private readonly ILogger logger;
 
-        public Slider(TourDAL tourDAL, DestinationDAL destinationDAL)
+        public Slider(TourDAL tourDAL, DestinationDAL destinationDAL, ILogger logger)
         {
             this.tourDAL = tourDAL;
             this.destinationDAL = destinationDAL;
+            this.logger = logger;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
-            TourSearchViewModel model = new TourSearchViewModel();
-            IEnumerable<Tour> tours = await tourDAL.GetNearestToursAsync();
-            if (tours != null)
+            try
             {
-                foreach (Tour tour in tours)
+                TourSearchViewModel model = new TourSearchViewModel();
+                IEnumerable<Tour> tours = await tourDAL.GetNearestToursAsync();
+                if (tours != null)
                 {
-                    tour.Destinations = await tourDAL.FindDestinationsByTourIdAsync(tour.Id);
+                    foreach (Tour tour in tours)
+                    {
+                        tour.Destinations = await tourDAL.FindDestinationsByTourIdAsync(tour.Id);
+                    }
+                    model.Tours = tours;
                 }
-                model.Tours = tours;
-            }
-            Dictionary<string, string> destinations = await destinationDAL.GetDestinationsIdNameAsync();
-            model.DurationItems = new List<SelectListItem>
+                Dictionary<string, string> destinations = await destinationDAL.GetDestinationsIdNameAsync();
+                model.DurationItems = new List<SelectListItem>
             {
                 new SelectListItem { Text = "Below or in 2 Days", Value = "2" },
                 new SelectListItem { Text = "Below or in 5 Days", Value = "5" },
                 new SelectListItem { Text = "Below or in 1 Week", Value = "7" },
                 new SelectListItem { Text = "More than 1 week", Value = "8" }
             };
-            model.PriceItems = new List<SelectListItem>
+                model.PriceItems = new List<SelectListItem>
             {
                 new SelectListItem { Text = "Below 50$", Value = "1" },
                 new SelectListItem { Text = "50$ - 250$", Value = "2" },
@@ -51,9 +56,15 @@ namespace ZTourist.Components
                 new SelectListItem { Text = "2000$ - 2500$", Value = "7" },
                 new SelectListItem { Text = "Upper 2500$", Value = "8" }
             };
-            if (destinations != null)
-                model.DestinationItems = new SelectList(destinations, "Key", "Value");
-            return View(model);
+                if (destinations != null)
+                    model.DestinationItems = new SelectList(destinations, "Key", "Value");
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                throw;
+            }            
         }
     }
 }

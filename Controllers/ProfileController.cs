@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ZTourist.Infrastructure;
 using ZTourist.Models;
 using ZTourist.Models.ViewModels;
@@ -18,36 +19,55 @@ namespace ZTourist.Controllers
         private readonly UserManager<AppUser> userManager;
         private readonly SignInManager<AppUser> signInManager;
         private readonly BlobService blobService;
+        private readonly ILogger logger;
 
-        public ProfileController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, BlobService blobService)
+        public ProfileController(UserManager<AppUser> userManager, SignInManager<AppUser> signInManager, BlobService blobService, ILogger logger)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.blobService = blobService;
+            this.logger = logger;
         }
 
         public async Task<IActionResult> Index()
         {
-            AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
-            return View(user);
+            try
+            {
+                AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
+                return View(user);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                throw;
+            }            
         }
 
         [ImportModelState]
         public async Task<IActionResult> Edit()
         {
-            AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
-            ProfileModel model = new ProfileModel
+            try
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Address = user.Address,
-                Email = user.Email,
-                BirthDate = user.BirthDate,
-                Gender = user.Gender,
-                Tel = user.PhoneNumber,
-                Avatar = user.Avatar
-            };
-            return View(model);
+                AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
+                ProfileModel model = new ProfileModel
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Address = user.Address,
+                    Email = user.Email,
+                    BirthDate = user.BirthDate,
+                    Gender = user.Gender,
+                    Tel = user.PhoneNumber,
+                    Avatar = user.Avatar
+                };
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                throw;
+            }
+            
         }
 
         [HttpPost]
@@ -55,53 +75,62 @@ namespace ZTourist.Controllers
         [ExportModelState]
         public async Task<IActionResult> Update(ProfileModel profile)
         {
-            if (ModelState.IsValid)
+            try
             {
-                AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
-                bool isSameEmail = user.Email.Equals(profile.Email, StringComparison.OrdinalIgnoreCase);
-                user.FirstName = profile.FirstName;
-                user.LastName = profile.LastName;
-                user.Address = profile.Address;
-                user.Email = profile.Email;
-                user.BirthDate = profile.BirthDate;
-                user.Gender = profile.Gender;
-                user.PhoneNumber = profile.Tel;
-                string avatar;
-                if (profile.Photo != null && !string.IsNullOrWhiteSpace(profile.Photo.FileName)) // if photo is change then copy
+                if (ModelState.IsValid)
                 {
-                    string filePath = user.UserName + "." + profile.Photo.FileName.Substring(profile.Photo.FileName.LastIndexOf(".") + 1);
-                    avatar = await blobService.UploadFile("avatars", filePath, profile.Photo);
-                }
-                else // if not, preserve old one
-                    avatar = user.Avatar;
-                if (avatar != null)
-                {
-                    user.Avatar = avatar;
-                    IdentityResult result = null;
-                    if (!isSameEmail) // remove external login when email changed
+                    AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
+                    bool isSameEmail = user.Email.Equals(profile.Email, StringComparison.OrdinalIgnoreCase);
+                    user.FirstName = profile.FirstName;
+                    user.LastName = profile.LastName;
+                    user.Address = profile.Address;
+                    user.Email = profile.Email;
+                    user.BirthDate = profile.BirthDate;
+                    user.Gender = profile.Gender;
+                    user.PhoneNumber = profile.Tel;
+                    string avatar;
+                    if (profile.Photo != null && !string.IsNullOrWhiteSpace(profile.Photo.FileName)) // if photo is change then copy
                     {
-                        IEnumerable<UserLoginInfo> loginInfos = await userManager.GetLoginsAsync(user);
-                        foreach (UserLoginInfo info in loginInfos)
+                        string filePath = user.UserName + "." + profile.Photo.FileName.Substring(profile.Photo.FileName.LastIndexOf(".") + 1);
+                        avatar = await blobService.UploadFile("avatars", filePath, profile.Photo);
+                    }
+                    else // if not, preserve old one
+                        avatar = user.Avatar;
+                    if (avatar != null)
+                    {
+                        user.Avatar = avatar;
+                        IdentityResult result = null;
+                        if (!isSameEmail) // remove external login when email changed
                         {
-                            result = await userManager.RemoveLoginAsync(user, info.LoginProvider, info.ProviderKey);
+                            IEnumerable<UserLoginInfo> loginInfos = await userManager.GetLoginsAsync(user);
+                            foreach (UserLoginInfo info in loginInfos)
+                            {
+                                result = await userManager.RemoveLoginAsync(user, info.LoginProvider, info.ProviderKey);
+                            }
                         }
-                    }
-                    if (result == null || result.Succeeded)
-                    {
-                        result = await userManager.UpdateAsync(user);
-                        if (result.Succeeded)
+                        if (result == null || result.Succeeded)
                         {
-                            return RedirectToAction(nameof(Index));
-                        }                        
+                            result = await userManager.UpdateAsync(user);
+                            if (result.Succeeded)
+                            {
+                                return RedirectToAction(nameof(Index));
+                            }
+                        }
+                        AddErrorFromResult(result);
                     }
-                    AddErrorFromResult(result);
+                    else
+                    {
+                        ModelState.AddModelError("", "Can't upload avatar");
+                    }
                 }
-                else
-                {
-                    ModelState.AddModelError("", "Can't upload avatar");
-                }
+                return RedirectToAction(nameof(Edit));
             }
-            return RedirectToAction(nameof(Edit));
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                throw;
+            }
+            
         }
 
         [ImportModelState]
@@ -115,25 +144,34 @@ namespace ZTourist.Controllers
         [ExportModelState]
         public async Task<IActionResult> ChangePassword(PasswordModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
-                if (user == null)
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("", "Your username is not found");
-                }
-                else
-                {
-                    IdentityResult result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
-                    if (result.Succeeded)
+                    AppUser user = await userManager.FindByNameAsync(User.Identity.Name);
+                    if (user == null)
                     {
-                        await signInManager.SignInAsync(user, false); //prevent validate security stamp log user out
-                        return RedirectToAction(nameof(Index));
+                        ModelState.AddModelError("", "Your username is not found");
                     }
-                    AddErrorFromResult(result);
+                    else
+                    {
+                        IdentityResult result = await userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+                        if (result.Succeeded)
+                        {
+                            await signInManager.SignInAsync(user, false); //prevent validate security stamp log user out
+                            return RedirectToAction(nameof(Index));
+                        }
+                        AddErrorFromResult(result);
+                    }
                 }
+                return RedirectToAction(nameof(ChangePassword));
             }
-            return RedirectToAction(nameof(ChangePassword));
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                throw;
+            }
+            
         }
 
         [NonAction]

@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using ZTourist.Infrastructure;
 using ZTourist.Models;
@@ -105,8 +107,10 @@ namespace ZTourist
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            var logger = new LoggerConfiguration().WriteTo.AzureBlobStorage(Configuration["Data:StorageAccount"], Serilog.Events.LogEventLevel.Information, "logs", "{yyyy}/{MM}/{dd}/log.txt").CreateLogger();
+            loggerFactory.AddSerilog(logger);
             if (env.IsDevelopment())
             {
                 app.UseStatusCodePages();
@@ -117,7 +121,6 @@ namespace ZTourist
                 app.UseStatusCodePagesWithReExecute("/Error", "?statusCode={0}");
                 app.UseExceptionHandler("/Error");
             }
-
             app.UseStaticFiles();
             app.UseSession();
             app.UseAuthentication();
@@ -158,7 +161,16 @@ namespace ZTourist
                     defaults: new { controller = "Home", action = "Index" }
                     );
             });
-            SeedData.CreateRolesAndAdminAccount(app, Configuration).Wait();
+            try
+            {
+                SeedData.CreateRolesAndAdminAccount(app, Configuration).Wait();
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+                throw;
+            }
+            
         }
     }
 }

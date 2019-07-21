@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -15,47 +16,65 @@ namespace ZTourist.Areas.Company.Controllers
     {
         private readonly DestinationDAL destinationDAL;
         private readonly BlobService blobService;
+        private readonly ILogger logger;
 
-        public DestinationController(DestinationDAL destinationDAL, BlobService blobService)
+        public DestinationController(DestinationDAL destinationDAL, BlobService blobService, ILogger logger)
         {
             this.destinationDAL = destinationDAL;
             this.blobService = blobService;
+            this.logger = logger;
         }
 
         public async Task<IActionResult> Index(bool? isActive, int page = 1)
         {
-            DestinationSearchViewModel model = new DestinationSearchViewModel { IsActive = isActive };
-            model.Skip = (page - 1) * model.Fetch;
-            int total = await destinationDAL.GetTotalDestinationsAsync(model.IsActive);
-            PageInfo pageInfo = new PageInfo
+            try
             {
-                TotalItems = total,
-                ItemPerPage = model.Fetch,
-                PageAction = nameof(Index),
-                CurrentPage = page
-            };
-            model.Destinations = await destinationDAL.GetAllDestinationsAsync(model.IsActive, model.Skip, model.Fetch);
-            model.PageInfo = pageInfo;
-            if (isActive == null)
-                ViewBag.Title = "All Destinations";
-            else if (isActive == true)
-                ViewBag.Title = "Active Destinations";
-            else
-                ViewBag.Title = "Not Active Destinations";
-            return View(model);
+                DestinationSearchViewModel model = new DestinationSearchViewModel { IsActive = isActive };
+                model.Skip = (page - 1) * model.Fetch;
+                int total = await destinationDAL.GetTotalDestinationsAsync(model.IsActive);
+                PageInfo pageInfo = new PageInfo
+                {
+                    TotalItems = total,
+                    ItemPerPage = model.Fetch,
+                    PageAction = nameof(Index),
+                    CurrentPage = page
+                };
+                model.Destinations = await destinationDAL.GetAllDestinationsAsync(model.IsActive, model.Skip, model.Fetch);
+                model.PageInfo = pageInfo;
+                if (isActive == null)
+                    ViewBag.Title = "All Destinations";
+                else if (isActive == true)
+                    ViewBag.Title = "Active Destinations";
+                else
+                    ViewBag.Title = "Not Active Destinations";
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                throw;
+            }            
         }
 
         [ImportModelState]
         public async Task<IActionResult> Details(string id)
         {
-            if (string.IsNullOrWhiteSpace(id))
-                return NotFound();
-            Destination destination = await destinationDAL.FindDestinationByIdAsync(id);
-            if (destination == null)
+            try
             {
-                return NotFound();
+                if (string.IsNullOrWhiteSpace(id))
+                    return NotFound();
+                Destination destination = await destinationDAL.FindDestinationByIdAsync(id);
+                if (destination == null)
+                {
+                    return NotFound();
+                }
+                return View(destination);
             }
-            return View(destination);
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                throw;
+            }            
         }
 
         [Authorize(Policy = "Admin")]
@@ -73,72 +92,88 @@ namespace ZTourist.Areas.Company.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(DestinationViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (await destinationDAL.IsExistedDestinationIdAsync(model.Id))
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("", $"Destination ID '{model.Id.ToUpper()}' is existed");
-                }
-                if (!ModelState.IsValid)
-                {
-                    return View("Add", model);
-                }
-                Destination destination = new Destination
-                {
-                    Id = model.Id.ToUpper(),
-                    Name = model.Name,
-                    Description = model.Description ?? "",
-                    Country = model.Country,
-                    IsActive = model.IsActive
-                };
-                string img = model.Image ?? "https://ztourist.blob.core.windows.net/others/destination.jpg";
-                if (model.Photo != null && !string.IsNullOrWhiteSpace(model.Photo?.FileName)) // if photo is chosen then copy
-                {
-                    string filePath = model.Id + "." + model.Photo.FileName.Substring(model.Photo.FileName.LastIndexOf(".") + 1);
-                    img = await blobService.UploadFile("destinations", filePath, model.Photo);
-                }
-                if (img != null)
-                {
-                    destination.Image = img;
-                    if (await destinationDAL.AddDestinationAsync(destination))
+                    if (await destinationDAL.IsExistedDestinationIdAsync(model.Id))
                     {
-                        return RedirectToAction(nameof(Index));
+                        ModelState.AddModelError("", $"Destination ID '{model.Id.ToUpper()}' is existed");
+                    }
+                    if (!ModelState.IsValid)
+                    {
+                        return View("Add", model);
+                    }
+                    Destination destination = new Destination
+                    {
+                        Id = model.Id.ToUpper(),
+                        Name = model.Name,
+                        Description = model.Description ?? "",
+                        Country = model.Country,
+                        IsActive = model.IsActive
+                    };
+                    string img = model.Image ?? "https://ztourist.blob.core.windows.net/others/destination.jpg";
+                    if (model.Photo != null && !string.IsNullOrWhiteSpace(model.Photo?.FileName)) // if photo is chosen then copy
+                    {
+                        string filePath = model.Id + "." + model.Photo.FileName.Substring(model.Photo.FileName.LastIndexOf(".") + 1);
+                        img = await blobService.UploadFile("destinations", filePath, model.Photo);
+                    }
+                    if (img != null)
+                    {
+                        destination.Image = img;
+                        if (await destinationDAL.AddDestinationAsync(destination))
+                        {
+                            return RedirectToAction(nameof(Index));
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("", "Add destination failed");
+                        }
                     }
                     else
                     {
-                        ModelState.AddModelError("", "Add destination failed");
+                        ModelState.AddModelError("", "Can't upload image");
                     }
                 }
-                else
-                {
-                    ModelState.AddModelError("", "Can't upload image");
-                }
+                return View("Add", model);
             }
-            return View("Add", model);
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                throw;
+            }            
         }
 
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> Edit(string id)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            try
             {
-                return NotFound();
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    return NotFound();
+                }
+                Destination destination = await destinationDAL.FindDestinationByIdAsync(id);
+                if (destination == null)
+                {
+                    return NotFound();
+                }
+                DestinationViewModel model = new DestinationViewModel
+                {
+                    Id = destination.Id,
+                    Name = destination.Name,
+                    Image = destination.Image,
+                    Description = destination.Description ?? "",
+                    Country = destination.Country,
+                    IsActive = destination.IsActive
+                };
+                return View(model);
             }
-            Destination destination = await destinationDAL.FindDestinationByIdAsync(id);
-            if (destination == null)
+            catch (Exception ex)
             {
-                return NotFound();
-            }
-            DestinationViewModel model = new DestinationViewModel
-            {
-                Id = destination.Id,
-                Name = destination.Name,
-                Image = destination.Image,
-                Description = destination.Description ?? "",
-                Country = destination.Country,
-                IsActive = destination.IsActive
-            };
-            return View(model);
+                logger.LogError(ex.Message);
+                throw;
+            }            
         }
 
         [Authorize(Policy = "Admin")]
@@ -146,56 +181,64 @@ namespace ZTourist.Areas.Company.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(DestinationViewModel model)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (!await destinationDAL.IsExistedDestinationIdAsync(model.Id))
+                if (ModelState.IsValid)
                 {
-                    return NotFound();
-                }
-                Destination destination = new Destination
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                    Description = model.Description ?? "",
-                    Country = model.Country,
-                    IsActive = model.IsActive
-                };
-                string img = model.Image ?? "https://ztourist.blob.core.windows.net/others/destination.jpg";
-                if (model.Photo != null && !string.IsNullOrWhiteSpace(model.Photo?.FileName)) // if photo is chosen then copy
-                {
-                    string filePath = model.Id + "." + model.Photo.FileName.Substring(model.Photo.FileName.LastIndexOf(".") + 1);
-                    img = await blobService.UploadFile("destinations", filePath, model.Photo);
-                }
-                if (img != null)
-                {
-                    destination.Image = img;
-                    if (destination.IsActive) // if destination is not about to be deactivated
+                    if (!await destinationDAL.IsExistedDestinationIdAsync(model.Id))
                     {
-                        if (await destinationDAL.UpdateDestinationAsync(destination))
+                        return NotFound();
+                    }
+                    Destination destination = new Destination
+                    {
+                        Id = model.Id,
+                        Name = model.Name,
+                        Description = model.Description ?? "",
+                        Country = model.Country,
+                        IsActive = model.IsActive
+                    };
+                    string img = model.Image ?? "https://ztourist.blob.core.windows.net/others/destination.jpg";
+                    if (model.Photo != null && !string.IsNullOrWhiteSpace(model.Photo?.FileName)) // if photo is chosen then copy
+                    {
+                        string filePath = model.Id + "." + model.Photo.FileName.Substring(model.Photo.FileName.LastIndexOf(".") + 1);
+                        img = await blobService.UploadFile("destinations", filePath, model.Photo);
+                    }
+                    if (img != null)
+                    {
+                        destination.Image = img;
+                        if (destination.IsActive) // if destination is not about to be deactivated
                         {
-                            return RedirectToAction(nameof(Index));
+                            if (await destinationDAL.UpdateDestinationAsync(destination))
+                            {
+                                return RedirectToAction(nameof(Index));
+                            }
+                            else
+                            {
+                                ModelState.AddModelError("", "Update destination failed");
+                            }
                         }
-                        else
+                        else // if user want to deactivate destination then check if destination is used in future tours
                         {
-                            ModelState.AddModelError("", "Update destination failed");
+                            IEnumerable<string> tours = await destinationDAL.FindFutureToursByDestinationIdAsync(model.Id);
+                            if (tours != null)
+                            {
+                                ModelState.AddModelError("", $"Destination is using in tours: {string.Join(", ", tours)}. Please remove this destination from these tours first");
+                                return View("Edit", model);
+                            }
                         }
                     }
-                    else // if user want to deactivate destination then check if destination is used in future tours
+                    else
                     {
-                        IEnumerable<string> tours = await destinationDAL.FindFutureToursByDestinationIdAsync(model.Id);
-                        if (tours != null)
-                        {
-                            ModelState.AddModelError("", $"Destination is using in tours: {string.Join(", ", tours)}. Please remove this destination from these tours first");
-                            return View("Edit", model);
-                        }
+                        ModelState.AddModelError("", "Can't upload image");
                     }
                 }
-                else
-                {
-                    ModelState.AddModelError("", "Can't upload image");
-                }
+                return View("Edit", model);
             }
-            return View("Edit", model);
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                throw;
+            }            
         }
 
         [Authorize(Policy = "Admin")]
@@ -204,39 +247,56 @@ namespace ZTourist.Areas.Company.Controllers
         [ExportModelState]
         public async Task<IActionResult> Delete(string id)
         {
-            if (string.IsNullOrWhiteSpace(id) || !await destinationDAL.IsExistedDestinationIdAsync(id))
+            try
             {
-                return NotFound();
-            }
-            IEnumerable<string> tours = await destinationDAL.GetToursByDestinationIdAsync(id);
-            if (tours == null)
-            {
-                if (!await destinationDAL.DeleteDestinationByIdAsync(id))
+                if (string.IsNullOrWhiteSpace(id) || !await destinationDAL.IsExistedDestinationIdAsync(id))
                 {
-                    ModelState.AddModelError("", $"Delete destination failed");
+                    return NotFound();
                 }
-                else
+                IEnumerable<string> tours = await destinationDAL.GetToursByDestinationIdAsync(id);
+                if (tours == null)
                 {
-                    return RedirectToAction(nameof(Index));
+                    if (!await destinationDAL.DeleteDestinationByIdAsync(id))
+                    {
+                        ModelState.AddModelError("", $"Delete destination failed");
+                    }
+                    else
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
                 }
+                else // if destination is used
+                {
+                    ModelState.AddModelError("", $"Destination is used in tours: {string.Join(",", tours)}. Remove this destination from these tours before delete");
+                }
+                return RedirectToAction(nameof(Details), new { Id = id });
             }
-            else // if destination is used
+            catch (Exception ex)
             {
-                ModelState.AddModelError("", $"Destination is used in tours: {string.Join(",", tours)}. Remove this destination from these tours before delete");
-            }
-            return RedirectToAction(nameof(Details), new { Id = id });
+                logger.LogError(ex.Message);
+                throw;
+            }            
         }
 
         public async Task<IActionResult> IsExistedId(string id)
         {
-            if (!string.IsNullOrWhiteSpace(id))
+            try
             {
-                if (await destinationDAL.IsExistedDestinationIdAsync(id))
+                if (!string.IsNullOrWhiteSpace(id))
                 {
-                    return Json($"Destination ID '{id}' is already existed");
+                    if (await destinationDAL.IsExistedDestinationIdAsync(id))
+                    {
+                        return Json($"Destination ID '{id}' is already existed");
+                    }
                 }
+                return Json(true);
             }
-            return Json(true);
+            catch (Exception ex)
+            {
+                logger.LogError(ex.Message);
+                throw;
+            }
+            
         }
     }
 }

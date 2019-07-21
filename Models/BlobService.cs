@@ -18,18 +18,26 @@ namespace ZTourist.Models
 
         public async Task<string> UploadFile(string containerName, string fileName, IFormFile file)
         {
-            CloudStorageAccount storageAccount;
-            if (CloudStorageAccount.TryParse(connectionStr, out storageAccount))
+            try
             {
-                CloudBlobClient client = storageAccount.CreateCloudBlobClient();
-                CloudBlobContainer container = client.GetContainerReference(containerName);
-                await container.CreateIfNotExistsAsync();
-                await container.SetPermissionsAsync(new BlobContainerPermissions { PublicAccess = BlobContainerPublicAccessType.Blob });
-                var blob = container.GetBlockBlobReference(fileName.ToLower());
-                await blob.UploadFromStreamAsync(file.OpenReadStream());
-                return blob.Uri.AbsoluteUri +"?v=" + DateTime.Now;
+                CloudStorageAccount storageAccount;
+                if (CloudStorageAccount.TryParse(connectionStr, out storageAccount))
+                {
+                    CloudBlobClient client = storageAccount.CreateCloudBlobClient();
+                    CloudBlobContainer container = client.GetContainerReference(containerName);
+                    await container.CreateIfNotExistsAsync();
+                    await container.SetPermissionsAsync(new BlobContainerPermissions { PublicAccess = BlobContainerPublicAccessType.Blob });
+                    var blob = container.GetBlockBlobReference(fileName.ToLower());
+                    await blob.UploadFromStreamAsync(file.OpenReadStream());
+                    return blob.Uri.AbsoluteUri + "?v=" + DateTime.Now;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
             }
             return null;
         }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -10,10 +11,12 @@ namespace ZTourist.Models
     public class OrderDAL
     {
         private readonly string connectionStr;
+        private readonly ILogger logger;
 
-        public OrderDAL(IConfiguration configuration)
+        public OrderDAL(IConfiguration configuration, ILogger logger)
         {
             this.connectionStr = configuration["Data:ZTouristDB:ConnectionString"];
+            this.logger = logger;
         }
 
         #region OrderDAL
@@ -71,14 +74,14 @@ namespace ZTourist.Models
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine(ex.Message);
+                                logger.LogError(ex.Message);
                                 try
                                 {
                                     transaction.Rollback(); //if an exception is throw, roll back transaction
                                 }
                                 catch (Exception rollbackEx)
                                 {
-                                    Console.WriteLine(rollbackEx.Message);
+                                    logger.LogError(rollbackEx.Message);
                                 }
                             }
                         }

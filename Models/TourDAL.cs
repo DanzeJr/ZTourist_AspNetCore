@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,10 +13,12 @@ namespace ZTourist.Models
     public class TourDAL
     {
         private readonly string connectionStr;
+        private readonly ILogger logger;
 
-        public TourDAL(IConfiguration configuration)
+        public TourDAL(IConfiguration configuration, ILogger logger)
         {
             this.connectionStr = configuration["Data:ZTouristDB:ConnectionString"];
+            this.logger = logger;
         }
 
         #region TourDAL
@@ -837,14 +840,14 @@ namespace ZTourist.Models
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine(ex.Message);
+                                logger.LogError(ex.Message);
                                 try
                                 {
                                     transaction.Rollback(); //if an exception is throw, roll back transaction
                                 }
                                 catch (Exception rollbackEx)
                                 {
-                                    Console.WriteLine(rollbackEx.Message);
+                                    logger.LogError(rollbackEx.Message);
                                 }
                             }
                         }
@@ -959,14 +962,14 @@ namespace ZTourist.Models
                             }
                             catch (Exception ex)
                             {
-                                Console.WriteLine(ex.Message);
+                                logger.LogError(ex.Message);
                                 try
                                 {
                                     transaction.Rollback(); //if an exception is throw, roll back transaction
                                 }
                                 catch (Exception rollbackEx)
                                 {
-                                    Console.WriteLine(rollbackEx.Message);
+                                    logger.LogError(rollbackEx.Message);
                                 }
                             }
                         }
